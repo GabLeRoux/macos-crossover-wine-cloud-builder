@@ -5,15 +5,14 @@ set -ex
 which cmake
 cmake --version
 
-CROSS_OVER_VERSION=20.0.2
+# Note: llvm and clang are not provided anymore in versions higher than 20.0.0
+CROSS_OVER_VERSION=20.0.0
 CROSS_OVER_SOURCE_URL=https://media.codeweavers.com/pub/crossover/source/crossover-sources-${CROSS_OVER_VERSION}.tar.gz
 
 brew install \
     freetype \
-    bison \
-    llvm
+    bison
 
-export PATH="$(brew --prefix llvm)/bin:$PATH"
 export PATH="$(brew --prefix bison)/:$PATH"
 
 wget -O crossover.tar.gz ${CROSS_OVER_SOURCE_URL}
@@ -24,29 +23,29 @@ cd sources
 
 echo "Compiling LLVM..."
 
-#cd clang/llvm
-#mkdir build
-#cd buildc
-#cmake ../
-#make
-#cd bin
-#export PATH="$(pwd):$PATH"
-#cd ../../../..
-#
-#echo "LLVM Compile done"
-#
-#echo "Compiling Clang..."
-#
-#cd clang/clang
-#mkdir build
-#cd build
-#cmake ../
-#make
-#cd bin
-#export PATH="$(pwd):$PATH"
-#cd ../../../..
-#
-#echo "CLang compile done"
+cd clang/llvm
+mkdir build
+cd buildc
+cmake ../
+make
+cd bin
+export PATH="$(pwd):$PATH"
+cd ../../../..
+
+echo "LLVM Compile done"
+
+echo "Compiling Clang..."
+
+cd clang/clang
+mkdir build
+cd build
+cmake ../
+make
+cd bin
+export PATH="$(pwd):$PATH"
+cd ../../../..
+
+echo "CLang compile done"
 
 echo "Compiling Wine..."
 
