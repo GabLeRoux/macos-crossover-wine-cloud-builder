@@ -1,5 +1,7 @@
 # MacOS CrossOver FOSS built from the Cloud
 
+[![Build Status](https://travis-ci.com/GabLeRoux/macos-crossover-cloud-build.svg?branch=main)](https://travis-ci.com/GabLeRoux/macos-crossover-cloud-build)
+
 I found some gists explaining how to build CrossOver on MacOS in some gists. I asked myself why don't we use the cloud and open source to build this? Here it is.
 
 ## Where to download builds
