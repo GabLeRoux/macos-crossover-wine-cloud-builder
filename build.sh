@@ -18,7 +18,10 @@ brew install \
 which bison
 
 wget -O crossover.tar.gz ${CROSS_OVER_SOURCE_URL}
-cp distversion.h wine/include/distversion.h
+tar xf crossover.tar.gz
+
+cp distversion.h sources/wine/include/distversion.h
+cd sources
 
 echo "Compiling LLVM..."
 
