@@ -13,10 +13,8 @@ brew install \
     bison \
     llvm
 
-export PATH=$(brew --prefix llvm)/bin
-export PATH=$(brew --prefix bison)/
-
-which bison
+export PATH="$(brew --prefix llvm)/bin:$PATH"
+export PATH="$(brew --prefix bison)/:$PATH"
 
 wget -O crossover.tar.gz ${CROSS_OVER_SOURCE_URL}
 tar xf crossover.tar.gz
