@@ -17,7 +17,7 @@ brew install \
 
 which bison
 
-wget -O crossover.tar.gz ${CROSS_VER_SOURCE_URL}
+wget -O crossover.tar.gz ${CROSS_OVER_SOURCE_URL}
 cp distversion.h wine/include/distversion.h
 
 echo "Compiling LLVM..."
@@ -52,9 +52,9 @@ cd wine
 export PATH="$(pwd):$PATH"
 export MACOSX_DEPLOYMENT_TARGET=10.14
 
-export CC="clang" 
-export CXX="clang++" 
-export MACOSX_DEPLOYMENT_TARGET=10.14 
+export CC="clang"
+export CXX="clang++"
+export MACOSX_DEPLOYMENT_TARGET=10.14
 
 ./configure \
     --enable-win32on64 \
