@@ -7,13 +7,14 @@ cmake --version
 
 CROSS_OVER_VERSION=20.0.2
 CROSS_OVER_SOURCE_URL=https://media.codeweavers.com/pub/crossover/source/crossover-sources-${CROSS_OVER_VERSION}.tar.gz
-BISON_VERSION=3.7.4
-BISON_PATH=/usr/local/Cellar/bison/$BISON_VERSION/
-export PATH="${BISON_PATH}:$PATH"
 
 brew install \
     freetype \
-    bison
+    bison \
+    llvm
+
+export PATH=$(brew --prefix llvm)/bin
+export PATH=$(brew --prefix bison)/
 
 which bison
 
