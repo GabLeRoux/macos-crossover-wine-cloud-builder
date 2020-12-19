@@ -2,6 +2,9 @@
 
 set -ex
 
+which cmake
+cmake --version
+
 CROSS_OVER_VERSION=20.0.2
 CROSS_OVER_SOURCE_URL=https://media.codeweavers.com/pub/crossover/source/crossover-sources-${CROSS_OVER_VERSION}.tar.gz
 BISON_VERSION=3.7.4
@@ -10,8 +13,7 @@ export PATH="${BISON_PATH}:$PATH"
 
 brew install \
     freetype \
-    bison \
-    cmake \
+    bison
 
 which bison
 

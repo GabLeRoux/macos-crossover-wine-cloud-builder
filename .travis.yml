@@ -1,0 +1,3 @@
+os: osxjobs:
+script:
+  - ./build.sh

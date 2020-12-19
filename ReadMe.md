@@ -4,13 +4,12 @@ I found some gists explaining how to build CrossOver on MacOS in some gists. I a
 
 ## Where to download builds
 
-There is probably something tricky in providing the builds. I'm not sure if it can be distributed freely. If you know the answer, let me know. One might use these build scripts, connect through ssh using CircleCI using [Debugging with SSH
-- CircleCI](https://circleci.com/docs/2.0/ssh-access-jobs/)
+There is probably something tricky in providing the builds. I'm not sure if it can be distributed freely. If you know the answer, let me know.
 
 ## How this works?
 
-1. See [Hello World On MacOS - CircleCI](https://circleci.com/docs/2.0/hello-world-macos/)
-2. See [`.circleci/config.yml`](./.circleci/config.yml)
+1. See [Travis - The macOS Build Environment](https://docs.travis-ci.com/user/reference/osx/)
+2. See [`.travis.yml`]
 3. See [`build.sh`](./build.sh)
 
 ## Inspiration
