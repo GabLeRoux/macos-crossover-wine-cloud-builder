@@ -25,29 +25,29 @@ cd sources
 
 echo "Compiling LLVM..."
 
-cd clang/llvm
-mkdir build
-cd build
-cmake ../
-make
-cd bin
-export PATH="$(pwd):$PATH"
-cd ../../../..
-
-echo "LLVM Compile done"
-
-echo "Compiling Clang..."
-
-cd clang/clang
-mkdir build
-cd build
-cmake ../
-make
-cd bin
-export PATH="$(pwd):$PATH"
-cd ../../../..
-
-echo "CLang compile done"
+#cd clang/llvm
+#mkdir build
+#cd buildc
+#cmake ../
+#make
+#cd bin
+#export PATH="$(pwd):$PATH"
+#cd ../../../..
+#
+#echo "LLVM Compile done"
+#
+#echo "Compiling Clang..."
+#
+#cd clang/clang
+#mkdir build
+#cd build
+#cmake ../
+#make
+#cd bin
+#export PATH="$(pwd):$PATH"
+#cd ../../../..
+#
+#echo "CLang compile done"
 
 echo "Compiling Wine..."
 
