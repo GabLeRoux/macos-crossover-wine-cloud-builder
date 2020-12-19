@@ -52,6 +52,7 @@ cd wine
 export PATH="$(pwd):$PATH"
 export MACOSX_DEPLOYMENT_TARGET=10.14
 
+export CROSSCFLAGS="-g -O2 -fcommon"
 export CC="clang"
 export CXX="clang++"
 export MACOSX_DEPLOYMENT_TARGET=10.14
@@ -62,8 +63,5 @@ export MACOSX_DEPLOYMENT_TARGET=10.14
     --without-x \
     --without-vulkan \
     --disable-mscms
-
-# https://gist.github.com/Alex4386/4cce275760367e9f5e90e2553d655309#gistcomment-3556467
-# CROSSCFLAGS="-g -O2 -fcommon" CC="clang" CXX="clang++" MACOSX_DEPLOYMENT_TARGET=10.14 ./configure --enable-win32on64 -disable-winedbg --without-x --without-vulkan --disable-mscms
 
 make
