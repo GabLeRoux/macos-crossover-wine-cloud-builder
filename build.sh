@@ -25,7 +25,7 @@ echo "Compiling LLVM..."
 
 cd clang/llvm
 mkdir build
-cd buildc
+cd build
 cmake ../
 make
 cd bin
