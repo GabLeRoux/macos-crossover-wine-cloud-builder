@@ -9,11 +9,15 @@ cmake --version
 CROSS_OVER_VERSION=20.0.0
 CROSS_OVER_SOURCE_URL=https://media.codeweavers.com/pub/crossover/source/crossover-sources-${CROSS_OVER_VERSION}.tar.gz
 
-brew install \
+brew install --upgrade \
     freetype \
     bison
+    
 
+brew link bison --force
 export PATH="$(brew --prefix bison)/:$PATH"
+which bison
+bison --version
 
 wget -O crossover.tar.gz ${CROSS_OVER_SOURCE_URL}
 tar xf crossover.tar.gz
