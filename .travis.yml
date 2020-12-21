@@ -1,3 +1,0 @@
-os: osx
-script:
-  - ./build.sh
