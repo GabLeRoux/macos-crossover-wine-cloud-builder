@@ -10,16 +10,12 @@ CROSS_OVER_VERSION=20.0.0
 CROSS_OVER_SOURCE_URL=https://media.codeweavers.com/pub/crossover/source/crossover-sources-${CROSS_OVER_VERSION}.tar.gz
 
 brew --version
-brew update
-brew --version
 
 brew install \
     freetype \
     bison
     
-brew link bison --force
-export PATH="$(brew --prefix bison)/:$PATH"
-which bison
+export PATH="$(brew --prefix bison)/bin:$PATH"
 bison --version
 
 wget -O crossover.tar.gz ${CROSS_OVER_SOURCE_URL}
