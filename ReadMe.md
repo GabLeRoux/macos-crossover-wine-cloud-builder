@@ -7,7 +7,7 @@ I found some gists explaining how to build CrossOver on MacOS in some gists. I a
 ## How this works?
 
 1. See [Travis - The macOS Build Environment](https://docs.travis-ci.com/user/reference/osx/)
-2. See [`.travis.yml`](./travis.yml)
+2. See [`.travis.yml`](./.travis.yml)
 3. See [`build.sh`](./build.sh)
 
 ## Inspiration
