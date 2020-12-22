@@ -1,6 +1,6 @@
 # MacOS CrossOver FOSS built from the Cloud
 
-Let's build FOSS CrossOver for MacOS in the cloud! I found [some gists][crossover-gist] and I asked myself why don't we use the cloud and the free open source builders to build this? Here it is.
+Let's build [FOSS CrossOver][foss-crossover] for macOS in the cloud! I found [some gists][crossover-gist] and I asked myself why don't we use the cloud and the free open source builders to build this? Here it is.
 
 ## How this works?
 
@@ -10,15 +10,15 @@ Let's build FOSS CrossOver for MacOS in the cloud! I found [some gists][crossove
 
 ## Inspiration
 
-I learned about [Free and Open Source Software Code for CrossOver](https://www.codeweavers.com/crossover/source) and found [this gist][crossover-gist].
+I learned about [Free and Open Source Software Code for CrossOver][foss-crossover] and found [this gist][crossover-gist].
 
 ## Where to download builds?
 
 See https://github.com/GabLeRoux/macos-crossover-cloud-build/issues/2
 
-## Can I run `./build.sh` locally?
+## Can I run [`build.sh`](./build.sh) locally?
 
-It will only work if you're on MacOS, but yes. Clone the project, read the script first, then feel free to do it 👍. This is an [MIT](LICENSE.md) repo. If you break something on your system doing so, it's your fault 😉
+It will only work if you're on macOS, but yes. Clone the project, read the script first, then feel free to do it 👍. This is an [MIT](LICENSE.md) repo. If you break something on your system doing so, it's your fault 😉
 
 ## Can I contribute?
 
@@ -29,3 +29,4 @@ Definitely. Feel free to send PRs 🚀
 [MIT](LICENSE.md) © [Gabriel Le Breton](https://gableroux.com)
 
 [crossover-gist]: https://gist.github.com/sarimarton/471e9ff8046cc746f6ecb8340f942647
+[foss-crossover]: https://www.codeweavers.com/crossover/source
