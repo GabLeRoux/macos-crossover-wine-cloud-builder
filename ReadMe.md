@@ -10,6 +10,10 @@ Let's build [FOSS CrossOver][foss-crossover] for macOS in the cloud! I found [so
 2. See [`.github/workflows/build.yml`](./.github/workflows/build.yml)
 3. See [`build.sh`](./build.sh)
 
+## Is it working?
+
+Not for me, see [#6](https://github.com/GabLeRoux/macos-crossover-cloud-build/issues/6)
+
 ## Inspiration
 
 I learned about [Free and Open Source Software Code for CrossOver][foss-crossover] and found [this gist][crossover-gist].
