@@ -13,7 +13,8 @@ brew --version
 
 brew install \
     freetype \
-    bison
+    bison \
+    mingw-w64
     
 export PATH="$(brew --prefix bison)/bin:$PATH"
 bison --version
