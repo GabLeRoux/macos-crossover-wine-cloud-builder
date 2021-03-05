@@ -3,7 +3,7 @@ on: [push]
 jobs:
   build:
     name: Run build script on MacOS
-    runs-on: macos-11.0
+    runs-on: macos-latest
 
     steps:
       - name: Checkout
