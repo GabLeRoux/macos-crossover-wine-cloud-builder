@@ -5,6 +5,7 @@ set -ex
 # Note: llvm and clang are provided in version 20.0.4 again
 CROSS_OVER_VERSION=20.0.4
 CROSS_OVER_SOURCE_URL=https://media.codeweavers.com/pub/crossover/source/crossover-sources-${CROSS_OVER_VERSION}.tar.gz
+CROSS_OVER_LOCAL_FILE=crossover.tar.gz
 
 brew --version
 
@@ -21,7 +22,10 @@ cmake --version
 export PATH="$(brew --prefix bison)/bin:$PATH"
 bison --version
 
-wget -O crossover.tar.gz ${CROSS_OVER_SOURCE_URL}
+if [ ! -f "${CROSS_OVER_LOCAL_FILE}" ]; then
+    wget -O ${CROSS_OVER_LOCAL_FILE} ${CROSS_OVER_SOURCE_URL}
+fi
+
 tar xf crossover.tar.gz
 
 cp distversion.h sources/wine/include/distversion.h
