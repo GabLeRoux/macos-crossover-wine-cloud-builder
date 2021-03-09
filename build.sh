@@ -28,7 +28,11 @@ fi
 
 tar xf crossover.tar.gz
 
-cp distversion.h sources/wine/include/distversion.h
+
+SCRIPT_DIR="`dirname \"${BASH_SOURCE}\"`"
+
+cp ${SCRIPT_DIR}/distversion.h sources/wine/include/distversion.h
+
 cd sources
 
 echo "Compiling LLVM..."
