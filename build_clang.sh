@@ -6,8 +6,7 @@ export PATH="$(brew --prefix bison)/bin:${PATH}"
 export PATH="$(pwd)/sources/clang/llvm/build/bin:${PATH}"
 
 echo "Compiling Clang..."
-pushd
-cd sources/clang/clang
+pushd sources/clang/clang
 mkdir build
 cd build
 cmake ../
