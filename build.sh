@@ -28,7 +28,6 @@ fi
 
 tar xf crossover.tar.gz
 
-
 SCRIPT_DIR="`dirname \"${BASH_SOURCE}\"`"
 
 cp ${SCRIPT_DIR}/distversion.h sources/wine/include/distversion.h
