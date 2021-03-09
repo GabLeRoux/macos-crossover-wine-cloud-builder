@@ -6,17 +6,18 @@ set -ex
 CROSS_OVER_VERSION=20.0.4
 CROSS_OVER_SOURCE_URL=https://media.codeweavers.com/pub/crossover/source/crossover-sources-${CROSS_OVER_VERSION}.tar.gz
 
+brew --version
+
+brew install  \
+    cmake     \
+    wget      \
+    freetype  \
+    bison     \
+    mingw-w64
 
 which cmake
 cmake --version
 
-brew --version
-
-brew install \
-    freetype \
-    bison \
-    mingw-w64
-    
 export PATH="$(brew --prefix bison)/bin:$PATH"
 bison --version
 
