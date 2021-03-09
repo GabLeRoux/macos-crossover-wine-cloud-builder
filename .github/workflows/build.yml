@@ -9,8 +9,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
-      - name: Run build script
-        run: ./build.sh
+      - name: Prepare
+        run: ./prepare_env.sh
+
+      - name: Get Source
+        run: ./get_source.sh
+
+      - name: Build LLVM
+        run: ./build_llvm.sh
+
+      - name: Build Clang
+        run: ./build_clang.sh
+
+      - name: Build Wine
+        run: ./build_wine.sh
 
       - uses: actions/upload-artifact@v2
         with:
