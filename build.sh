@@ -41,7 +41,7 @@ cd clang/llvm
 mkdir build
 cd build
 cmake ../
-make
+make -j
 cd bin
 export PATH="$(pwd):$PATH"
 cd ../../../..
@@ -54,7 +54,7 @@ cd clang/clang
 mkdir build
 cd build
 cmake ../
-make
+make -j
 cd bin
 export PATH="$(pwd):$PATH"
 cd ../../../..
@@ -85,4 +85,6 @@ export LDFLAGS="-Wl,-headerpad_max_install_names,-rpath,@loader_path/../,-rpath,
     --without-vulkan \
     --disable-mscms
 
-make
+make -j
+
+echo "Wine compile done"
