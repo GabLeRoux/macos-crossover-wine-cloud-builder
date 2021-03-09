@@ -65,12 +65,11 @@ echo "Compiling Wine..."
 
 cd wine
 export PATH="$(pwd):$PATH"
-export MACOSX_DEPLOYMENT_TARGET=10.14
+export MACOSX_DEPLOYMENT_TARGET=10.15
 
 export CROSSCFLAGS="-g -O2 -fcommon"
 export CC="clang"
 export CXX="clang++"
-export MACOSX_DEPLOYMENT_TARGET=10.14
 
 # Xcode12 by default enables '-Werror,-Wimplicit-function-declaration' (49917738) 
 # this causes wine(64) builds to fail so needs to be disabled.
