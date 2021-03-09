@@ -80,7 +80,7 @@ export LDFLAGS="-Wl,-headerpad_max_install_names,-rpath,@loader_path/../,-rpath,
 
 ./configure \
     --enable-win32on64 \
-    -disable-winedbg \
+    --disable-winedbg \
     --without-x \
     --without-vulkan \
     --disable-mscms
