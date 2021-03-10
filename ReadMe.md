@@ -36,3 +36,7 @@ Definitely. Feel free to send PRs 🚀
 
 [crossover-gist]: https://gist.github.com/sarimarton/471e9ff8046cc746f6ecb8340f942647
 [foss-crossover]: https://www.codeweavers.com/crossover/source
+
+
+# References
+See https://www.winehq.org/pipermail/wine-devel/2019-December/156602.html for some technical details.
