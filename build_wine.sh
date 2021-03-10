@@ -16,7 +16,7 @@ ${CXX} --version
 
 echo "Compiling Wine..."
 
-cd wine
+pushd sources/wine
 export PATH="$(pwd):$PATH"
 export MACOSX_DEPLOYMENT_TARGET=10.14
 
@@ -35,6 +35,7 @@ export LDFLAGS="-Wl,-headerpad_max_install_names,-rpath,@loader_path/../,-rpath,
     --without-vulkan \
     --disable-mscms
 
-make -j
+make -j ${PARALLEL_JOBS}
+popd
 
 echo "Wine compile done"
