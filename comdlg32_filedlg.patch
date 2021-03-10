@@ -1,0 +1,21 @@
+--- filedlg.orig.c	2021-03-10 19:43:20.000000000 +0100
++++ filedlg.c	2021-03-10 19:43:42.000000000 +0100
+@@ -45,15 +45,15 @@
+  *
+  */
+ 
++#define COBJMACROS
++#define NONAMELESSUNION
++
+ #include <ctype.h>
+ #include <stdlib.h>
+ #include <stdarg.h>
+ #include <stdio.h>
+ #include <string.h>
+ 
+-#define COBJMACROS
+-#define NONAMELESSUNION
+-
+ #include "windef.h"
+ #include "winbase.h"
+ #include "winternl.h"
