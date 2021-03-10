@@ -9,9 +9,8 @@ CROSS_OVER_LOCAL_FILE=crossover.tar.gz
 
 if [ ! -f "${CROSS_OVER_LOCAL_FILE}" ]; then
     wget -O ${CROSS_OVER_LOCAL_FILE} ${CROSS_OVER_SOURCE_URL}
+    tar xf crossover.tar.gz
 fi
-
-tar xf crossover.tar.gz
 
 SCRIPT_DIR="`dirname \"${BASH_SOURCE}\"`"
 
