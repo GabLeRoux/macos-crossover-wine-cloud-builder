@@ -1,0 +1,16 @@
+--- propsheet.orig.c	2021-03-10 18:04:10.000000000 +0100
++++ propsheet.c	2021-03-10 18:04:20.000000000 +0100
+@@ -49,11 +49,11 @@
+  *     o PSP_USEREFPARENT
+  */
+ 
++#define NONAMELESSUNION
++
+ #include <stdarg.h>
+ #include <string.h>
+ 
+-#define NONAMELESSUNION
+-
+ #include "windef.h"
+ #include "winnt.h"
+ #include "winbase.h"
