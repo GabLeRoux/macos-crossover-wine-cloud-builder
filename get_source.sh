@@ -14,7 +14,3 @@ if [ ! -f "${CROSS_OVER_LOCAL_FILE}" ]; then
     wget -O ${CROSS_OVER_LOCAL_FILE} ${CROSS_OVER_SOURCE_URL}
     tar xf crossover.tar.gz
 fi
-
-SCRIPT_DIR="`dirname \"${BASH_SOURCE}\"`"
-
-cp ${SCRIPT_DIR}/distversion.h sources/wine/include/distversion.h

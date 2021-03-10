@@ -8,6 +8,7 @@ set -ex
 
 ./prepare_env.sh
 ./get_source.sh
+./apply_patches.sh
 ./build_llvm.sh
 ./build_clang.sh
 ./build_wine.sh

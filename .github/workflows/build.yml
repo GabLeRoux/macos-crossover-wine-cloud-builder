@@ -19,6 +19,9 @@ jobs:
       - name: Get Source
         run: ./get_source.sh
 
+      - name: Apply Patches
+        run: ./apply_patches.sh
+
       - name: Build LLVM
         run: ./build_llvm.sh
 
