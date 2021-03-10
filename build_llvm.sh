@@ -6,7 +6,7 @@ export PATH="$(brew --prefix bison)/bin:${PATH}"
 
 echo "Compiling LLVM..."
 pushd sources/clang/llvm
-mkdir build
+mkdir -p build
 cd build
 cmake ../
 make -j

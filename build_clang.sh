@@ -7,7 +7,7 @@ export PATH="$(pwd)/sources/clang/llvm/build/bin:${PATH}"
 
 echo "Compiling Clang..."
 pushd sources/clang/clang
-mkdir build
+mkdir -p build
 cd build
 cmake ../
 make -j
