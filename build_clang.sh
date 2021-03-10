@@ -10,7 +10,7 @@ pushd sources/clang/clang
 mkdir -p build
 cd build
 cmake ../
-make -j
+make -j ${PARALLEL_JOBS}
 popd
 
 echo "CLang compile done"

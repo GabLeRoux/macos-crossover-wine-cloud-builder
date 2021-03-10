@@ -18,7 +18,10 @@ echo "Compiling Wine..."
 
 pushd sources/wine
 export PATH="$(pwd):$PATH"
-export MACOSX_DEPLOYMENT_TARGET=10.14
+
+if [ -z "$MACOSX_DEPLOYMENT_TARGET" ]; then
+    export MACOSX_DEPLOYMENT_TARGET=10.15
+fi
 
 export CROSSCFLAGS="-g -O2 -fcommon"
 

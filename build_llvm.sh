@@ -9,7 +9,7 @@ pushd sources/clang/llvm
 mkdir -p build
 cd build
 cmake ../
-make -j
+make -j ${PARALLEL_JOBS}
 popd
 
 echo "LLVM Compile done"
