@@ -28,7 +28,7 @@ export CROSSCFLAGS="-g -O2 -fcommon"
 # Xcode12 by default enables '-Werror,-Wimplicit-function-declaration' (49917738) 
 # this causes wine(64) builds to fail so needs to be disabled.
 # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes
-export CFLAGS="-Wno-implicit-function-declaration"
+export CFLAGS="-Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format -Wno-pointer-to-int-cast"
 export LDFLAGS="-Wl,-headerpad_max_install_names,-rpath,@loader_path/../,-rpath,/opt/X11/lib"
 
 ./configure \
