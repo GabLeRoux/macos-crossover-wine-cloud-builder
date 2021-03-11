@@ -8,7 +8,7 @@ Let's build [FOSS CrossOver][foss-crossover] for macOS in the cloud! I found [so
 
 1. See [Github Actions](https://github.com/features/actions)
 2. See [`.github/workflows/build.yml`](./.github/workflows/build.yml)
-3. See [`build.sh`](./build.sh)
+3. See [`build_local.sh`](./build_local.sh)
 
 ## Is it working?
 
@@ -22,9 +22,14 @@ I learned about [Free and Open Source Software Code for CrossOver][foss-crossove
 
 See [#2](https://github.com/GabLeRoux/macos-crossover-cloud-build/issues/2)
 
-## Can I run [`build.sh`](./build.sh) locally?
+## Can I run the build locally?
 
-It will only work if you're on macOS, but yes. Clone the project, read the script first, then feel free to do it 👍. This is an [MIT](LICENSE.md) repo. If you break something on your system doing so, it's your fault 😉
+It will only work if you're on macOS, but yes.
+Clone the project, read the scripts first, then feel free to run [`build_local.sh`](./build_local.sh) 👍.
+The script is a copy of the steps done in the github action in [`.github/workflows/build.yml`](./.github/workflows/build.yml).
+It contains some variables to allow for customizations.
+
+This is an [MIT](LICENSE.md) repo. If you break something on your system doing so, it's your fault 😉
 
 ## Can I contribute?
 
