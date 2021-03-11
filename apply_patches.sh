@@ -40,3 +40,12 @@ patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_40_Ma
 patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_41_Makefile.patch
 patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_42_Makefile.patch
 patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_43_Makefile.patch
+
+patch sources/wine/dlls/dsound/Makefile.in < ${SCRIPT_DIR}/patches/dsound_Makefile.patch
+
+patch sources/wine/dlls/dplayx/dplay.c < ${SCRIPT_DIR}/patches/dplayx_dplay.patch
+patch sources/wine/dlls/dplayx/dplayx_global.c < ${SCRIPT_DIR}/patches/dplayx_dplayx_global.patch
+patch sources/wine/dlls/dplayx/dplobby.c < ${SCRIPT_DIR}/patches/dplayx_dplobby.patch
+patch sources/wine/dlls/dplayx/name_server.c < ${SCRIPT_DIR}/patches/dplayx_name_server.patch
+
+patch sources/wine/dlls/gdiplus/Makefile.in < ${SCRIPT_DIR}/patches/gdiplus_Makefile.patch

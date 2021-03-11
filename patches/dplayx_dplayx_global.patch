@@ -1,0 +1,16 @@
+--- dplayx_global.orig.c	2021-03-11 09:48:10.000000000 +0100
++++ dplayx_global.c	2021-03-11 09:48:39.000000000 +0100
+@@ -29,11 +29,11 @@
+  *
+  */
+ 
++#define NONAMELESSUNION
++
+ #include <stdarg.h>
+ #include <string.h>
+ 
+-#define NONAMELESSUNION
+-
+ #include "wine/debug.h"
+ #include "windef.h"
+ #include "winbase.h"
