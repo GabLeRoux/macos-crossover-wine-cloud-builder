@@ -7,6 +7,7 @@ brew --version
 brew install  \
     cmake     \
     wget      \
+    ninja     \
     freetype  \
     bison     \
     mingw-w64

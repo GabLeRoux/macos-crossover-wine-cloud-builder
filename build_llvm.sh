@@ -8,8 +8,8 @@ echo "Compiling LLVM..."
 pushd sources/clang/llvm
 mkdir -p build
 cd build
-cmake ../
-make -j ${PARALLEL_JOBS}
+cmake -G Ninja ../
+Ninja
 popd
 
 echo "LLVM Compile done"

@@ -9,8 +9,8 @@ echo "Compiling Clang..."
 pushd sources/clang/clang
 mkdir -p build
 cd build
-cmake ../
-make -j ${PARALLEL_JOBS}
+cmake -G Ninja ../
+Ninja
 popd
 
 echo "CLang compile done"
