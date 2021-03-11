@@ -1,0 +1,27 @@
+--- thread.orig.c	2021-03-11 10:18:43.000000000 +0100
++++ thread.c	2021-03-11 10:21:35.000000000 +0100
+@@ -18,13 +18,14 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
+  */
+ 
++#define NONAMELESSUNION
++
+ #include <stdarg.h>
+ #include <string.h>
+ #include <limits.h>
+ 
+ #include "ntstatus.h"
+ #define WIN32_NO_STATUS
+-#define NONAMELESSUNION
+ #include "windef.h"
+ #include "winbase.h"
+ #include "winnls.h"
+@@ -877,7 +878,7 @@
+ 
+ static void init_fiber_context( struct fiber_data *fiber )
+ {
+-#ifdef __i386__
++#if (defined(__i386__) || defined(__i386_on_x86_64__))
+     fiber->context.Esp = (ULONG_PTR)fiber->stack_base - 4;
+     fiber->context.Eip = (ULONG_PTR)start_fiber;
+ #elif defined(__x86_64__)

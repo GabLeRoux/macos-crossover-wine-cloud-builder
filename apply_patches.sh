@@ -49,3 +49,11 @@ patch sources/wine/dlls/dplayx/dplobby.c < ${SCRIPT_DIR}/patches/dplayx_dplobby.
 patch sources/wine/dlls/dplayx/name_server.c < ${SCRIPT_DIR}/patches/dplayx_name_server.patch
 
 patch sources/wine/dlls/gdiplus/Makefile.in < ${SCRIPT_DIR}/patches/gdiplus_Makefile.patch
+
+patch sources/wine/dlls/kernelbase/console.c < ${SCRIPT_DIR}/patches/kernelbase_console.patch
+patch sources/wine/dlls/kernelbase/memory.c < ${SCRIPT_DIR}/patches/kernelbase_memory.patch
+patch sources/wine/dlls/kernelbase/sync.c < ${SCRIPT_DIR}/patches/kernelbase_sync.patch
+patch sources/wine/dlls/kernelbase/thread.c < ${SCRIPT_DIR}/patches/kernelbase_thread.patch
+patch sources/wine/dlls/kernelbase/version.c < ${SCRIPT_DIR}/patches/kernelbase_version.patch
+patch sources/wine/dlls/kernelbase/debug.c < ${SCRIPT_DIR}/patches/kernelbase_debug.patch
+patch sources/wine/dlls/kernelbase/loader.c < ${SCRIPT_DIR}/patches/kernelbase_loader.patch

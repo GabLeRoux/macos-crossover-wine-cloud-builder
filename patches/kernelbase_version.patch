@@ -1,0 +1,20 @@
+--- version.orig.c	2021-03-11 10:22:43.000000000 +0100
++++ version.c	2021-03-11 10:22:54.000000000 +0100
+@@ -22,14 +22,15 @@
+  *
+  */
+ 
++#define NONAMELESSUNION
++#define NONAMELESSSTRUCT
++
+ #include <stdarg.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <stdio.h>
+ #include <sys/types.h>
+ 
+-#define NONAMELESSUNION
+-#define NONAMELESSSTRUCT
+ #include "windef.h"
+ #include "winbase.h"
+ #include "winver.h"
