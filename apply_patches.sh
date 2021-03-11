@@ -62,3 +62,12 @@ patch sources/wine/dlls/kernelbase/Makefile.in < ${SCRIPT_DIR}/patches/kernelbas
 patch sources/wine/dlls/mfplat/main.c < ${SCRIPT_DIR}/patches/mfplat_main.patch
 
 patch sources/wine/dlls/hal/hal.c < ${SCRIPT_DIR}/patches/hal_hal.patch
+
+patch sources/wine/dlls/msvcp70/Makefile.in < ${SCRIPT_DIR}/patches/msvcp70_Makefile.patch
+patch sources/wine/dlls/msvcp71/Makefile.in < ${SCRIPT_DIR}/patches/msvcp71_Makefile.patch
+patch sources/wine/dlls/msvcp80/Makefile.in < ${SCRIPT_DIR}/patches/msvcp80_Makefile.patch
+patch sources/wine/dlls/msvcp90/Makefile.in < ${SCRIPT_DIR}/patches/msvcp90_Makefile.patch
+patch sources/wine/dlls/msvcp100/Makefile.in < ${SCRIPT_DIR}/patches/msvcp100_Makefile.patch
+patch sources/wine/dlls/msvcp110/Makefile.in < ${SCRIPT_DIR}/patches/msvcp110_Makefile.patch
+patch sources/wine/dlls/msvcp120/Makefile.in < ${SCRIPT_DIR}/patches/msvcp120_Makefile.patch
+patch sources/wine/dlls/msvcp140/Makefile.in < ${SCRIPT_DIR}/patches/msvcp140_Makefile.patch

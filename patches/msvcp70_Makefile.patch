@@ -1,0 +1,9 @@
+--- Makefile.orig.in	2021-03-11 14:14:06.000000000 +0100
++++ Makefile.in	2021-03-11 14:14:16.000000000 +0100
+@@ -1,5 +1,5 @@
+ MODULE = msvcp70.dll
+-IMPORTS = msvcr70
++IMPORTS = msvcr70 msvcrt
+ EXTRADEFS = -D_MSVCP_VER=70
+ PARENTSRC = ../msvcp90
+ 

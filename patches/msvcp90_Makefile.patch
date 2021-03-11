@@ -1,0 +1,9 @@
+--- Makefile.orig.in	2021-03-11 14:16:47.000000000 +0100
++++ Makefile.in	2021-03-11 14:16:55.000000000 +0100
+@@ -1,5 +1,5 @@
+ MODULE    = msvcp90.dll
+-IMPORTS   = msvcr90
++IMPORTS   = msvcr90 msvcrt
+ EXTRADEFS = -D_MSVCP_VER=90
+ 
+ EXTRADLLFLAGS = -mno-cygwin
