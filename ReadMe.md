@@ -1,6 +1,6 @@
 # MacOS CrossOver FOSS built from the Cloud
 
-[![.github/workflows/build.yml](https://github.com/GabLeRoux/macos-crossover-cloud-build/workflows/.github/workflows/build.yml/badge.svg)](https://github.com/GabLeRoux/macos-crossover-cloud-build/actions) <-- help me fix that! [#6](https://github.com/GabLeRoux/macos-crossover-cloud-build/issues/6)
+[![.github/workflows/build.yml](https://github.com/dasmy/macos-crossover-cloud-build/workflows/.github/workflows/build.yml/badge.svg)](https://github.com/dasmy/macos-crossover-cloud-build/actions)
 
 Let's build [FOSS CrossOver][foss-crossover] for macOS in the cloud! I found [some gists][crossover-gist] and I asked myself why don't we use the cloud and the free open source builders to build this? Here it is.
 
