@@ -71,3 +71,5 @@ patch sources/wine/dlls/msvcp100/Makefile.in < ${SCRIPT_DIR}/patches/msvcp100_Ma
 patch sources/wine/dlls/msvcp110/Makefile.in < ${SCRIPT_DIR}/patches/msvcp110_Makefile.patch
 patch sources/wine/dlls/msvcp120/Makefile.in < ${SCRIPT_DIR}/patches/msvcp120_Makefile.patch
 patch sources/wine/dlls/msvcp140/Makefile.in < ${SCRIPT_DIR}/patches/msvcp140_Makefile.patch
+
+patch sources/wine/dlls/mshtml/ifacewrap.c < ${SCRIPT_DIR}/patches/mshtml_ifacewrap.patch
