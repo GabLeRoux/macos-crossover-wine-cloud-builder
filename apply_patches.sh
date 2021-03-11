@@ -21,25 +21,25 @@ patch sources/wine/dlls/comdlg32/printdlg.c < ${SCRIPT_DIR}/patches/comdlg32_pri
 patch sources/wine/dlls/cryptui/main.c < ${SCRIPT_DIR}/patches/cryptui_main.patch
 
 patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_24_Makefile.patch
-patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_25_Makefile.patch
-patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_26_Makefile.patch
-patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_27_Makefile.patch
-patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_28_Makefile.patch
-patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_29_Makefile.patch
-patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_30_Makefile.patch
-patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_31_Makefile.patch
-patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_32_Makefile.patch
-patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_33_Makefile.patch
-patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_34_Makefile.patch
-patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_35_Makefile.patch
-patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_36_Makefile.patch
-patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_37_Makefile.patch
-patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_38_Makefile.patch
-patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_39_Makefile.patch
-patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_40_Makefile.patch
-patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_41_Makefile.patch
-patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_42_Makefile.patch
-patch sources/wine/dlls/d3dx9_24/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_43_Makefile.patch
+patch sources/wine/dlls/d3dx9_25/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_24_Makefile.patch
+patch sources/wine/dlls/d3dx9_26/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_24_Makefile.patch
+patch sources/wine/dlls/d3dx9_27/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_24_Makefile.patch
+patch sources/wine/dlls/d3dx9_28/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_24_Makefile.patch
+patch sources/wine/dlls/d3dx9_29/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_24_Makefile.patch
+patch sources/wine/dlls/d3dx9_30/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_24_Makefile.patch
+patch sources/wine/dlls/d3dx9_31/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_24_Makefile.patch
+patch sources/wine/dlls/d3dx9_32/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_24_Makefile.patch
+patch sources/wine/dlls/d3dx9_33/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_24_Makefile.patch
+patch sources/wine/dlls/d3dx9_34/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_24_Makefile.patch
+patch sources/wine/dlls/d3dx9_35/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_24_Makefile.patch
+patch sources/wine/dlls/d3dx9_36/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_24_Makefile.patch
+patch sources/wine/dlls/d3dx9_37/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_24_Makefile.patch
+patch sources/wine/dlls/d3dx9_38/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_24_Makefile.patch
+patch sources/wine/dlls/d3dx9_39/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_24_Makefile.patch
+patch sources/wine/dlls/d3dx9_40/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_24_Makefile.patch
+patch sources/wine/dlls/d3dx9_41/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_24_Makefile.patch
+patch sources/wine/dlls/d3dx9_42/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_24_Makefile.patch
+patch sources/wine/dlls/d3dx9_43/Makefile.in < ${SCRIPT_DIR}/patches/d3dx9_24_Makefile.patch
 
 patch sources/wine/dlls/dsound/Makefile.in < ${SCRIPT_DIR}/patches/dsound_Makefile.patch
 
