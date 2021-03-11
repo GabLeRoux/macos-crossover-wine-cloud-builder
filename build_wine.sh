@@ -39,7 +39,7 @@ export LDFLAGS="-Wl,-headerpad_max_install_names,-rpath,@loader_path/../,-rpath,
     --without-vulkan
 
 
-make -j ${PARALLEL_JOBS}
+make -k -j ${PARALLEL_JOBS}
 popd
 
 echo "Wine compile done"

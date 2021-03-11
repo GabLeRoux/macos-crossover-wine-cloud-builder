@@ -6,7 +6,7 @@ SCRIPT_DIR="`dirname \"${BASH_SOURCE}\"`"
 
 cp ${SCRIPT_DIR}/patches/distversion.h sources/wine/include/distversion.h
 
-# patch sources/wine/dlls/winecoreaudio.drv/authorization.m < ${SCRIPT_DIR}/winecoreaudio.patch
+patch sources/wine/dlls/winecoreaudio.drv/authorization.m < ${SCRIPT_DIR}/winecoreaudio.patch
 
 patch sources/wine/include/msvcrt/stdio.h < ${SCRIPT_DIR}/patches/msvcrt_stdio.patch
 
