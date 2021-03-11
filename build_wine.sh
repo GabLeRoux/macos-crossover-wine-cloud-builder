@@ -23,7 +23,7 @@ if [ -z "$MACOSX_DEPLOYMENT_TARGET" ]; then
     export MACOSX_DEPLOYMENT_TARGET=10.15
 fi
 
-export CROSSCFLAGS="-mwine32 -g -O2 -fcommon"
+export CROSSCFLAGS="-g -O2 -fcommon"
 
 # Xcode12 by default enables '-Werror,-Wimplicit-function-declaration' (49917738) 
 # this causes wine(64) builds to fail so needs to be disabled.
@@ -31,12 +31,13 @@ export CROSSCFLAGS="-mwine32 -g -O2 -fcommon"
 export CFLAGS="-Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
 export LDFLAGS="-Wl,-headerpad_max_install_names,-rpath,@loader_path/../,-rpath,/opt/X11/lib"
 
-# for disabled components, see https://www.winehq.org/pipermail/wine-devel/2019-December/157027.html
 ./configure -C \
     --disable-tests \
     --enable-win32on64 \
+    --disable-winedbg \
     --without-x \
-    --disable-winedbg
+    --without-vulkan
+
 
 make -j ${PARALLEL_JOBS}
 popd
