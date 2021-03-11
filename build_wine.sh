@@ -31,12 +31,13 @@ export CROSSCFLAGS="-g -O2 -fcommon"
 export CFLAGS="-Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
 export LDFLAGS="-Wl,-headerpad_max_install_names,-rpath,@loader_path/../,-rpath,/opt/X11/lib"
 
-./configure -C \
+./configure \
     --disable-tests \
     --enable-win32on64 \
     --disable-winedbg \
     --without-x \
-    --without-vulkan
+    --without-vulkan \
+    --disable-winevulkan
 
 
 make -k -j ${PARALLEL_JOBS}
