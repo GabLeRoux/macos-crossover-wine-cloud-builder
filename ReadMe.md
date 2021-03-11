@@ -46,9 +46,11 @@ See  for some technical details.
 * [How to compile codeweavers crossover from source][alex4386]
 * [Some technical details][mails-dec2019]
 * [How to install/about wine on mac][wine-on-mac]
+* [Winehq style macOS Builds][winehq-style]
 
 [crossover-gist]: https://gist.github.com/sarimarton/471e9ff8046cc746f6ecb8340f942647
 [foss-crossover]: https://www.codeweavers.com/crossover/source
 [alex4386]: https://gist.github.com/Alex4386/4cce275760367e9f5e90e2553d655309
 [mails-dec2019]: https://www.winehq.org/pipermail/wine-devel/2019-December/156602.html
 [wine-on-mac]: https://github.com/Gcenx/wine-on-mac
+[winehq-style]: https://github.com/Gcenx/macOS_Wine_builds
