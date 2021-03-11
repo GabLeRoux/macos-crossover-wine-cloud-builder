@@ -73,3 +73,5 @@ patch sources/wine/dlls/msvcp120/Makefile.in < ${SCRIPT_DIR}/patches/msvcp120_Ma
 patch sources/wine/dlls/msvcp140/Makefile.in < ${SCRIPT_DIR}/patches/msvcp140_Makefile.patch
 
 patch sources/wine/dlls/mshtml/ifacewrap.c < ${SCRIPT_DIR}/patches/mshtml_ifacewrap.patch
+
+patch sources/wine/dlls/ntoskrnl.exe/instr.c < ${SCRIPT_DIR}/patches/ntoskrnl_instr.patch
