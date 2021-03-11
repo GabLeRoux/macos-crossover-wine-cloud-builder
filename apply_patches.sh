@@ -75,3 +75,12 @@ patch sources/wine/dlls/msvcp140/Makefile.in < ${SCRIPT_DIR}/patches/msvcp140_Ma
 patch sources/wine/dlls/mshtml/ifacewrap.c < ${SCRIPT_DIR}/patches/mshtml_ifacewrap.patch
 
 patch sources/wine/dlls/ntoskrnl.exe/instr.c < ${SCRIPT_DIR}/patches/ntoskrnl_instr.patch
+
+patch sources/wine/dlls/ole32/clipboard.c < ${SCRIPT_DIR}/patches/ole32_clipboard.patch
+patch sources/wine/dlls/ole32/datacache.c < ${SCRIPT_DIR}/patches/ole32_datacache.patch
+patch sources/wine/dlls/ole32/filelockbytes.c < ${SCRIPT_DIR}/patches/ole32_filelockbytes.patch
+patch sources/wine/dlls/ole32/ole2.c < ${SCRIPT_DIR}/patches/ole32_ole2.patch
+patch sources/wine/dlls/ole32/ole2impl.c < ${SCRIPT_DIR}/patches/ole32_ole2impl.patch
+patch sources/wine/dlls/ole32/oleobj.c < ${SCRIPT_DIR}/patches/ole32_oleobj.patch
+patch sources/wine/dlls/ole32/stg_prop.c < ${SCRIPT_DIR}/patches/ole32_stg_prop.patch
+patch sources/wine/dlls/ole32/usrmarshal.c < ${SCRIPT_DIR}/patches/ole32_usrmarshal.patch

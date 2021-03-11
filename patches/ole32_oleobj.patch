@@ -1,0 +1,27 @@
+--- oleobj.orig.c	2021-03-11 15:05:43.000000000 +0100
++++ oleobj.c	2021-03-11 15:07:21.000000000 +0100
+@@ -19,13 +19,12 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
+  */
+ 
++#define COBJMACROS
++#define NONAMELESSUNION
+ 
+ #include <stdarg.h>
+ #include <string.h>
+ 
+-#define COBJMACROS
+-#define NONAMELESSUNION
+-
+ #include "windef.h"
+ #include "winbase.h"
+ #include "winuser.h"
+@@ -560,7 +559,7 @@
+   {
+     if (ptrToDestroy->connections[index].pAdvSink != NULL)
+     {
+-      if (ptrToDestroy->delegate && 
++      if (ptrToDestroy->delegate &&
+           (ptrToDestroy->connections[index].advf & WINE_ADVF_REMOTE))
+         IDataObject_DUnadvise(ptrToDestroy->delegate,
+           ptrToDestroy->remote_connections[index]);

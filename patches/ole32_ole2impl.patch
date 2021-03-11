@@ -1,0 +1,18 @@
+--- ole2impl.orig.c	2021-03-11 15:05:35.000000000 +0100
++++ ole2impl.c	2021-03-11 15:07:28.000000000 +0100
+@@ -18,12 +18,12 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
+  */
+ 
+-#include <stdarg.h>
+-#include <string.h>
+-
+ #define COBJMACROS
+ #define NONAMELESSUNION
+ 
++#include <stdarg.h>
++#include <string.h>
++
+ #include "windef.h"
+ #include "winbase.h"
+ #include "wingdi.h"
