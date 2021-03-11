@@ -39,9 +39,16 @@ Definitely. Feel free to send PRs 🚀
 
 [MIT](LICENSE.md) © [Gabriel Le Breton](https://gableroux.com)
 
+## References / Links / Possibly helpful resources
+See  for some technical details.
+* [Starting point for this][crossover-gist].
+* [Free and Open Source Software Code for CrossOver][foss-crossover]
+* [How to compile codeweavers crossover from source][alex4386]
+* [Some technical details][mails-dec2019]
+* [How to install/about wine on mac][wine-on-mac]
+
 [crossover-gist]: https://gist.github.com/sarimarton/471e9ff8046cc746f6ecb8340f942647
 [foss-crossover]: https://www.codeweavers.com/crossover/source
-
-
-# References
-See https://www.winehq.org/pipermail/wine-devel/2019-December/156602.html for some technical details.
+[alex4386]: https://gist.github.com/Alex4386/4cce275760367e9f5e90e2553d655309
+[mails-dec2019]: https://www.winehq.org/pipermail/wine-devel/2019-December/156602.html
+[wine-on-mac]: https://github.com/Gcenx/wine-on-mac
