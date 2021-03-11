@@ -57,3 +57,5 @@ patch sources/wine/dlls/kernelbase/thread.c < ${SCRIPT_DIR}/patches/kernelbase_t
 patch sources/wine/dlls/kernelbase/version.c < ${SCRIPT_DIR}/patches/kernelbase_version.patch
 patch sources/wine/dlls/kernelbase/debug.c < ${SCRIPT_DIR}/patches/kernelbase_debug.patch
 patch sources/wine/dlls/kernelbase/loader.c < ${SCRIPT_DIR}/patches/kernelbase_loader.patch
+
+patch sources/wine/dlls/mfplat/main.c < ${SCRIPT_DIR}/patches/mfplat_main.patch
