@@ -9,8 +9,8 @@ echo "Compiling Clang..."
 pushd sources/clang/clang
 mkdir -p build
 cd build
-cmake -G Ninja ../
+cmake -G Ninja ../ -DCMAKE_BUILD_TYPE=Release ../
 Ninja
 popd
 
-echo "CLang compile done"
+echo "Clang compile done"
