@@ -31,7 +31,10 @@ jobs:
       - name: Build Wine
         run: ./build_wine.sh
 
+      - name: Install Wine
+        run: ./install_wine.sh
+
       - uses: actions/upload-artifact@v2
         with:
           name: crossover
-          path: ./
+          path: ./wine_install/
