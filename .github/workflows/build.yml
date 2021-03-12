@@ -34,7 +34,11 @@ jobs:
       - name: Install Wine
         run: ./install_wine.sh
 
-      - uses: actions/upload-artifact@v2
+      - name: 'Tar files'
+        run: tar -czvf wine.win32on64.tar.gz ./install/win32on64
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v2
         with:
-          name: crossover
-          path: ./wine_install/
+          name: wine.win32on64
+          path: wine.win32on64.tar.gz

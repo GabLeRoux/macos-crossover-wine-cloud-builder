@@ -3,7 +3,7 @@
 set -ex
 
 if [ -z "$WINE_INSTALL_DIR" ]; then
-    export WINE_INSTALL_DIR="$(pwd)/wine_install"
+    export WINE_INSTALL_DIR="$(pwd)/install/win32on64"
 fi
 
 mkdir -p ${WINE_INSTALL_DIR}
