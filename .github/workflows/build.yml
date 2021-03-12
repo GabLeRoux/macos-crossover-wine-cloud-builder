@@ -49,7 +49,7 @@ jobs:
         run: ./build_wine.sh
 
       - name: Tar Wine
-        run: tar -czvf ${ARTIFACT_NAME}.tar.gz ./install/win32on64
+        run: tar -czvf ${ARTIFACT_NAME}.tar.gz ./install/wine
 
       - name: Upload Wine
         uses: actions/upload-artifact@v2
