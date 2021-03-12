@@ -36,10 +36,10 @@ jobs:
         run: ./install_wine.sh
 
       - name: 'Tar files'
-        run: tar -czvf $ARTIFACT_NAME.tar.gz ./install/win32on64
+        run: tar -czvf ${ARTIFACT_NAME}.tar.gz ./install/win32on64
 
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v2
         with:
-          name: $ARTIFACT_NAME
-          path: $ARTIFACT_NAME.tar.gz
+          name: ${ARTIFACT_NAME}
+          path: ${ARTIFACT_NAME}.tar.gz
