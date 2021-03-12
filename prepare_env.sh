@@ -10,7 +10,8 @@ brew install  \
     ninja     \
     freetype  \
     bison     \
-    mingw-w64
+    mingw-w64 \
+    libpng
 
 which cmake
 cmake --version

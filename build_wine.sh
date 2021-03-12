@@ -31,13 +31,17 @@ export CROSSCFLAGS="-g -O2 -fcommon"
 export CFLAGS="-Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
 export LDFLAGS="-Wl,-headerpad_max_install_names,-rpath,@loader_path/../,-rpath,/opt/X11/lib"
 
+export PNG_CFLAGS="-I/usr/local/include"
+export PNG_LIBS="-L/usr/local/lib"
+
 ./configure \
     --disable-tests \
     --enable-win32on64 \
     --disable-winedbg \
     --without-x \
     --without-vulkan \
-    --disable-winevulkan
+    --disable-winevulkan \
+    --with-png
 
 
 make -k -j ${PARALLEL_JOBS}
