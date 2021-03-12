@@ -20,7 +20,7 @@ pushd sources/wine
 export PATH="$(pwd):$PATH"
 
 if [ -z "$MACOSX_DEPLOYMENT_TARGET" ]; then
-    export MACOSX_DEPLOYMENT_TARGET=10.15
+    export MACOSX_DEPLOYMENT_TARGET=10.14
 fi
 
 export CROSSCFLAGS="-g -O2 -fcommon"

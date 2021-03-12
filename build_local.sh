@@ -3,7 +3,7 @@
 set -ex
 
  export PARALLEL_JOBS=6
- export MACOSX_DEPLOYMENT_TARGET=10.15
+ export MACOSX_DEPLOYMENT_TARGET=10.14
  export CROSS_OVER_VERSION=20.0.4
 
 ./prepare_env.sh
