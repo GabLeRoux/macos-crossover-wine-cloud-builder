@@ -47,6 +47,7 @@ See  for some technical details.
 * [Some technical details][mails-dec2019]
 * [How to install/about wine on mac][wine-on-mac]
 * [Winehq style macOS Builds][winehq-style]
+* [Detailed build script form phoenics][phoenics-winebuild]
 
 [crossover-gist]: https://gist.github.com/sarimarton/471e9ff8046cc746f6ecb8340f942647
 [foss-crossover]: https://www.codeweavers.com/crossover/source
@@ -54,3 +55,4 @@ See  for some technical details.
 [mails-dec2019]: https://www.winehq.org/pipermail/wine-devel/2019-December/156602.html
 [wine-on-mac]: https://github.com/Gcenx/wine-on-mac
 [winehq-style]: https://github.com/Gcenx/macOS_Wine_builds
+[phoenics-winebuild]: https://github.com/PhoenicisOrg/phoenicis-winebuild/blob/cf86dd3c98ba0b8fdbd5f9fc02bc5a4c15587ee9/builders/scripts/builder_darwin_x86on64_wine#L42-L46
