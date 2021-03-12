@@ -12,3 +12,4 @@ set -ex
 ./build_llvm.sh
 ./build_clang.sh
 ./build_wine.sh
+./install_wine.sh
