@@ -56,5 +56,5 @@ jobs:
       - name: Upload Wine
         uses: actions/upload-artifact@v2
         with:
-          name: ${ARTIFACT_NAME}
-          path: ${ARTIFACT_NAME}.tar.gz
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.ARTIFACT_NAME }}.tar.gz
