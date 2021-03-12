@@ -2,21 +2,33 @@
 
 set -ex
 
+if [ -z "$INSTALLROOT_TOOLS" ]; then
+    export INSTALLROOT_TOOLS="$(pwd)/install/build-tools"
+fi
+
+if [ -z "$INSTALLROOT_WINE" ]; then
+    export INSTALLROOT_WINE="$(pwd)/install/wine"
+fi
+
+
 export PATH="$(brew --prefix bison)/bin:${PATH}"
-export PATH="$(pwd)/sources/clang/llvm/build/bin:${PATH}"
-export PATH="$(pwd)/sources/clang/clang/build/bin:${PATH}"
+export PATH="${INSTALLROOT_TOOLS}/bin:${PATH}"
+
 
 export CC="clang"
 export CXX="clang++"
+
 
 which ${CC}
 ${CC} --version
 which ${CXX}
 ${CXX} --version
 
+
 echo "Compiling Wine..."
 
 pushd sources/wine
+
 export PATH="$(pwd):$PATH"
 
 if [ -z "$MACOSX_DEPLOYMENT_TARGET" ]; then
@@ -45,6 +57,7 @@ export PNG_LIBS="-L/usr/local/lib"
 
 
 make -k -j ${PARALLEL_JOBS}
+make install-lib DESTDIR="${INSTALLROOT_WINE}"
 popd
 
 echo "Wine compile done"

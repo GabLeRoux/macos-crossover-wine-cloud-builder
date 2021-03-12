@@ -5,7 +5,7 @@ jobs:
     name: Run build script on MacOS
     runs-on: macos-10.15
     env:
-        PARALLEL_JOBS: 8
+        PARALLEL_JOBS: 10
         MACOSX_DEPLOYMENT_TARGET: 10.14
         CROSS_OVER_VERSION: 20.0.4
         ARTIFACT_NAME: wine.$CROSS_OVER_VERSION.win32on64
@@ -23,23 +23,35 @@ jobs:
       - name: Apply Patches
         run: ./apply_patches.sh
 
+      - name: Tar patched Wine Sources
+        run: tar -czvf wine-sources-patched.tar.gz ./sources/wine
+
+      - name: Upload patched Wine Sources
+        uses: actions/upload-artifact@v2
+        with:
+          path: wine-sources-patched.tar.gz
+
       - name: Build LLVM
         run: ./build_llvm.sh
 
       - name: Build Clang
         run: ./build_clang.sh
 
+      - name: Tar Build Tools
+        run: tar -czvf build-tools.tar.gz ./install/build-tools
+
+      - name: Upload Build Tools
+        uses: actions/upload-artifact@v2
+        with:
+          path: build-tools.tar.gz
+
       - name: Build Wine
         run: ./build_wine.sh
 
-      - name: Install Wine
-        run: ./install_wine.sh
-
-      - name: 'Tar files'
+      - name: Tar Wine
         run: tar -czvf ${ARTIFACT_NAME}.tar.gz ./install/win32on64
 
-      - name: 'Upload Artifact'
+      - name: Upload Wine
         uses: actions/upload-artifact@v2
         with:
-          name: ${ARTIFACT_NAME}
           path: ${ARTIFACT_NAME}.tar.gz

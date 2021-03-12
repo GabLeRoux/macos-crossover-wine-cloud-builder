@@ -2,9 +2,11 @@
 
 set -ex
 
- export PARALLEL_JOBS=6
- export MACOSX_DEPLOYMENT_TARGET=10.14
- export CROSS_OVER_VERSION=20.0.4
+export PARALLEL_JOBS=6
+export MACOSX_DEPLOYMENT_TARGET=10.14
+export CROSS_OVER_VERSION=20.0.4
+export INSTALLROOT_TOOLS="$(pwd)/install/build-tools"
+export INSTALLROOT_WINE="$(pwd)/install/wine"
 
 ./prepare_env.sh
 ./get_source.sh
@@ -12,4 +14,3 @@ set -ex
 ./build_llvm.sh
 ./build_clang.sh
 ./build_wine.sh
-./install_wine.sh
