@@ -10,6 +10,6 @@ mkdir -p ${WINE_INSTALL_DIR}
 
 pushd sources/wine
 
-make install DESTDIR="${WINE_INSTALL_DIR}"
+make install-lib DESTDIR="${WINE_INSTALL_DIR}"
 
 popd
