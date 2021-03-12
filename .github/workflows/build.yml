@@ -8,7 +8,7 @@ jobs:
         PARALLEL_JOBS: 10
         MACOSX_DEPLOYMENT_TARGET: 10.14
         CROSS_OVER_VERSION: 20.0.4
-        ARTIFACT_NAME: wine.${CROSS_OVER_VERSION}.win32on64
+        ARTIFACT_NAME: wine_20.0.4_win32on64
 
     steps:
       - name: Checkout
