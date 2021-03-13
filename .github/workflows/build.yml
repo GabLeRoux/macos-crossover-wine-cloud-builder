@@ -41,7 +41,7 @@ jobs:
         run: ./build_clang.sh
 
       - name: Tar Build Tools
-        run: tar -czvf build-tools.tar.gz ${INSTALLROOT_TOOLS}
+        run: tar -czvf build-tools.tar.gz ${{ env.INSTALLROOT_TOOLS }}
 
       - name: Upload Build Tools
         uses: actions/upload-artifact@v2
@@ -53,10 +53,10 @@ jobs:
         run: ./build_wine.sh
 
       - name: Tar Wine
-        run: tar -czvf wine_${{ CROSS_OVER_VERSION }}_${{ WINE_ARCH }}.tar.gz ${{ INSTALLROOT_WINE }}
+        run: tar -czvf wine_${{ env.CROSS_OVER_VERSION }}_${{ env.WINE_ARCH }}.tar.gz ${{ env.INSTALLROOT_WINE }}
 
       - name: Upload Wine
         uses: actions/upload-artifact@v2
         with:
-          name: wine_${{ CROSS_OVER_VERSION }}_${{ WINE_ARCH }}
-          path: wine_${{ CROSS_OVER_VERSION }}_${{ WINE_ARCH }}.tar.gz
+          name: wine_${{ env.CROSS_OVER_VERSION }}_${{ env.WINE_ARCH }}
+          path: wine_${{ env.CROSS_OVER_VERSION }}_${{ env.WINE_ARCH }}.tar.gz
