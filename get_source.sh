@@ -14,5 +14,5 @@ if [ ! -f "${CROSS_OVER_LOCAL_FILE}" ]; then
 fi
 
 if [ ! -d "sources" ]; then
-    tar xf ${CROSS_OVER_LOCAL_FILE}.tar.gz
+    tar xf ${CROSS_OVER_LOCAL_FILE}
 fi
