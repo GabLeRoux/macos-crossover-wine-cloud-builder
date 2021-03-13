@@ -3,15 +3,19 @@
 set -ex
 
 if [ -z "$INSTALLROOT_TOOLS" ]; then
-    export INSTALLROOT_TOOLS="$(pwd)/install/build-tools"
+    { echo "INSTALLROOT_TOOLS not set."; exit 1; }
 fi
 
 if [ -z "$INSTALLROOT_WINE" ]; then
-    export INSTALLROOT_WINE="$(pwd)/install/wine_${CROSS_OVER_VERSION}_${WINE_ARCH}"
+    { echo "INSTALLROOT_WINE not set."; exit 2; }
+fi
+
+if [ -z "$WINE_ARCH" ]; then
+    { echo "WINE_ARCH not set."; exit 3; }
 fi
 
 if [ -z "$MACOSX_DEPLOYMENT_TARGET" ]; then
-    export MACOSX_DEPLOYMENT_TARGET=10.14
+    { echo "MACOSX_DEPLOYMENT_TARGET not set."; exit 4; }
 fi
 
 

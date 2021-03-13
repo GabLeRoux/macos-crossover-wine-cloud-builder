@@ -3,7 +3,7 @@
 set -ex
 
 if [ -z "$INSTALLROOT_TOOLS" ]; then
-    export INSTALLROOT_TOOLS="$(pwd)/install/build-tools"
+    { echo "INSTALLROOT_TOOLS not set."; exit 1; }
 fi
 
 

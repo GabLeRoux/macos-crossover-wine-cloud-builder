@@ -2,9 +2,8 @@
 
 set -ex
 
-# Note: llvm and clang are provided in version 20.0.4 again
 if [ -z "$CROSS_OVER_VERSION" ]; then
-    CROSS_OVER_VERSION=20.0.4
+    { echo "CROSS_OVER_VERSION not set."; exit 1; }
 fi
 
 CROSS_OVER_SOURCE_URL=https://media.codeweavers.com/pub/crossover/source/crossover-sources-${CROSS_OVER_VERSION}.tar.gz
