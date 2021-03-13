@@ -52,6 +52,7 @@ export PNG_LIBS="-L/usr/local/lib"
     --disable-winedbg \
     --without-x \
     --without-vulkan \
+    --without-vkd3d \
     --disable-winevulkan \
     --with-png
 
