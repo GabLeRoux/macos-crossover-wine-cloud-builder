@@ -7,7 +7,11 @@ if [ -z "$INSTALLROOT_TOOLS" ]; then
 fi
 
 if [ -z "$INSTALLROOT_WINE" ]; then
-    export INSTALLROOT_WINE="$(pwd)/install/wine"
+    export INSTALLROOT_WINE="$(pwd)/install/wine_${CROSS_OVER_VERSION}_${WINE_ARCH}"
+fi
+
+if [ -z "$MACOSX_DEPLOYMENT_TARGET" ]; then
+    export MACOSX_DEPLOYMENT_TARGET=10.14
 fi
 
 
@@ -31,9 +35,8 @@ pushd sources/wine
 
 export PATH="$(pwd):$PATH"
 
-if [ -z "$MACOSX_DEPLOYMENT_TARGET" ]; then
-    export MACOSX_DEPLOYMENT_TARGET=10.14
-fi
+mkdir -p "build_${WINE_ARCH}"
+pushd "build_${WINE_ARCH}"
 
 export CROSSCFLAGS="-g -O2 -fcommon"
 
@@ -46,9 +49,9 @@ export LDFLAGS="-Wl,-headerpad_max_install_names,-rpath,@loader_path/../,-rpath,
 export PNG_CFLAGS="-I/usr/local/include"
 export PNG_LIBS="-L/usr/local/lib"
 
-./configure \
+../configure \
     --disable-tests \
-    --enable-win32on64 \
+    --enable-${WINE_ARCH} \
     --disable-winedbg \
     --without-x \
     --without-vulkan \
@@ -56,9 +59,10 @@ export PNG_LIBS="-L/usr/local/lib"
     --disable-winevulkan \
     --with-png
 
-
 make -k -j ${PARALLEL_JOBS}
 make install-lib DESTDIR="${INSTALLROOT_WINE}"
+
+popd
 popd
 
 echo "Wine compile done"

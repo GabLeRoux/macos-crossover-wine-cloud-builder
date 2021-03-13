@@ -8,7 +8,9 @@ jobs:
         PARALLEL_JOBS: 10
         MACOSX_DEPLOYMENT_TARGET: 10.14
         CROSS_OVER_VERSION: 20.0.4
-        ARTIFACT_NAME: wine_20.0.4_win32on64
+        WINE_ARCH: win32on64
+        INSTALLROOT_TOOLS: ${{ github.workspace }}/install/build-tools
+        INSTALLROOT_WINE: "${{ github.workspace }}/install/wine_20.0.4_win32on64"
 
     steps:
       - name: Checkout
@@ -39,7 +41,7 @@ jobs:
         run: ./build_clang.sh
 
       - name: Tar Build Tools
-        run: tar -czvf build-tools.tar.gz ./install/build-tools
+        run: tar -czvf build-tools.tar.gz ${INSTALLROOT_TOOLS}
 
       - name: Upload Build Tools
         uses: actions/upload-artifact@v2
@@ -51,10 +53,10 @@ jobs:
         run: ./build_wine.sh
 
       - name: Tar Wine
-        run: tar -czvf ${ARTIFACT_NAME}.tar.gz ./install/wine
+        run: tar -czvf wine_${{ CROSS_OVER_VERSION }}_${{ WINE_ARCH }}.tar.gz ${{ INSTALLROOT_WINE }}
 
       - name: Upload Wine
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.ARTIFACT_NAME }}
-          path: ${{ env.ARTIFACT_NAME }}.tar.gz
+          name: wine_${{ CROSS_OVER_VERSION }}_${{ WINE_ARCH }}
+          path: wine_${{ CROSS_OVER_VERSION }}_${{ WINE_ARCH }}.tar.gz
