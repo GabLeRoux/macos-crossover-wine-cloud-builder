@@ -1,16 +1,14 @@
 on: [push, workflow_dispatch]
+env:
+    PARALLEL_JOBS: 10
+    MACOSX_DEPLOYMENT_TARGET: 10.14
+    CROSS_OVER_VERSION: 20.0.4
+    INSTALLROOT_TOOLS: ${{ github.workspace }}/install/build-tools
 
 jobs:
-  build:
-    name: Run build script on MacOS
+  prepare:
+    name: Prepare Environment and Tools
     runs-on: macos-10.15
-    env:
-        PARALLEL_JOBS: 10
-        MACOSX_DEPLOYMENT_TARGET: 10.14
-        CROSS_OVER_VERSION: 20.0.4
-        WINE_ARCH: win32on64
-        INSTALLROOT_TOOLS: ${{ github.workspace }}/install/build-tools
-        INSTALLROOT_WINE: "${{ github.workspace }}/install/wine_20.0.4_win32on64"
 
     steps:
       - name: Checkout
@@ -41,7 +39,7 @@ jobs:
         run: ./build_clang.sh
 
       - name: Tar Build Tools
-        run: tar -czvf build-tools.tar.gz ${{ env.INSTALLROOT_TOOLS }}
+        run: tar -czf build-tools.tar.gz ${{ env.INSTALLROOT_TOOLS }}
 
       - name: Upload Build Tools
         uses: actions/upload-artifact@v2
@@ -49,46 +47,39 @@ jobs:
           name: build-tools
           path: build-tools.tar.gz
 
+  build_wine:
+    name: Build Wine
+    runs-on: macos-10.15
+    needs: prepare
+    strategy:
+      matrix:
+        wine_arch: [win64, win32on64]
+    env:
+      WINE_ARCH: ${{ matrix.wine_arch }}
+      WINE_TARFILE: wine_${{ env.CROSS_OVER_VERSION }}_${{ matrix.wine_arch }}
+      INSTALLROOT_WINE: "${{ github.workspace }}/install/wine_${{ CROSSOVER_VERSION }}_${{ matrix.wine_arch }}"
 
-      - name: Build Wine win64
-        env:
-            WINE_ARCH: win64
-            INSTALLROOT_WINE: "${{ github.workspace }}/install/wine_20.0.4_win64"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Dwonload Artifacts
+        uses: actions/download-artifact@v2
+
+      - name: Extract Wine Sources
+        run: mkdir -p ./sources/wine && tar -xzf wine-sources-patched.tar.gz ./sources/wine
+
+      - name: Extract Build Tools
+        run: mkdir -p ${{ env.INSTALLROOT_TOOLS }} && tar -xzf build-tools.tar.gz ${{ env.INSTALLROOT_TOOLS }}
+
+      - name: Build Wine
         run: ./build_wine.sh
 
-      - name: Tar Wine win64
-        env:
-            WINE_ARCH: win64
-            INSTALLROOT_WINE: "${{ github.workspace }}/install/wine_20.0.4_win64"
-        run: tar -czvf wine_${{ env.CROSS_OVER_VERSION }}_${{ env.WINE_ARCH }}.tar.gz ${{ env.INSTALLROOT_WINE }}
+      - name: Tar Wine
+        run: tar -czvf ${{ env.WINE_TARFILE }}.tar.gz ${{ env.INSTALLROOT_WINE }}
 
-      - name: Upload Wine win64
-        env:
-            WINE_ARCH: win64
-            INSTALLROOT_WINE: "${{ github.workspace }}/install/wine_20.0.4_win64"
+      - name: Upload Wine
         uses: actions/upload-artifact@v2
         with:
-          name: wine_${{ env.CROSS_OVER_VERSION }}_${{ env.WINE_ARCH }}
-          path: wine_${{ env.CROSS_OVER_VERSION }}_${{ env.WINE_ARCH }}.tar.gz
-
-
-      - name: Build Wine win32on64
-        env:
-            WINE_ARCH: win32on64
-            INSTALLROOT_WINE: "${{ github.workspace }}/install/wine_20.0.4_win32on64"
-        run: ./build_wine.sh
-
-      - name: Tar Wine win32on64
-        env:
-            WINE_ARCH: win32on64
-            INSTALLROOT_WINE: "${{ github.workspace }}/install/wine_20.0.4_win32on64"
-        run: tar -czvf wine_${{ env.CROSS_OVER_VERSION }}_${{ env.WINE_ARCH }}.tar.gz ${{ env.INSTALLROOT_WINE }}
-
-      - name: Upload Wine win32on64
-        env:
-            WINE_ARCH: win32on64
-            INSTALLROOT_WINE: "${{ github.workspace }}/install/wine_20.0.4_win32on64"
-        uses: actions/upload-artifact@v2
-        with:
-          name: wine_${{ env.CROSS_OVER_VERSION }}_${{ env.WINE_ARCH }}
-          path: wine_${{ env.CROSS_OVER_VERSION }}_${{ env.WINE_ARCH }}.tar.gz
+          name: ${{ env.WINE_TARFILE }}
+          path: ${{ env.WINE_TARFILE }}.tar.gz
