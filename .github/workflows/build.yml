@@ -3,6 +3,8 @@ env:
     PARALLEL_JOBS: 10
     MACOSX_DEPLOYMENT_TARGET: 10.14
     CROSS_OVER_VERSION: 20.0.4
+    WINE_SOURCES: wine-sources-patched
+    BUILDTOOLS: build-tools
     INSTALLROOT_TOOLS: ${{ github.workspace }}/install/build-tools
 
 jobs:
@@ -24,13 +26,13 @@ jobs:
         run: ./apply_patches.sh
 
       - name: Tar patched Wine Sources
-        run: tar -czvf wine-sources-patched.tar.gz ./sources/wine
+        run: tar -czvf ${{ env.WINE_SOURCES }}.tar.gz ./sources/wine
 
       - name: Upload patched Wine Sources
         uses: actions/upload-artifact@v2
         with:
           name: wine-sources
-          path: wine-sources-patched.tar.gz
+          path: ${{ env.WINE_SOURCES }}.tar.gz
 
       - name: Build LLVM
         run: ./build_llvm.sh
@@ -39,13 +41,13 @@ jobs:
         run: ./build_clang.sh
 
       - name: Tar Build Tools
-        run: tar -czf build-tools.tar.gz ${{ env.INSTALLROOT_TOOLS }}
+        run: tar -czf ${{ env.BUILDTOOLS }}.tar.gz ${{ env.INSTALLROOT_TOOLS }}
 
       - name: Upload Build Tools
         uses: actions/upload-artifact@v2
         with:
-          name: build-tools
-          path: build-tools.tar.gz
+          name: ${{ env.BUILDTOOLS }}
+          path: ${{ env.BUILDTOOLS }}.tar.gz
 
   build_wine:
     name: Build Wine
@@ -65,19 +67,19 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: wine-sources
-          path: wine-sources-patched.tar.gz
+          path: ${{ env.WINE_SOURCES }}.tar.gz
 
       - name: Extract Wine Sources
-        run: mkdir -p ./sources/wine && tar -xzf wine-sources-patched.tar.gz ./sources/wine
+        run: mkdir -p ./sources/wine && tar -xzf ${{ env.WINE_SOURCES }}.tar.gz ./sources/wine
 
       - name: Download Build Tools
         uses: actions/download-artifact@v2
         with:
-          name: build-tools
-          path: build-tools.tar.gz
+          name: ${{ env.BUILDTOOLS }}
+          path: ${{ env.BUILDTOOLS }}.tar.gz
 
       - name: Extract Build Tools
-        run: mkdir -p ${{ env.INSTALLROOT_TOOLS }} && tar -xzf build-tools.tar.gz ${{ env.INSTALLROOT_TOOLS }}
+        run: mkdir -p ${{ env.INSTALLROOT_TOOLS }} && tar -xzf ${{ env.BUILDTOOLS }}.tar.gz ${{ env.INSTALLROOT_TOOLS }}
 
       - name: Build Wine
         env:
