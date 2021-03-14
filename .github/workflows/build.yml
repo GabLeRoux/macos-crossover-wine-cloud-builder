@@ -56,14 +56,12 @@ jobs:
         wine_arch: [win64, win32on64]
     env:
       WINE_ARCH: ${{ matrix.wine_arch }}
-      WINE_TARFILE: wine_${{ env.CROSS_OVER_VERSION }}_${{ matrix.wine_arch }}
-      INSTALLROOT_WINE: "${{ github.workspace }}/install/wine_${{ CROSSOVER_VERSION }}_${{ matrix.wine_arch }}"
 
     steps:
       - name: Checkout
         uses: actions/checkout@v1
 
-      - name: Dwonload Artifacts
+      - name: Download Artifacts
         uses: actions/download-artifact@v2
 
       - name: Extract Wine Sources
@@ -73,13 +71,20 @@ jobs:
         run: mkdir -p ${{ env.INSTALLROOT_TOOLS }} && tar -xzf build-tools.tar.gz ${{ env.INSTALLROOT_TOOLS }}
 
       - name: Build Wine
+        env:
+          INSTALLROOT_WINE: "${{ github.workspace }}/install/wine_${{ env.CROSSOVER_VERSION }}_${{ matrix.wine_arch }}"
         run: ./build_wine.sh
 
       - name: Tar Wine
+        env:
+          WINE_TARFILE: wine_${{ env.CROSS_OVER_VERSION }}_${{ matrix.wine_arch }}
+          INSTALLROOT_WINE: "${{ github.workspace }}/install/wine_${{ env.CROSSOVER_VERSION }}_${{ matrix.wine_arch }}"
         run: tar -czvf ${{ env.WINE_TARFILE }}.tar.gz ${{ env.INSTALLROOT_WINE }}
 
       - name: Upload Wine
         uses: actions/upload-artifact@v2
+        env:
+          WINE_TARFILE: wine_${{ env.CROSS_OVER_VERSION }}_${{ matrix.wine_arch }}
         with:
           name: ${{ env.WINE_TARFILE }}
           path: ${{ env.WINE_TARFILE }}.tar.gz
