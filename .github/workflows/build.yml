@@ -61,11 +61,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
-      - name: Download Artifacts
+      - name: Download Wine Sources
         uses: actions/download-artifact@v2
+        with:
+          name: wine-sources
+          path: wine-sources-patched.tar.gz
 
       - name: Extract Wine Sources
         run: mkdir -p ./sources/wine && tar -xzf wine-sources-patched.tar.gz ./sources/wine
+
+      - name: Download Build Tools
+        uses: actions/download-artifact@v2
+        with:
+          name: build-tools
+          path: build-tools.tar.gz
 
       - name: Extract Build Tools
         run: mkdir -p ${{ env.INSTALLROOT_TOOLS }} && tar -xzf build-tools.tar.gz ${{ env.INSTALLROOT_TOOLS }}

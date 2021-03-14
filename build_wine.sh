@@ -61,6 +61,7 @@ export PNG_LIBS="-L/usr/local/lib"
     --without-vulkan \
     --without-vkd3d \
     --disable-winevulkan \
+    --disable-vulkan_1 \
     --with-png
 
 make -k -j ${PARALLEL_JOBS}
