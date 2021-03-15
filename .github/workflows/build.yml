@@ -80,7 +80,7 @@ jobs:
           name: ${{ env.BUILDTOOLS }}
 
       - name: Extract Build Tools
-        run: tar -xf ${{ env.BUILDTOOLS }}.tar.gz
+        run: tar -xvf ${{ env.BUILDTOOLS }}.tar.gz
 
       - name: Build Wine
         env:
