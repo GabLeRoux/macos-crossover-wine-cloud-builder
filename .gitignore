@@ -1,5 +1,6 @@
-crossover.tar.gz
+crossover*.tar.gz
 sources
 .vscode
+winetricks
 wine_install
 install
