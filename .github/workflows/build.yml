@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
-      - name: Prepare
+      - name: Install Dependencies
         run: ./prepare_env.sh
 
       - name: Get Source
@@ -62,6 +62,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+
+      - name: Install Dependencies
+        run: ./prepare_env.sh
 
       - name: Download Wine Sources
         uses: actions/download-artifact@v2
