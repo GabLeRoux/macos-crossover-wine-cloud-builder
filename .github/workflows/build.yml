@@ -6,6 +6,7 @@ env:
     WINE_SOURCES: wine-sources-patched
     BUILDTOOLS: build-tools
     INSTALLROOT_TOOLS: ${{ github.workspace }}/install/build-tools
+    SKIP_BUILD: ${{ true }}
 
 jobs:
   prepare:
@@ -35,15 +36,19 @@ jobs:
           path: ${{ env.WINE_SOURCES }}.tar.gz
 
       - name: Build LLVM
+        if: ${{ ! env.SKIP_BUILD }}
         run: ./build_llvm.sh
 
       - name: Build Clang
+        if: ${{ ! env.SKIP_BUILD }}
         run: ./build_clang.sh
 
       - name: Tar Build Tools
+        if: ${{ ! env.SKIP_BUILD }}
         run: tar -czf ${{ env.BUILDTOOLS }}.tar.gz ${{ env.INSTALLROOT_TOOLS }}
 
       - name: Upload Build Tools
+        if: ${{ ! env.SKIP_BUILD }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.BUILDTOOLS }}
@@ -73,26 +78,31 @@ jobs:
         run: mkdir -p ./sources/wine && tar -xzf ${{ env.WINE_SOURCES }}.tar.gz ./sources/wine
 
       - name: Download Build Tools
+        if: ${{ ! env.SKIP_BUILD }}
         uses: actions/download-artifact@v2
         with:
           name: ${{ env.BUILDTOOLS }}
           path: ${{ env.BUILDTOOLS }}.tar.gz
 
       - name: Extract Build Tools
+        if: ${{ ! env.SKIP_BUILD }}
         run: mkdir -p ${{ env.INSTALLROOT_TOOLS }} && tar -xzf ${{ env.BUILDTOOLS }}.tar.gz ${{ env.INSTALLROOT_TOOLS }}
 
       - name: Build Wine
+        if: ${{ ! env.SKIP_BUILD }}
         env:
           INSTALLROOT_WINE: "${{ github.workspace }}/install/wine_${{ env.CROSSOVER_VERSION }}_${{ matrix.wine_arch }}"
         run: ./build_wine.sh
 
       - name: Tar Wine
+        if: ${{ ! env.SKIP_BUILD }}
         env:
           WINE_TARFILE: wine_${{ env.CROSS_OVER_VERSION }}_${{ matrix.wine_arch }}
           INSTALLROOT_WINE: "${{ github.workspace }}/install/wine_${{ env.CROSSOVER_VERSION }}_${{ matrix.wine_arch }}"
         run: tar -czvf ${{ env.WINE_TARFILE }}.tar.gz ${{ env.INSTALLROOT_WINE }}
 
       - name: Upload Wine
+        if: ${{ ! env.SKIP_BUILD }}
         uses: actions/upload-artifact@v2
         env:
           WINE_TARFILE: wine_${{ env.CROSS_OVER_VERSION }}_${{ matrix.wine_arch }}
