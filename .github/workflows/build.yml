@@ -95,7 +95,7 @@ jobs:
       - name: Tar Wine
         env:
           WINE_TARFILE: wine_${{ env.CROSS_OVER_VERSION }}_${{ matrix.wine_arch }}
-          INSTALLROOT_WINE: "${{ github.workspace }}/install/wine_${{ env.CROSSOVER_VERSION }}_${{ matrix.wine_arch }}"
+          INSTALLROOT_WINE: "install/wine_${{ env.CROSSOVER_VERSION }}_${{ matrix.wine_arch }}"
         run: tar -czvf ${{ env.WINE_TARFILE }}.tar.gz ${{ env.INSTALLROOT_WINE }}
 
       - name: Upload Wine
