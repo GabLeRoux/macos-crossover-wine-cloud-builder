@@ -72,21 +72,19 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: wine-sources
-          path: ${{ env.WINE_SOURCES }}.tar.gz
 
       - name: Extract Wine Sources
-        run: mkdir -p ./sources/wine && tar -xzf ${{ env.WINE_SOURCES }}.tar.gz ./sources/wine
+        run: tar -xvf ${{ env.WINE_SOURCES }}.tar.gz ./
 
       - name: Download Build Tools
         if: ${{ ! env.SKIP_BUILD }}
         uses: actions/download-artifact@v2
         with:
           name: ${{ env.BUILDTOOLS }}
-          path: ${{ env.BUILDTOOLS }}.tar.gz
 
       - name: Extract Build Tools
         if: ${{ ! env.SKIP_BUILD }}
-        run: mkdir -p ${{ env.INSTALLROOT_TOOLS }} && tar -xzf ${{ env.BUILDTOOLS }}.tar.gz ${{ env.INSTALLROOT_TOOLS }}
+        run: tar -xf ${{ env.BUILDTOOLS }}.tar.gz ./
 
       - name: Build Wine
         if: ${{ ! env.SKIP_BUILD }}
