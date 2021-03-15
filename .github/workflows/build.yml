@@ -5,7 +5,7 @@ env:
     CROSS_OVER_VERSION: 20.0.4
     WINE_SOURCES: wine-sources-patched
     BUILDTOOLS: build-tools
-    INSTALLROOT_TOOLS: ${{ github.workspace }}/install/build-tools
+    INSTALLROOT_TOOLS_RELATIVE: install/build-tools
 
 jobs:
   prepare:
@@ -35,13 +35,17 @@ jobs:
           path: ${{ env.WINE_SOURCES }}.tar.gz
 
       - name: Build LLVM
+        env:
+          INSTALLROOT_TOOLS: ${{ github.workspace }}/${{ env.INSTALLROOT_TOOLS_RELATIVE }}
         run: ./build_llvm.sh
 
       - name: Build Clang
+        env:
+          INSTALLROOT_TOOLS: ${{ github.workspace }}/${{ env.INSTALLROOT_TOOLS_RELATIVE }}
         run: ./build_clang.sh
 
       - name: Tar Build Tools
-        run: tar -czf ${{ env.BUILDTOOLS }}.tar.gz ${{ env.INSTALLROOT_TOOLS }}
+        run: tar -czf ${{ env.BUILDTOOLS }}.tar.gz ${{ env.INSTALLROOT_TOOLS_RELATIVE }}
 
       - name: Upload Build Tools
         uses: actions/upload-artifact@v2
@@ -84,6 +88,7 @@ jobs:
 
       - name: Build Wine
         env:
+          INSTALLROOT_TOOLS: ${{ github.workspace }}/${{ env.INSTALLROOT_TOOLS_RELATIVE }}
           INSTALLROOT_WINE: "${{ github.workspace }}/install/wine_${{ env.CROSSOVER_VERSION }}_${{ matrix.wine_arch }}"
         run: ./build_wine.sh
 
