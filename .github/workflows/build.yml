@@ -74,7 +74,7 @@ jobs:
           name: wine-sources
 
       - name: Extract Wine Sources
-        run: ls -al . ; ls -al * ; tar -xvf ${{ env.WINE_SOURCES }}.tar.gz ./
+        run: ls -al . ; ls -al * ; tar -xvf ${{ env.WINE_SOURCES }}.tar.gz
 
       - name: Download Build Tools
         if: ${{ ! env.SKIP_BUILD }}
@@ -84,7 +84,7 @@ jobs:
 
       - name: Extract Build Tools
         if: ${{ ! env.SKIP_BUILD }}
-        run: tar -xf ${{ env.BUILDTOOLS }}.tar.gz ./
+        run: tar -xf ${{ env.BUILDTOOLS }}.tar.gz
 
       - name: Build Wine
         if: ${{ ! env.SKIP_BUILD }}
