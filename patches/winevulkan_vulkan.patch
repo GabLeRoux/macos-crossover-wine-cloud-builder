@@ -1,0 +1,11 @@
+--- vulkan.orig.c	2021-03-16 14:02:23.000000000 +0100
++++ vulkan.c	2021-03-16 14:02:28.000000000 +0100
+@@ -1318,7 +1318,7 @@
+  * Allows winelib applications to access Vulkan functions with Wine
+  * additions and native ABI.
+  */
+-void *native_vkGetInstanceProcAddrWINE(VkInstance instance, const char *name)
++void * WINAPI native_vkGetInstanceProcAddrWINE(VkInstance instance, const char *name)
+ {
+     return vk_funcs->p_vkGetInstanceProcAddr(instance, name);
+ }

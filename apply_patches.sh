@@ -85,3 +85,6 @@ patch ${WINE_DLLS}/ole32/ole2impl.c < ${SCRIPT_DIR}/patches/ole32_ole2impl.patch
 patch ${WINE_DLLS}/ole32/oleobj.c < ${SCRIPT_DIR}/patches/ole32_oleobj.patch
 patch ${WINE_DLLS}/ole32/stg_prop.c < ${SCRIPT_DIR}/patches/ole32_stg_prop.patch
 patch ${WINE_DLLS}/ole32/usrmarshal.c < ${SCRIPT_DIR}/patches/ole32_usrmarshal.patch
+
+patch ${WINE_DLLS}/winevulkan/vulkan.c < ${SCRIPT_DIR}/patches/winevulkan_vulkan.patch
+patch ${WINE_DLLS}/winevulkan/vulkan_private.h < ${SCRIPT_DIR}/patches/winevulkan_vulkan_private.patch
