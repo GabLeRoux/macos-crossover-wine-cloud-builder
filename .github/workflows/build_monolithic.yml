@@ -34,6 +34,10 @@ jobs:
     runs-on:  macos-10.15
 
     steps:
+
+
+      ############ Prepare Workspace / Environment ##############
+
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -65,6 +69,9 @@ jobs:
           set -eu
           echo "$GITHUB_WORKSPACE/${{ env.TOOLS_INSTALLROOT }}" >> $GITHUB_PATH
 
+
+      ############ Download and Prepare Source Code ##############
+
       - name: Get Source
         run:  |
           curl -o ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz ${{ env.CROSS_OVER_SOURCE_URL }}
@@ -90,6 +97,9 @@ jobs:
         with:
           name: ${{ env.WINE_SOURCES }}
           path: ${{ env.WINE_SOURCES }}.tar.gz
+
+
+      ############ Build LLVM / Clang ##############
 
       - name: Configure LLVM
         run: |
@@ -145,6 +155,9 @@ jobs:
           name: ${{ env.BUILDTOOLS }}
           path: ${{ env.BUILDTOOLS }}.tar.gz
 
+
+      ############ Build 64bit Version ##############
+
       - name: Configure wine64
         env:
           CC: clang
@@ -179,6 +192,9 @@ jobs:
           pushd ${{ env.BUILDROOT }}/wine64
           make install DESTDIR="$GITHUB_WORKSPACE/${{ env.WINE_INSTALLROOT }}"
           popd
+
+
+      ############ Build 32bit Version (WoW64) ##############
 
       - name: Configure wine32on64
         env:
@@ -215,6 +231,9 @@ jobs:
           pushd ${{ env.BUILDROOT }}/wine32on64
           make install DESTDIR="$GITHUB_WORKSPACE/${{ env.WINE_INSTALLROOT }}"
           popd
+
+
+      ############ Bundle and Upload Deliverable ##############
 
       - name: Tar Wine
         run: tar -czvf ${{ env.WINE_INSTALLATION }}.tar.gz ${{ env.WINE_INSTALLROOT }}
