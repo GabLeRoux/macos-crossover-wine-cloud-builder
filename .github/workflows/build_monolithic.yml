@@ -8,9 +8,9 @@ on:
   workflow_dispatch:
 
 env:
-    PARALLEL_JOBS: 10
-    # Avoid weird linker errors with Xcode 10 and later
+    # avoid weird linker errors with Xcode 10 and later
     MACOSX_DEPLOYMENT_TARGET: 10.14
+    # crossover source code to be downloaded
     CROSS_OVER_SOURCE_URL: https://media.codeweavers.com/pub/crossover/source/crossover-sources-20.0.4.tar.gz
     CROSS_OVER_LOCAL_FILE: crossover-20.0.4
     # directories / files inside the downloaded tar file directory structure
