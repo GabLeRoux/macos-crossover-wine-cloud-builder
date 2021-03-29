@@ -204,9 +204,9 @@ jobs:
           # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes
           CFLAGS: "-Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
           LDFLAGS: "-Wl,-headerpad_max_install_names,-rpath,@loader_path/../,-rpath,/opt/X11/lib"
-          PNG_CFLAGS: "-I$(brew --prefix libpng)/include"
-          PNG_LIBS: "-L$(brew --prefix libpng)/lib"
         run: |
+          export PNG_CFLAGS="-I$(brew --prefix libpng)/include"
+          export PNG_LIBS="-L$(brew --prefix libpng)/lib"
           mkdir -p ${{ env.BUILDROOT }}/wine64
           pushd ${{ env.BUILDROOT }}/wine64
           ${{ env.WINE_CONFIGURE }} \
@@ -242,9 +242,9 @@ jobs:
           # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes
           CFLAGS: "-Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
           LDFLAGS: "-Wl,-headerpad_max_install_names,-rpath,@loader_path/../,-rpath,/opt/X11/lib"
-          PNG_CFLAGS: "-I$(brew --prefix libpng)/include"
-          PNG_LIBS: "-L$(brew --prefix libpng)/lib"
         run: |
+          export PNG_CFLAGS="-I$(brew --prefix libpng)/include"
+          export PNG_LIBS="-L$(brew --prefix libpng)/lib"
           mkdir -p ${{ env.BUILDROOT }}/wine32on64
           pushd ${{ env.BUILDROOT }}/wine32on64
           ${{ env.WINE_CONFIGURE }} \
