@@ -50,6 +50,7 @@ jobs:
                         bison            \
                         krb5             \
                         faudio           \
+                        pulseaudio       \
                         gphoto2          \
                         mingw-w64        \
                         gst-plugins-base \
