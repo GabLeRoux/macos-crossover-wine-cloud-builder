@@ -30,7 +30,7 @@ env:
     WINE_INSTALLATION: wine
 
 jobs:
-  wine-staging:
+  wine-crossover:
     runs-on:  macos-10.15
 
     steps:
