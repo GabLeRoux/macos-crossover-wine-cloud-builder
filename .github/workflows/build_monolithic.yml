@@ -157,7 +157,7 @@ jobs:
         run: |
           mkdir -p ${{ env.BUILDROOT }}/wine64
           pushd ${{ env.BUILDROOT }}/wine64
-          ./${{ env.WINE_CONFIGURE }} \
+          ${{ env.WINE_CONFIGURE }} \
                     --enable-win64 \
                     --disable-tests \
                     --disable-winedbg \
@@ -184,7 +184,7 @@ jobs:
         run: |
           mkdir -p ${{ env.BUILDROOT }}/wine32on64
           pushd ${{ env.BUILDROOT }}/wine32on64
-          ./${{ env.WINE_CONFIGURE }} \
+          ${{ env.WINE_CONFIGURE }} \
                     --enable-win32on64 \
                     --with-wine64=${{ env.BUILDROOT }}/wine64 \
                     --disable-tests \
