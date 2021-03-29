@@ -88,3 +88,5 @@ patch ${WINE_DLLS}/ole32/usrmarshal.c < ${SCRIPT_DIR}/patches/ole32_usrmarshal.p
 
 patch ${WINE_DLLS}/winevulkan/vulkan.c < ${SCRIPT_DIR}/patches/winevulkan_vulkan.patch
 patch ${WINE_DLLS}/winevulkan/vulkan_private.h < ${SCRIPT_DIR}/patches/winevulkan_vulkan_private.patch
+
+patch sources/dxvk/src/util/rc/util_rc_ptr.h < ${SCRIPT_DIR}/patches/dxvk_util_rc_ptr.patch

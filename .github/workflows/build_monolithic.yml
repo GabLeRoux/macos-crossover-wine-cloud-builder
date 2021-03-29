@@ -17,6 +17,7 @@ env:
     LLVM_MAKEDIR: $GITHUB_WORKSPACE/sources/clang/llvm
     CLANG_MAKEDIR: $GITHUB_WORKSPACE/sources/clang/clang
     WINE_CONFIGURE: $GITHUB_WORKSPACE/sources/wine/configure
+    DXVK_BUILDSCRIPT: $GITHUB_WORKSPACE/sources/dxvk/package-release.sh
     # build directories
     BUILDROOT: $GITHUB_WORKSPACE/build
     LLVM_BUILDDIR: $GITHUB_WORKSPACE/build/llvm
@@ -24,10 +25,13 @@ env:
     # target directories for installation (must be relative to $GITHUB_WORKSPACE)
     TOOLS_INSTALLROOT: install/build-tools
     WINE_INSTALLROOT: install/wine
+    DXVK_INSTALLROOT: install/dxvk
     # artifact names
     BUILDTOOLS: build-tools
     WINE_SOURCES: crossover-20.0.4-patched
+    DXVK_SOURCES: dxvk-sources-patched
     WINE_INSTALLATION: wine
+    DXVK_INSTALLATION: dxvk
 
 jobs:
   wine-crossover:
@@ -58,6 +62,10 @@ jobs:
                         little-cms2      \
                         libpng           \
                         molten-vk
+          # dependencies for dxvk
+          brew install  coreutils \
+                        meson     \
+                        glslang
 
       - name: Add bison & krb5 to $PATH
         run: |
@@ -90,7 +98,7 @@ jobs:
       - name: Apply Patches
         run: ./apply_patches.sh
 
-      - name: Tar Patched Wine Sources
+      - name: Tar Patched Crossover Sources
         run: tar -czvf ${{ env.WINE_SOURCES }}.tar.gz ./sources/wine
 
       - name: Upload Patched Crossover Sources
@@ -98,6 +106,15 @@ jobs:
         with:
           name: ${{ env.WINE_SOURCES }}
           path: ${{ env.WINE_SOURCES }}.tar.gz
+
+      - name: Tar Patched DXVK Sources
+        run: tar -czvf ${{ env.DXVK_SOURCES }}.tar.gz ./sources/dxvk
+
+      - name: Upload Patched DXVK Sources
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.DXVK_SOURCES }}
+          path: ${{ env.DXVK_SOURCES }}.tar.gz
 
 
       ############ Build LLVM / Clang ##############
@@ -155,6 +172,25 @@ jobs:
         with:
           name: ${{ env.BUILDTOOLS }}
           path: ${{ env.BUILDTOOLS }}.tar.gz
+
+
+      ############ Build DXVK ##############
+
+      - name: Build DXVK
+        env:
+          CC: clang
+          CXX: clang++
+        run: |
+          PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH" ${{ env.DXVK_BUILDSCRIPT }} master $GITHUB_WORKSPACE/${{ env.DXVK_INSTALLROOT }} --no-package
+
+      - name: Tar DXVK
+        run: tar -czf ${{ env.DXVK_INSTALLATION }}.tar.gz ${{ env.DXVK_INSTALLROOT }}
+
+      - name: Upload DXVK
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.DXVK_INSTALLATION }}
+          path: ${{ env.DXVK_INSTALLATION }}.tar.gz
 
 
       ############ Build 64bit Version ##############
