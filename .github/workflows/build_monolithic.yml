@@ -67,7 +67,7 @@ jobs:
       - name: Add llvm/clang to $PATH (for later)
         run: |
           set -eu
-          echo "$GITHUB_WORKSPACE/${{ env.TOOLS_INSTALLROOT }}" >> $GITHUB_PATH
+          echo "$GITHUB_WORKSPACE/${{ env.TOOLS_INSTALLROOT }}/bin" >> $GITHUB_PATH
 
 
       ############ Download and Prepare Source Code ##############
