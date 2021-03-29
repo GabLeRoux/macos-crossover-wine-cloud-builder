@@ -12,7 +12,7 @@ env:
     # Avoid weird linker errors with Xcode 10 and later
     MACOSX_DEPLOYMENT_TARGET: 10.14
     CROSS_OVER_SOURCE_URL: https://media.codeweavers.com/pub/crossover/source/crossover-sources-20.0.4.tar.gz
-    CROSS_OVER_LOCAL_FILE: crossover.tar.gz
+    CROSS_OVER_LOCAL_FILE: crossover-20.0.4
     # directories / files inside the downloaded tar file directory structure
     LLVM_MAKEDIR: $GITHUB_WORKSPACE/sources/clang/llvm
     CLANG_MAKEDIR: $GITHUB_WORKSPACE/sources/clang/clang
@@ -26,7 +26,7 @@ env:
     WINE_INSTALLROOT: install/wine
     # artifact names
     BUILDTOOLS: build-tools
-    WINE_SOURCES: wine-sources-patched
+    WINE_SOURCES: crossover-20.0.4-patched
     WINE_INSTALLATION: wine
 
 jobs:
@@ -67,22 +67,28 @@ jobs:
 
       - name: Get Source
         run:  |
-          curl -o ${{ env.CROSS_OVER_LOCAL_FILE }} ${{ env.CROSS_OVER_SOURCE_URL }}
+          curl -o ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz ${{ env.CROSS_OVER_SOURCE_URL }}
+
+      - name: Upload Original Crossover Sources
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.CROSS_OVER_LOCAL_FILE }}
+          path: ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz
 
       - name: Extract Source
         run:  |
-          tar xf ${{ env.CROSS_OVER_LOCAL_FILE }}
+          tar xf ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz
 
       - name: Apply Patches
         run: ./apply_patches.sh
 
-      - name: Tar patched Wine Sources
+      - name: Tar Patched Wine Sources
         run: tar -czvf ${{ env.WINE_SOURCES }}.tar.gz ./sources/wine
 
-      - name: Upload patched Wine Sources
+      - name: Upload Patched Crossover Sources
         uses: actions/upload-artifact@v2
         with:
-          name: wine-sources
+          name: ${{ env.WINE_SOURCES }}
           path: ${{ env.WINE_SOURCES }}.tar.gz
 
       - name: Configure LLVM
