@@ -1,0 +1,200 @@
+name: Wine-Crossover-MacOS
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+env:
+    PARALLEL_JOBS: 10
+    # Avoid weird linker errors with Xcode 10 and later
+    MACOSX_DEPLOYMENT_TARGET: 10.14
+    CROSS_OVER_SOURCE_URL: https://media.codeweavers.com/pub/crossover/source/crossover-sources-20.0.4.tar.gz
+    CROSS_OVER_LOCAL_FILE: crossover.tar.gz
+    # directories / files inside the downloaded tar file directory structure
+    LLVM_MAKEDIR: $GITHUB_WORKSPACE/sources/clang/llvm
+    CLANG_MAKEDIR: $GITHUB_WORKSPACE/sources/clang/clang
+    WINE_CONFIGURE: $GITHUB_WORKSPACE/sources/wine/configure
+    # build directories
+    BUILDROOT: $GITHUB_WORKSPACE/build
+    LLVM_BUILDDIR: $GITHUB_WORKSPACE/build/llvm
+    CLANG_BUILDDIR: $GITHUB_WORKSPACE/build/clang
+    # target directories for installation (must be relative to $GITHUB_WORKSPACE)
+    TOOLS_INSTALLROOT: install/build-tools
+    WINE_INSTALLROOT: install/wine
+    # artifact names
+    BUILDTOOLS: build-tools
+    WINE_SOURCES: wine-sources-patched
+    WINE_INSTALLATION: wine
+
+jobs:
+  wine-staging:
+    runs-on:  macos-10.15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: |
+          brew install --cask xquartz
+          brew install  cmake            \
+                        ninja            \
+                        freetype         \
+                        bison            \
+                        krb5             \
+                        faudio           \
+                        gphoto2          \
+                        mingw-w64        \
+                        gst-plugins-base \
+                        mpg123           \
+                        little-cms2      \
+                        libpng           \
+                        molten-vk
+
+      - name: Add bison & krb5 to $PATH
+        run: |
+          set -eu
+          echo "$(brew --prefix bison)/bin" >> $GITHUB_PATH
+          echo "$(brew --prefix krb5)/bin" >> $GITHUB_PATH
+
+      - name: Add llvm/clang to $PATH (for later)
+        run: |
+          set -eu
+          echo "$GITHUB_WORKSPACE/${{ env.TOOLS_INSTALLROOT }}" >> $GITHUB_PATH
+
+      - name: Get Source
+        run:  |
+          curl -o ${{ env.CROSS_OVER_LOCAL_FILE }} ${{ env.CROSS_OVER_SOURCE_URL }}
+
+      - name: Extract Source
+        run:  |
+          tar xf ${{ env.CROSS_OVER_LOCAL_FILE }}
+
+      - name: Apply Patches
+        run: ./apply_patches.sh
+
+      - name: Tar patched Wine Sources
+        run: tar -czvf ${{ env.WINE_SOURCES }}.tar.gz ./sources/wine
+
+      - name: Upload patched Wine Sources
+        uses: actions/upload-artifact@v2
+        with:
+          name: wine-sources
+          path: ${{ env.WINE_SOURCES }}.tar.gz
+
+      - name: Configure LLVM
+        run: |
+          mkdir -p ${{ env.LLVM_BUILDDIR }}
+          pushd ${{ env.LLVM_BUILDDIR }}
+          cmake -G Ninja \
+                -DLLVM_TARGETS_TO_BUILD=X86 \
+                -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/${{ env.TOOLS_INSTALLROOT }}" \
+                ${{ env.LLVM_MAKEDIR }}
+          popd
+
+      - name: Build LLVM
+        run: |
+          pushd ${{ env.LLVM_BUILDDIR }}
+          Ninja
+          Ninja install
+          popd
+
+      - name: Configure Clang
+        run: |
+          mkdir -p ${{ env.CLANG_BUILDDIR }}
+          pushd ${{ env.CLANG_BUILDDIR }}
+          cmake -G Ninja \
+                -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/${{ env.TOOLS_INSTALLROOT }}" \
+                ${{ env.CLANG_MAKEDIR }}
+          popd
+
+      - name: Build Clang
+        run: |
+          pushd ${{ env.CLANG_BUILDDIR }}
+          Ninja
+          Ninja install
+          popd
+
+      - name: Tar Build Tools
+        run: tar -czf ${{ env.BUILDTOOLS }}.tar.gz ${{ env.TOOLS_INSTALLROOT }}
+
+      - name: Upload Build Tools
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.BUILDTOOLS }}
+          path: ${{ env.BUILDTOOLS }}.tar.gz
+
+      - name: Configure wine64
+        env:
+          # Xcode12 by default enables '-Werror,-Wimplicit-function-declaration' (49917738)
+          # this causes wine(64) builds to fail so needs to be disabled.
+          # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes
+          CFLAGS: "-Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
+          LDFLAGS: "-Wl,-headerpad_max_install_names,-rpath,@loader_path/../,-rpath,/opt/X11/lib"
+          PNG_CFLAGS: "-I$(brew --prefix libpng)/include"
+          PNG_LIBS: "-L$(brew --prefix libpng)/lib"
+        run: |
+          mkdir -p ${{ env.BUILDROOT }}/wine64
+          pushd ${{ env.BUILDROOT }}/wine64
+          ./${{ env.WINE_CONFIGURE }} \
+                    --enable-win64 \
+                    --disable-tests \
+                    --disable-winedbg \
+                    --with-png \
+                    --x-include=/opt/X11/include \
+                    --x-lib=/opt/X11/lib
+          popd
+
+      - name: Build wine64
+        run: |
+          pushd ${{ env.BUILDROOT }}/wine64
+          make -j$(sysctl -n hw.ncpu 2>/dev/null)
+          popd
+
+      - name: Configure wine32on64
+        env:
+          # Xcode12 by default enables '-Werror,-Wimplicit-function-declaration' (49917738)
+          # this causes wine(64) builds to fail so needs to be disabled.
+          # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes
+          CFLAGS: "-Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
+          LDFLAGS: "-Wl,-headerpad_max_install_names,-rpath,@loader_path/../,-rpath,/opt/X11/lib"
+          PNG_CFLAGS: "-I$(brew --prefix libpng)/include"
+          PNG_LIBS: "-L$(brew --prefix libpng)/lib"
+        run: |
+          mkdir -p ${{ env.BUILDROOT }}/wine32on64
+          pushd ${{ env.BUILDROOT }}/wine32on64
+          ./${{ env.WINE_CONFIGURE }} \
+                    --enable-win32on64 \
+                    --with-wine64=${{ env.BUILDROOT }}/wine64 \
+                    --disable-tests \
+                    --disable-winedbg \
+                    --with-png \
+                    --x-include=/opt/X11/include \
+                    --x-lib=/opt/X11/lib
+          popd
+
+      - name: Build wine32on64
+        run: |
+          pushd ${{ env.BUILDROOT }}/wine32on64
+          make -j$(sysctl -n hw.ncpu 2>/dev/null)
+          popd
+
+      - name: Install wine32on64
+        run: |
+          pushd ${{ env.BUILDROOT }}/wine32on64
+          make install DESTDIR="$GITHUB_WORKSPACE/${{ env.WINE_INSTALLROOT }}"
+          popd
+
+      - name: Tar Wine
+        run: tar -czvf ${{ env.WINE_INSTALLATION }}.tar.gz ${{ env.WINE_INSTALLROOT }}
+
+      - name: Upload Wine
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.WINE_INSTALLATION }}
+          path: ${{ env.WINE_INSTALLATION }}.tar.gz
