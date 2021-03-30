@@ -47,20 +47,23 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          # build tools
           brew install  cmake            \
                         ninja            \
-                        freetype         \
+                        mingw-w64        \
+
+          # build dependencies for wine / crossover
+          brew install  freetype         \
                         bison            \
                         krb5             \
                         faudio           \
-                        pulseaudio       \
                         gphoto2          \
-                        mingw-w64        \
                         gst-plugins-base \
                         mpg123           \
                         little-cms2      \
                         libpng           \
                         molten-vk
+
           # dependencies for dxvk
           brew install  coreutils \
                         meson     \
@@ -208,6 +211,14 @@ jobs:
           ${{ env.WINE_CONFIGURE }} \
                     --enable-win64 \
                     --disable-tests \
+                    --without-alsa \
+                    --without-capi \
+                    --without-dbus \
+                    --without-inotify \
+                    --without-oss \
+                    --without-pulse \
+                    --without-udev \
+                    --without-v4l2 \
                     --with-png \
                     --x-include=/opt/X11/include \
                     --x-lib=/opt/X11/lib
@@ -245,6 +256,14 @@ jobs:
                     --enable-win32on64 \
                     --with-wine64=${{ env.BUILDROOT }}/wine64 \
                     --disable-tests \
+                    --without-alsa \
+                    --without-capi \
+                    --without-dbus \
+                    --without-inotify \
+                    --without-oss \
+                    --without-pulse \
+                    --without-udev \
+                    --without-v4l2 \
                     --disable-winedbg \
                     --without-cms \
                     --with-png \
