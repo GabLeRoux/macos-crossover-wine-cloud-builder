@@ -265,6 +265,7 @@ jobs:
                     --without-v4l2 \
                     --disable-winedbg \
                     --without-cms \
+                    --without-gstreamer \
                     --with-png \
                     --without-x
           popd
