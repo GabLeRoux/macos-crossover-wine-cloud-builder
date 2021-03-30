@@ -176,9 +176,6 @@ jobs:
       ############ Build DXVK ##############
 
       - name: Build DXVK
-        env:
-          CC: clang
-          CXX: clang++
         run: |
           PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH" ${{ env.DXVK_BUILDSCRIPT }} master $GITHUB_WORKSPACE/${{ env.DXVK_INSTALLROOT }} --no-package
 
