@@ -251,6 +251,7 @@ jobs:
                     --with-wine64=${{ env.BUILDROOT }}/wine64 \
                     --disable-tests \
                     --disable-winedbg \
+                    --without-cms \
                     --with-png \
                     --x-include=/opt/X11/include \
                     --x-lib=/opt/X11/lib
