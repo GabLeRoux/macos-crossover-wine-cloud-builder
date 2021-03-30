@@ -57,6 +57,7 @@ jobs:
                         bison            \
                         krb5             \
                         faudio           \
+                        sdl2             \
                         gphoto2          \
                         gst-plugins-base \
                         mpg123           \
