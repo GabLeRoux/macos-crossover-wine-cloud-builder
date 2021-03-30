@@ -223,6 +223,7 @@ jobs:
                     --without-pulse \
                     --without-udev \
                     --without-v4l2 \
+                    --without-gsm \
                     --with-png \
                     --with-sdl \
                     --without-x
@@ -275,6 +276,7 @@ jobs:
                     --disable-winedbg \
                     --without-cms \
                     --without-gstreamer \
+                    --without-gsm \
                     --with-png \
                     --with-sdl \
                     --without-x
