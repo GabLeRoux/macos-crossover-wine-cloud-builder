@@ -212,7 +212,6 @@ jobs:
           ${{ env.WINE_CONFIGURE }} \
                     --enable-win64 \
                     --disable-tests \
-                    --disable-winedbg \
                     --with-png \
                     --x-include=/opt/X11/include \
                     --x-lib=/opt/X11/lib
