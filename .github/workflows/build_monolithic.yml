@@ -210,6 +210,8 @@ jobs:
           export PNG_CFLAGS="-I$(brew --prefix libpng)/include"
           export PNG_LIBS="-L$(brew --prefix libpng)/lib"
 
+          export LDFLAGS="-L $(brew --prefix molten-vk)/lib"
+
           mkdir -p ${{ env.BUILDROOT }}/wine64
           pushd ${{ env.BUILDROOT }}/wine64
           ${{ env.WINE_CONFIGURE }} \
@@ -226,6 +228,7 @@ jobs:
                     --without-gsm \
                     --with-png \
                     --with-sdl \
+                    --with-vulkan \
                     --without-x
           popd
 
