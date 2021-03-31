@@ -241,7 +241,7 @@ jobs:
       - name: Install wine64
         run: |
           pushd ${{ env.BUILDROOT }}/wine64
-          make install DESTDIR="$GITHUB_WORKSPACE/${{ env.WINE_INSTALLROOT }}"
+          make install-lib DESTDIR="$GITHUB_WORKSPACE/${{ env.WINE_INSTALLROOT }}"
           popd
 
 
@@ -294,7 +294,7 @@ jobs:
       - name: Install wine32on64
         run: |
           pushd ${{ env.BUILDROOT }}/wine32on64
-          make install DESTDIR="$GITHUB_WORKSPACE/${{ env.WINE_INSTALLROOT }}"
+          make install-lib DESTDIR="$GITHUB_WORKSPACE/${{ env.WINE_INSTALLROOT }}"
           popd
 
 
