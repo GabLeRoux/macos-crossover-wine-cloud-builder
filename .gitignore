@@ -4,3 +4,4 @@ sources
 winetricks
 wine_install
 install
+build
