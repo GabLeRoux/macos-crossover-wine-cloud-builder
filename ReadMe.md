@@ -1,6 +1,5 @@
 # MacOS CrossOver FOSS built from the Cloud
 
-[![.github/workflows/build.yml](https://github.com/dasmy/macos-crossover-cloud-build/workflows/.github/workflows/build.yml/badge.svg)](https://github.com/dasmy/macos-crossover-cloud-build/actions)
 [![.github/workflows/build_monolithic.yml](https://github.com/dasmy/macos-crossover-cloud-build/workflows/.github/workflows/build_monolithic.yml/badge.svg)](https://github.com/dasmy/macos-crossover-cloud-build/actions)
 
 Let's build [FOSS CrossOver][foss-crossover] for macOS in the cloud! I found [some gists][crossover-gist] and I asked myself why don't we use the cloud and the free open source builders to build this? Here it is.
@@ -8,7 +7,7 @@ Let's build [FOSS CrossOver][foss-crossover] for macOS in the cloud! I found [so
 ## How this works?
 
 1. See [Github Actions](https://github.com/features/actions)
-2. See [`.github/workflows/build.yml`](./.github/workflows/build.yml)
+2. See [`.github/workflows/build_monolithic.yml`](./.github/workflows/build_monolithic.yml)
 3. See [`build_local.sh`](./build_local.sh)
 
 ## Is it working?
@@ -27,7 +26,7 @@ See [#2](https://github.com/GabLeRoux/macos-crossover-cloud-build/issues/2)
 
 It will only work if you're on macOS, but yes.
 Clone the project, read the scripts first, then feel free to run [`build_local.sh`](./build_local.sh) 👍.
-The script is a copy of the steps done in the github action in [`.github/workflows/build.yml`](./.github/workflows/build.yml).
+The script is a copy of the steps done in the github action in [`.github/workflows/build_monolithic.yml`](./.github/workflows/build_monolithic.yml).
 It contains some variables to allow for customizations.
 
 This is an [MIT](LICENSE.md) repo. If you break something on your system doing so, it's your fault 😉
