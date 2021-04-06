@@ -4,21 +4,23 @@ set -ex
 
 echo Wine-Crossover-MacOS
 
+export GITHUB_WORKSPACE=$(pwd)
+
 # avoid weird linker errors with Xcode 10 and later
 export MACOSX_DEPLOYMENT_TARGET=10.14
 # crossover source code to be downloaded
 export CROSS_OVER_SOURCE_URL=https://media.codeweavers.com/pub/crossover/source/crossover-sources-20.0.4.tar.gz
 export CROSS_OVER_LOCAL_FILE=crossover-20.0.4
 # directories / files inside the downloaded tar file directory structure
-export LLVM_MAKEDIR=$(pwd)/sources/clang/llvm
-export CLANG_MAKEDIR=$(pwd)/sources/clang/clang
-export WINE_CONFIGURE=$(pwd)/sources/wine/configure
-export DXVK_BUILDSCRIPT=$(pwd)/sources/dxvk/package-release.sh
+export LLVM_MAKEDIR=$GITHUB_WORKSPACE/sources/clang/llvm
+export CLANG_MAKEDIR=$GITHUB_WORKSPACE/sources/clang/clang
+export WINE_CONFIGURE=$GITHUB_WORKSPACE/sources/wine/configure
+export DXVK_BUILDSCRIPT=$GITHUB_WORKSPACE/sources/dxvk/package-release.sh
 # build directories
-export BUILDROOT=$(pwd)/build
-export LLVM_BUILDDIR=$(pwd)/build/llvm
-export CLANG_BUILDDIR=$(pwd)/build/clang
-# target directories for installation (must be relative to $(pwd))
+export BUILDROOT=$GITHUB_WORKSPACE/build
+export LLVM_BUILDDIR=$GITHUB_WORKSPACE/build/llvm
+export CLANG_BUILDDIR=$GITHUB_WORKSPACE/build/clang
+# target directories for installation (must be relative to $GITHUB_WORKSPACE)
 export TOOLS_INSTALLROOT=install/build-tools
 export WINE_INSTALLROOT=install/wine
 export DXVK_INSTALLROOT=install/dxvk
@@ -60,7 +62,7 @@ export PATH="$(brew --prefix bison)/bin":${PATH}
 export PATH="$(brew --prefix krb5)/bin":${PATH}
 
 echo Add llvm/clang to PATH for later
-export PATH="$(pwd)/${TOOLS_INSTALLROOT}/bin":${PATH}
+export PATH="$GITHUB_WORKSPACE/${TOOLS_INSTALLROOT}/bin":${PATH}
 
 
 ############ Download and Prepare Source Code ##############
@@ -101,7 +103,7 @@ pushd ${LLVM_BUILDDIR}
 cmake -G Ninja \
     -DLLVM_TARGETS_TO_BUILD=X86 \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="$(pwd)/${TOOLS_INSTALLROOT}" \
+    -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/${TOOLS_INSTALLROOT}" \
     ${LLVM_MAKEDIR}
 popd
 
@@ -120,7 +122,7 @@ mkdir -p ${CLANG_BUILDDIR}
 pushd ${CLANG_BUILDDIR}
 cmake -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="$(pwd)/${TOOLS_INSTALLROOT}" \
+    -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/${TOOLS_INSTALLROOT}" \
     ${CLANG_MAKEDIR}
 popd
 
@@ -145,7 +147,7 @@ cp ${BUILDTOOLS}.tar.gz ${PACKAGE_UPLOAD}/
 ############ Build DXVK ##############
 
 echo Build DXVK
-PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${DXVK_BUILDSCRIPT} master $(pwd)/${DXVK_INSTALLROOT} --no-package
+PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${DXVK_BUILDSCRIPT} master $GITHUB_WORKSPACE/${DXVK_INSTALLROOT} --no-package
 
 echo Tar DXVK
 tar -czf ${DXVK_INSTALLATION}.tar.gz ${DXVK_INSTALLROOT}
@@ -200,7 +202,7 @@ popd
 
 echo Install wine64
 pushd ${BUILDROOT}/wine64
-make install-lib DESTDIR="$(pwd)/${WINE_INSTALLROOT}"
+make install-lib DESTDIR="$GITHUB_WORKSPACE/${WINE_INSTALLROOT}"
 popd
 
 
@@ -254,7 +256,7 @@ popd
 
 echo Install wine32on64
 pushd ${BUILDROOT}/wine32on64
-make install-lib DESTDIR="$(pwd)/${WINE_INSTALLROOT}"
+make install-lib DESTDIR="$GITHUB_WORKSPACE/${WINE_INSTALLROOT}"
 popd
 
 
