@@ -282,6 +282,7 @@ jobs:
                     --without-gsm \
                     --with-png \
                     --with-sdl \
+                    --without-vkd3d \
                     --without-vulkan \
                     --without-x
           popd
