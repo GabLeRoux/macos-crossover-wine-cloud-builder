@@ -55,7 +55,7 @@ brew install  coreutils \
             meson     \
             glslang
 
-echo Add bison & krb5 to PATH
+echo Add bison and krb5 to PATH
 export PATH="$(brew --prefix bison)/bin":${PATH}
 export PATH="$(brew --prefix krb5)/bin":${PATH}
 
@@ -66,8 +66,7 @@ export PATH="$(pwd)/${TOOLS_INSTALLROOT}/bin":${PATH}
 ############ Download and Prepare Source Code ##############
 
 echo Get Source
-
-    curl -o ${CROSS_OVER_LOCAL_FILE}.tar.gz ${CROSS_OVER_SOURCE_URL}
+curl -o ${CROSS_OVER_LOCAL_FILE}.tar.gz ${CROSS_OVER_SOURCE_URL}
 
 echo Upload Original Crossover Sources
 mkdir -p ${PACKAGE_UPLOAD}
