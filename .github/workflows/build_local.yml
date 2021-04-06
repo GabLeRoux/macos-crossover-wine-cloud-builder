@@ -1,0 +1,30 @@
+name: Wine-Crossover-MacOS-local
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+    # this has to be synchronized with the same variable in build_local.sh
+    PACKAGE_UPLOAD: install/packages
+
+jobs:
+  wine-crossover-local:
+    runs-on:  macos-10.15
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Run build_local.sh
+        run: build_local.sh
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PACKAGE_UPLOAD }}
+          path: ${{ env.PACKAGE_UPLOAD }}
