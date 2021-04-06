@@ -284,6 +284,8 @@ jobs:
                     --with-sdl \
                     --without-vkd3d \
                     --without-vulkan \
+                    --disable-vulkan_1 \
+                    --disable-winevulkan \
                     --without-x
           popd
 
