@@ -89,4 +89,4 @@ cp ${SCRIPT_DIR}/patches/distversion.h sources/wine/include/distversion.h
 #patch ${WINE_DLLS}/winevulkan/vulkan.c < ${SCRIPT_DIR}/patches/winevulkan_vulkan.patch
 #patch ${WINE_DLLS}/winevulkan/vulkan_private.h < ${SCRIPT_DIR}/patches/winevulkan_vulkan_private.patch
 
-patch sources/dxvk/src/util/rc/util_rc_ptr.h < ${SCRIPT_DIR}/patches/dxvk_util_rc_ptr.patch
+#patch sources/dxvk/src/util/rc/util_rc_ptr.h < ${SCRIPT_DIR}/patches/dxvk_util_rc_ptr.patch
