@@ -181,7 +181,7 @@ jobs:
 
       - name: Build DXVK
         run: |
-          PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH" ${{ env.DXVK_BUILDSCRIPT }} master $GITHUB_WORKSPACE/${{ env.DXVK_INSTALLROOT }} --no-package
+          PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${{ env.DXVK_BUILDSCRIPT }} master $GITHUB_WORKSPACE/${{ env.DXVK_INSTALLROOT }} --no-package
 
       - name: Tar DXVK
         run: tar -czf ${{ env.DXVK_INSTALLATION }}.tar.gz ${{ env.DXVK_INSTALLROOT }}
