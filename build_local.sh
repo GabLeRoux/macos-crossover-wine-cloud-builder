@@ -80,6 +80,9 @@ tar xf ${CROSS_OVER_LOCAL_FILE}.tar.gz
 echo Add distversion.h
 cp distversion.h sources/wine/include/distversion.h
 
+echo Patch DXVK
+patch sources/dxvk/src/util/rc/util_rc_ptr.h < dxvk_util_rc_ptr.patch
+
 echo Tar Patched Crossover Sources
 tar -czvf ${WINE_SOURCES}.tar.gz ./sources/wine
 
