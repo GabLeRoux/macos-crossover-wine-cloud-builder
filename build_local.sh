@@ -59,7 +59,7 @@ echo Add bison and krb5 to PATH
 export PATH="$(brew --prefix bison)/bin":${PATH}
 export PATH="$(brew --prefix krb5)/bin":${PATH}
 
-echo Add llvm/clang to PATH (for later)
+echo Add llvm/clang to PATH for later
 export PATH="$(pwd)/${TOOLS_INSTALLROOT}/bin":${PATH}
 
 
