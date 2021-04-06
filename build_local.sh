@@ -77,8 +77,8 @@ cp ${CROSS_OVER_LOCAL_FILE}.tar.gz ${PACKAGE_UPLOAD}/
 echo Extract Source
 tar xf ${CROSS_OVER_LOCAL_FILE}.tar.gz
 
-echo Apply Patches
- ./apply_patches.sh
+echo Add distversion.h
+cp distversion.h sources/wine/include/distversion.h
 
 echo Tar Patched Crossover Sources
 tar -czvf ${WINE_SOURCES}.tar.gz ./sources/wine
