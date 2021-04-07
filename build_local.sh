@@ -14,7 +14,7 @@ fi
 export MACOSX_DEPLOYMENT_TARGET=10.14
 # crossover source code to be downloaded
 export CROSS_OVER_SOURCE_URL=https://media.codeweavers.com/pub/crossover/source/crossover-sources-${CROSS_OVER_VERSION}.tar.gz
-export CROSS_OVER_LOCAL_FILE=crossover-${matrix.CROSS_OVER_VERSION}
+export CROSS_OVER_LOCAL_FILE=crossover-${CROSS_OVER_VERSION}
 # directories / files inside the downloaded tar file directory structure
 export LLVM_MAKEDIR=$GITHUB_WORKSPACE/sources/clang/llvm
 export CLANG_MAKEDIR=$GITHUB_WORKSPACE/sources/clang/clang
