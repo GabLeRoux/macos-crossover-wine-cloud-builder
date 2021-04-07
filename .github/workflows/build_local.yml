@@ -21,15 +21,16 @@ jobs:
 
     runs-on:  macos-10.15
 
+    env:
+      CROSS_OVER_VERSION: ${{ matrix.CROSS_OVER_VERSION }}
+
     steps:
 
       - name: Checkout
         uses: actions/checkout@v2
 
       - name: Run build_local.sh
-        run: |
-          export CROSS_OVER_VERSION=${{ matrix.CROSS_OVER_VERSION }}
-          ./build_local.sh
+        run: ./build_local.sh
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
