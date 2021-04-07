@@ -10,9 +10,6 @@ on:
 env:
     # avoid weird linker errors with Xcode 10 and later
     MACOSX_DEPLOYMENT_TARGET: 10.14
-    # crossover source code to be downloaded
-    CROSS_OVER_SOURCE_URL: https://media.codeweavers.com/pub/crossover/source/crossover-sources-20.0.4.tar.gz
-    CROSS_OVER_LOCAL_FILE: crossover-20.0.4
     # directories / files inside the downloaded tar file directory structure
     LLVM_MAKEDIR: $GITHUB_WORKSPACE/sources/clang/llvm
     CLANG_MAKEDIR: $GITHUB_WORKSPACE/sources/clang/clang
@@ -26,19 +23,29 @@ env:
     TOOLS_INSTALLROOT: install/build-tools
     WINE_INSTALLROOT: install/wine
     DXVK_INSTALLROOT: install/dxvk
-    # artifact names
-    BUILDTOOLS: build-tools
-    WINE_SOURCES: crossover-20.0.4-patched
-    DXVK_SOURCES: dxvk-sources-patched
-    WINE_INSTALLATION: wine
-    DXVK_INSTALLATION: dxvk
 
 jobs:
   wine-crossover:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        CROSS_OVER_VERSION: [20.0.4, 20.0.2, 19.0.2]
+
     runs-on:  macos-10.15
 
-    steps:
+    env:
+      # crossover source code to be downloaded
+      CROSS_OVER_SOURCE_URL: https://media.codeweavers.com/pub/crossover/source/crossover-sources-${{ matrix.CROSS_OVER_VERSION }}.tar.gz
+      CROSS_OVER_LOCAL_FILE: crossover-${{ matrix.CROSS_OVER_VERSION }}
+      # artifact names
+      BUILDTOOLS: build-tools
+      WINE_SOURCES: wine.src-cx${{ matrix.CROSS_OVER_VERSION }}-patched
+      DXVK_SOURCES: dxvk.src-cx${{ matrix.CROSS_OVER_VERSION }}-patched
+      WINE_INSTALLATION: wine-cx${{ matrix.CROSS_OVER_VERSION }}
+      DXVK_INSTALLATION: dxvk-cx${{ matrix.CROSS_OVER_VERSION }}
 
+    steps:
 
       ############ Prepare Workspace / Environment ##############
 
