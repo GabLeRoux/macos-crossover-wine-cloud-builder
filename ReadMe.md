@@ -13,7 +13,10 @@ Let's build [FOSS CrossOver][foss-crossover] for macOS in the cloud! I found [so
 
 ## Is it working?
 
-Not for me, see [#6](https://github.com/GabLeRoux/macos-crossover-cloud-build/issues/6)
+In principle yes, see the following image which is `notepad.exe` running inside wine on a macOS 10.15 machine:
+![Notepad running in wine](doc/wine64_notepad.png)
+
+However, there are still some issues, e.g. #9.
 
 ## Inspiration
 
