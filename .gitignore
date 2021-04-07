@@ -5,3 +5,4 @@ winetricks
 wine_install
 install
 build
+.DS_Store
