@@ -6,11 +6,15 @@ echo Wine-Crossover-MacOS
 
 export GITHUB_WORKSPACE=$(pwd)
 
+if [ -z "$CROSS_OVER_VERSION" ]; then
+    export CROSS_OVER_VERSION=20.0.4
+fi
+
 # avoid weird linker errors with Xcode 10 and later
 export MACOSX_DEPLOYMENT_TARGET=10.14
 # crossover source code to be downloaded
-export CROSS_OVER_SOURCE_URL=https://media.codeweavers.com/pub/crossover/source/crossover-sources-20.0.4.tar.gz
-export CROSS_OVER_LOCAL_FILE=crossover-20.0.4
+export CROSS_OVER_SOURCE_URL=https://media.codeweavers.com/pub/crossover/source/crossover-sources-${CROSS_OVER_VERSION}.tar.gz
+export CROSS_OVER_LOCAL_FILE=crossover-${matrix.CROSS_OVER_VERSION}
 # directories / files inside the downloaded tar file directory structure
 export LLVM_MAKEDIR=$GITHUB_WORKSPACE/sources/clang/llvm
 export CLANG_MAKEDIR=$GITHUB_WORKSPACE/sources/clang/clang
@@ -27,10 +31,10 @@ export DXVK_INSTALLROOT=install/dxvk
 export PACKAGE_UPLOAD=install/packages
 # artifact names
 export BUILDTOOLS=build-tools
-export WINE_SOURCES=crossover-20.0.4-patched
-export DXVK_SOURCES=dxvk-sources-patched
-export WINE_INSTALLATION=wine
-export DXVK_INSTALLATION=dxvk
+export WINE_SOURCES=cwine.src-cx${CROSS_OVER_VERSION}-patched
+export DXVK_SOURCES=dxvk.src-cx${CROSS_OVER_VERSION}-patched
+export WINE_INSTALLATION=wine-cx${CROSS_OVER_VERSION}
+export DXVK_INSTALLATION=dxvk-cx${CROSS_OVER_VERSION}
 
 
 echo Install Dependencies
