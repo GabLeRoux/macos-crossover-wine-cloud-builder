@@ -96,12 +96,6 @@ jobs:
         run:  |
           curl -o ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz ${{ env.CROSS_OVER_SOURCE_URL }}
 
-      - name: Upload Original Crossover Sources
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.CROSS_OVER_LOCAL_FILE }}
-          path: ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz
-
       - name: Extract Source
         run:  |
           tar xf ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz
@@ -118,26 +112,6 @@ jobs:
       - name: Patch DXVK
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         run: patch sources/dxvk/src/util/rc/util_rc_ptr.h < dxvk_util_rc_ptr.patch
-
-      - name: Tar Patched Crossover Sources
-        run: tar -czvf ${{ env.WINE_SOURCES }}.tar.gz ./sources/wine
-
-      - name: Upload Patched Crossover Sources
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.WINE_SOURCES }}
-          path: ${{ env.WINE_SOURCES }}.tar.gz
-
-      - name: Tar Patched DXVK Sources
-        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-        run: tar -czvf ${{ env.DXVK_SOURCES }}.tar.gz ./sources/dxvk
-
-      - name: Upload Patched DXVK Sources
-        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.DXVK_SOURCES }}
-          path: ${{ env.DXVK_SOURCES }}.tar.gz
 
 
       ############ Build LLVM / Clang ##############
