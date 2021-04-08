@@ -11,8 +11,6 @@ env:
     # avoid weird linker errors with Xcode 10 and later
     MACOSX_DEPLOYMENT_TARGET: 10.14
     # directories / files inside the downloaded tar file directory structure
-    LLVM_MAKEDIR: $GITHUB_WORKSPACE/sources/clang/llvm
-    CLANG_MAKEDIR: $GITHUB_WORKSPACE/sources/clang/clang
     WINE_CONFIGURE: $GITHUB_WORKSPACE/sources/wine/configure
     DXVK_BUILDSCRIPT: $GITHUB_WORKSPACE/sources/dxvk/package-release.sh
     # build directories
@@ -38,6 +36,9 @@ jobs:
       # crossover source code to be downloaded
       CROSS_OVER_SOURCE_URL: https://media.codeweavers.com/pub/crossover/source/crossover-sources-${{ matrix.CROSS_OVER_VERSION }}.tar.gz
       CROSS_OVER_LOCAL_FILE: crossover-${{ matrix.CROSS_OVER_VERSION }}
+      # directories / files inside the downloaded tar file directory structure
+      LLVM_MAKEDIR: $GITHUB_WORKSPACE/sources/${{ startsWith(matrix.CROSS_OVER_VERSION, '20') && 'clang/llvm' || 'llvm' }}
+      CLANG_MAKEDIR: $GITHUB_WORKSPACE/sources/${{ startsWith(matrix.CROSS_OVER_VERSION, '20') && 'clang/clang' || 'clang' }}
       # artifact names
       BUILDTOOLS: build-tools
       WINE_SOURCES: wine.src-cx${{ matrix.CROSS_OVER_VERSION }}-patched
