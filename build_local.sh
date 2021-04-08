@@ -84,9 +84,6 @@ tar xf ${CROSS_OVER_LOCAL_FILE}.tar.gz
 echo Add distversion.h
 cp distversion.h sources/wine/include/distversion.h
 
-echo Patch DXVK
-patch sources/dxvk/src/util/rc/util_rc_ptr.h < dxvk_util_rc_ptr.patch
-
 echo Tar Patched Crossover Sources
 tar -czvf ${WINE_SOURCES}.tar.gz ./sources/wine
 
@@ -94,13 +91,17 @@ echo Upload Patched Crossover Sources
 mkdir -p ${PACKAGE_UPLOAD}
 cp ${WINE_SOURCES}.tar.gz ${PACKAGE_UPLOAD}/
 
-echo Tar Patched DXVK Sources
- tar -czvf ${DXVK_SOURCES}.tar.gz ./sources/dxvk
+if [[ ${CROSS_OVER_VERSION} == 20.* ]]; then
+    echo Patch DXVK
+    patch sources/dxvk/src/util/rc/util_rc_ptr.h < dxvk_util_rc_ptr.patch
 
-echo Upload Patched DXVK Sources
-mkdir -p ${PACKAGE_UPLOAD}
-cp ${DXVK_SOURCES}.tar.gz ${PACKAGE_UPLOAD}/
+    echo Tar Patched DXVK Sources
+    tar -czvf ${DXVK_SOURCES}.tar.gz ./sources/dxvk
 
+    echo Upload Patched DXVK Sources
+    mkdir -p ${PACKAGE_UPLOAD}
+    cp ${DXVK_SOURCES}.tar.gz ${PACKAGE_UPLOAD}/
+fi
 
 ############ Build LLVM / Clang ##############
 
@@ -153,16 +154,17 @@ cp ${BUILDTOOLS}.tar.gz ${PACKAGE_UPLOAD}/
 
 ############ Build DXVK ##############
 
-echo Build DXVK
-PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${DXVK_BUILDSCRIPT} master $GITHUB_WORKSPACE/${DXVK_INSTALLROOT} --no-package
+if [[ ${CROSS_OVER_VERSION} == 20.* ]]; then
+    echo Build DXVK
+    PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${DXVK_BUILDSCRIPT} master $GITHUB_WORKSPACE/${DXVK_INSTALLROOT} --no-package
 
-echo Tar DXVK
-tar -czf ${DXVK_INSTALLATION}.tar.gz ${DXVK_INSTALLROOT}
+    echo Tar DXVK
+    tar -czf ${DXVK_INSTALLATION}.tar.gz ${DXVK_INSTALLROOT}
 
-echo Upload DXVK
-mkdir -p ${PACKAGE_UPLOAD}
-cp ${DXVK_INSTALLATION}.tar.gz ${PACKAGE_UPLOAD}/
-
+    echo Upload DXVK
+    mkdir -p ${PACKAGE_UPLOAD}
+    cp ${DXVK_INSTALLATION}.tar.gz ${PACKAGE_UPLOAD}/
+fi
 
 ############ Build 64bit Version ##############
 

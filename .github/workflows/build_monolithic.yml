@@ -109,6 +109,7 @@ jobs:
         run: cp distversion.h sources/wine/include/distversion.h
 
       - name: Patch DXVK
+        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         run: patch sources/dxvk/src/util/rc/util_rc_ptr.h < dxvk_util_rc_ptr.patch
 
       - name: Tar Patched Crossover Sources
@@ -121,9 +122,11 @@ jobs:
           path: ${{ env.WINE_SOURCES }}.tar.gz
 
       - name: Tar Patched DXVK Sources
+        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         run: tar -czvf ${{ env.DXVK_SOURCES }}.tar.gz ./sources/dxvk
 
       - name: Upload Patched DXVK Sources
+        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.DXVK_SOURCES }}
@@ -190,13 +193,16 @@ jobs:
       ############ Build DXVK ##############
 
       - name: Build DXVK
+        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         run: |
           PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${{ env.DXVK_BUILDSCRIPT }} master $GITHUB_WORKSPACE/${{ env.DXVK_INSTALLROOT }} --no-package
 
       - name: Tar DXVK
+        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         run: tar -czf ${{ env.DXVK_INSTALLATION }}.tar.gz ${{ env.DXVK_INSTALLROOT }}
 
       - name: Upload DXVK
+        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.DXVK_INSTALLATION }}
