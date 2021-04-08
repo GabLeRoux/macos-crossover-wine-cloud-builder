@@ -171,6 +171,8 @@ fi
 echo Configure wine64
 export CC=clang
 export CXX=clang++
+# see https://github.com/Gcenx/macOS_Wine_builds/issues/17#issuecomment-750346843
+export CROSSCFLAGS="-g -O2 -fcommon"
 # Xcode12 by default enables '-Werror,-Wimplicit-function-declaration' (49917738)
 # this causes wine(64) builds to fail so needs to be disabled.
 # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes
@@ -220,6 +222,8 @@ popd
 echo Configure wine32on64
 export CC=clang
 export CXX=clang++
+# see https://github.com/Gcenx/macOS_Wine_builds/issues/17#issuecomment-750346843
+export CROSSCFLAGS="-g -O2 -fcommon"
 # Xcode12 by default enables '-Werror,-Wimplicit-function-declaration' (49917738)
 # this causes wine(64) builds to fail so needs to be disabled.
 # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes
