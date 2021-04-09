@@ -34,8 +34,6 @@ export DXVK_INSTALLROOT=install/dxvk
 export PACKAGE_UPLOAD=install/packages
 # artifact names
 export BUILDTOOLS=build-tools
-export WINE_SOURCES=cwine.src-cx${CROSS_OVER_VERSION}-patched
-export DXVK_SOURCES=dxvk.src-cx${CROSS_OVER_VERSION}-patched
 export WINE_INSTALLATION=wine-cx${CROSS_OVER_VERSION}
 export DXVK_INSTALLATION=dxvk-cx${CROSS_OVER_VERSION}
 
@@ -77,33 +75,15 @@ export PATH="$GITHUB_WORKSPACE/${TOOLS_INSTALLROOT}/bin":${PATH}
 echo Get Source
 curl -o ${CROSS_OVER_LOCAL_FILE}.tar.gz ${CROSS_OVER_SOURCE_URL}
 
-echo Upload Original Crossover Sources
-mkdir -p ${PACKAGE_UPLOAD}
-cp ${CROSS_OVER_LOCAL_FILE}.tar.gz ${PACKAGE_UPLOAD}/
-
 echo Extract Source
 tar xf ${CROSS_OVER_LOCAL_FILE}.tar.gz
 
 echo Add distversion.h
 cp distversion.h sources/wine/include/distversion.h
 
-echo Tar Patched Crossover Sources
-tar -czvf ${WINE_SOURCES}.tar.gz ./sources/wine
-
-echo Upload Patched Crossover Sources
-mkdir -p ${PACKAGE_UPLOAD}
-cp ${WINE_SOURCES}.tar.gz ${PACKAGE_UPLOAD}/
-
 if [[ ${CROSS_OVER_VERSION} == 20.* ]]; then
     echo Patch DXVK
     patch sources/dxvk/src/util/rc/util_rc_ptr.h < dxvk_util_rc_ptr.patch
-
-    echo Tar Patched DXVK Sources
-    tar -czvf ${DXVK_SOURCES}.tar.gz ./sources/dxvk
-
-    echo Upload Patched DXVK Sources
-    mkdir -p ${PACKAGE_UPLOAD}
-    cp ${DXVK_SOURCES}.tar.gz ${PACKAGE_UPLOAD}/
 fi
 
 ############ Build LLVM / Clang ##############
