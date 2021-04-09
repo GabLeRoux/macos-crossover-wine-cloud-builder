@@ -75,6 +75,12 @@ curl -o ${CROSS_OVER_LOCAL_FILE}.tar.gz ${CROSS_OVER_SOURCE_URL}
 echo Extract Source
 tar xf ${CROSS_OVER_LOCAL_FILE}.tar.gz
 
+if [[ "${CROSS_OVER_VERSION}" == "20.0.1" || "${CROSS_OVER_VERSION}" == "20.0.2"  ]]; then
+    echo Add missing llvm/clang
+    curl -o crossover-20.0.0.tar.gz https://media.codeweavers.com/pub/crossover/source/crossover-sources-20.0.0.tar.gz
+    tar -xvf crossover-20.0.0.tar.gz sources/clang
+fi
+
 echo Add distversion.h
 cp distversion.h sources/wine/include/distversion.h
 
