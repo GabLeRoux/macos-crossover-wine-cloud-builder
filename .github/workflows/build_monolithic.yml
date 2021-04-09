@@ -40,7 +40,7 @@ jobs:
       LLVM_MAKEDIR: $GITHUB_WORKSPACE/sources/${{ startsWith(matrix.CROSS_OVER_VERSION, '20') && 'clang/llvm' || 'llvm' }}
       CLANG_MAKEDIR: $GITHUB_WORKSPACE/sources/${{ startsWith(matrix.CROSS_OVER_VERSION, '20') && 'clang/clang' || 'clang' }}
       # artifact names
-      BUILDTOOLS: build-tools
+      BUILDTOOLS: build-tools-cx${{ matrix.CROSS_OVER_VERSION }}
       WINE_INSTALLATION: wine-cx${{ matrix.CROSS_OVER_VERSION }}
       DXVK_INSTALLATION: dxvk-cx${{ matrix.CROSS_OVER_VERSION }}
 

@@ -30,7 +30,7 @@ export WINE_INSTALLROOT=install/wine
 export DXVK_INSTALLROOT=install/dxvk
 export PACKAGE_UPLOAD=install/packages
 # artifact names
-export BUILDTOOLS=build-tools
+export BUILDTOOLS=build-tools-cx${CROSS_OVER_VERSION}
 export WINE_INSTALLATION=wine-cx${CROSS_OVER_VERSION}
 export DXVK_INSTALLATION=dxvk-cx${CROSS_OVER_VERSION}
 
