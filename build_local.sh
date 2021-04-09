@@ -157,7 +157,7 @@ export CROSSCFLAGS="-g -O2 -fcommon"
 # this causes wine(64) builds to fail so needs to be disabled.
 # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes
 export CFLAGS="-Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
-export LDFLAGS="-Wl,-headerpad_max_install_names,-Wl,-rpath,@loader_path/../"
+export LDFLAGS="-Wl,-headerpad_max_install_names -Wl,-rpath,@loader_path/../"
 
 export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include"
 export SDL2_LIBS="-L$(brew --prefix sdl2)/lib"
@@ -165,7 +165,7 @@ export SDL2_LIBS="-L$(brew --prefix sdl2)/lib"
 export PNG_CFLAGS="-I$(brew --prefix libpng)/include"
 export PNG_LIBS="-L$(brew --prefix libpng)/lib"
 
-export LDFLAGS="-L $(brew --prefix molten-vk)/lib"
+export LDFLAGS="-L $(brew --prefix molten-vk)/lib ${LDFLAGS}"
 
 mkdir -p ${BUILDROOT}/wine64
 pushd ${BUILDROOT}/wine64
@@ -209,7 +209,7 @@ export CROSSCFLAGS="-g -O2 -fcommon"
 # this causes wine(64) builds to fail so needs to be disabled.
 # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes
 export CFLAGS="-Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
-export LDFLAGS="-Wl,-headerpad_max_install_names,-Wl,-rpath,@loader_path/../"
+export LDFLAGS="-Wl,-headerpad_max_install_names -Wl,-rpath,@loader_path/../"
 
 export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include"
 export SDL2_LIBS="-L$(brew --prefix sdl2)/lib"
