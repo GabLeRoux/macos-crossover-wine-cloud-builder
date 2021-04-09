@@ -245,6 +245,7 @@ ${WINE_CONFIGURE} \
         --without-gstreamer \
         --without-gsm \
         --without-gphoto \
+        --without-sane \
         --with-png \
         --with-sdl \
         --without-vkd3d \
