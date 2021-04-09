@@ -18,9 +18,6 @@ export CROSS_OVER_LOCAL_FILE=crossover-${CROSS_OVER_VERSION}
 # directories / files inside the downloaded tar file directory structure
 export LLVM_MAKEDIR=$GITHUB_WORKSPACE/sources/$([[ ${CROSS_OVER_VERSION} == 20.* ]] && echo "clang/llvm" || echo "llvm")
 export CLANG_MAKEDIR=$GITHUB_WORKSPACE/sources/$([[ ${CROSS_OVER_VERSION} == 20.* ]] && echo "clang/clang" || echo "clang")
-
-export LLVM_MAKEDIR=$GITHUB_WORKSPACE/sources/clang/llvm
-export CLANG_MAKEDIR=$GITHUB_WORKSPACE/sources/clang/clang
 export WINE_CONFIGURE=$GITHUB_WORKSPACE/sources/wine/configure
 export DXVK_BUILDSCRIPT=$GITHUB_WORKSPACE/sources/dxvk/package-release.sh
 # build directories
