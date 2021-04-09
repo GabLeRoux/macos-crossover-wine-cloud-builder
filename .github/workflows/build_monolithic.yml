@@ -41,8 +41,6 @@ jobs:
       CLANG_MAKEDIR: $GITHUB_WORKSPACE/sources/${{ startsWith(matrix.CROSS_OVER_VERSION, '20') && 'clang/clang' || 'clang' }}
       # artifact names
       BUILDTOOLS: build-tools
-      WINE_SOURCES: wine.src-cx${{ matrix.CROSS_OVER_VERSION }}-patched
-      DXVK_SOURCES: dxvk.src-cx${{ matrix.CROSS_OVER_VERSION }}-patched
       WINE_INSTALLATION: wine-cx${{ matrix.CROSS_OVER_VERSION }}
       DXVK_INSTALLATION: dxvk-cx${{ matrix.CROSS_OVER_VERSION }}
 
