@@ -168,6 +168,9 @@ export LDFLAGS="-Wl,-headerpad_max_install_names -Wl,-rpath,@loader_path/../"
 export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include"
 export SDL2_LIBS="-L$(brew --prefix sdl2)/lib"
 
+export GPHOTO2_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
+export GPHOTO2_PORT_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
+
 export PNG_CFLAGS="-I$(brew --prefix libpng)/include"
 export PNG_LIBS="-L$(brew --prefix libpng)/lib"
 
@@ -219,6 +222,9 @@ export LDFLAGS="-Wl,-headerpad_max_install_names -Wl,-rpath,@loader_path/../"
 
 export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include"
 export SDL2_LIBS="-L$(brew --prefix sdl2)/lib"
+
+export GPHOTO2_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
+export GPHOTO2_PORT_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
 
 export PNG_CFLAGS="-I$(brew --prefix libpng)/include"
 export PNG_LIBS="-L$(brew --prefix libpng)/lib"
