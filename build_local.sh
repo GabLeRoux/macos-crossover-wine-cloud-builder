@@ -48,6 +48,7 @@ brew install  freetype         \
               faudio           \
               sdl2             \
               gphoto2          \
+              sane-backends    \
               gst-plugins-base \
               mpg123           \
               little-cms2      \
