@@ -77,7 +77,7 @@ tar xf ${CROSS_OVER_LOCAL_FILE}.tar.gz
 if [[ "${CROSS_OVER_VERSION}" == "20.0.1" || "${CROSS_OVER_VERSION}" == "20.0.2"  ]]; then
     echo Add missing llvm/clang
     curl -o crossover-20.0.0.tar.gz https://media.codeweavers.com/pub/crossover/source/crossover-sources-20.0.0.tar.gz
-    tar -xvf crossover-20.0.0.tar.gz sources/clang
+    tar -xf crossover-20.0.0.tar.gz sources/clang
 fi
 
 echo Add distversion.h

@@ -101,7 +101,7 @@ jobs:
         if: ${{ matrix.CROSS_OVER_VERSION == '20.0.1' || matrix.CROSS_OVER_VERSION == '20.0.2' }}
         run: |
           curl -o crossover-20.0.0.tar.gz https://media.codeweavers.com/pub/crossover/source/crossover-sources-20.0.0.tar.gz
-          tar -xvf crossover-20.0.0.tar.gz sources/clang
+          tar -xf crossover-20.0.0.tar.gz sources/clang
 
       - name: Add distversion.h
         run: cp distversion.h sources/wine/include/distversion.h
