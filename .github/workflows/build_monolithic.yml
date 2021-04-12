@@ -17,10 +17,8 @@ env:
     BUILDROOT: $GITHUB_WORKSPACE/build
     LLVM_BUILDDIR: $GITHUB_WORKSPACE/build/llvm
     CLANG_BUILDDIR: $GITHUB_WORKSPACE/build/clang
-    # target directories for installation (must be relative to $GITHUB_WORKSPACE)
-    TOOLS_INSTALLROOT: install/build-tools
-    WINE_INSTALLROOT: install/wine
-    DXVK_INSTALLROOT: install/dxvk
+    # target directory for installation
+    INSTALLROOT: $GITHUB_WORKSPACE/install
 
 jobs:
   wine-crossover:
@@ -40,7 +38,7 @@ jobs:
       LLVM_MAKEDIR: $GITHUB_WORKSPACE/sources/${{ startsWith(matrix.CROSS_OVER_VERSION, '20') && 'clang/llvm' || 'llvm' }}
       CLANG_MAKEDIR: $GITHUB_WORKSPACE/sources/${{ startsWith(matrix.CROSS_OVER_VERSION, '20') && 'clang/clang' || 'clang' }}
       # artifact names
-      BUILDTOOLS: build-tools-cx${{ matrix.CROSS_OVER_VERSION }}
+      TOOLS_INSTALLATION: build-tools-cx${{ matrix.CROSS_OVER_VERSION }}
       WINE_INSTALLATION: wine-cx${{ matrix.CROSS_OVER_VERSION }}
       DXVK_INSTALLATION: dxvk-cx${{ matrix.CROSS_OVER_VERSION }}
 
@@ -86,7 +84,7 @@ jobs:
       - name: Add llvm/clang to $PATH (for later)
         run: |
           set -eu
-          echo "$GITHUB_WORKSPACE/${{ env.TOOLS_INSTALLROOT }}/bin" >> $GITHUB_PATH
+          echo "${{ env.INSTALLROOT }}/${{ matrix.TOOLS_INSTALLATION }}/bin" >> $GITHUB_PATH
 
 
       ############ Download and Prepare Source Code ##############
@@ -122,7 +120,7 @@ jobs:
           cmake -G Ninja \
                 -DLLVM_TARGETS_TO_BUILD=X86 \
                 -DCMAKE_BUILD_TYPE=Release \
-                -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/${{ env.TOOLS_INSTALLROOT }}" \
+                -DCMAKE_INSTALL_PREFIX="${{ env.INSTALLROOT }}/${{ matrix.TOOLS_INSTALLATION }}" \
                 ${{ env.LLVM_MAKEDIR }}
           popd
 
@@ -144,7 +142,7 @@ jobs:
           pushd ${{ env.CLANG_BUILDDIR }}
           cmake -G Ninja \
                 -DCMAKE_BUILD_TYPE=Release \
-                -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/${{ env.TOOLS_INSTALLROOT }}" \
+                -DCMAKE_INSTALL_PREFIX="${{ env.INSTALLROOT }}/${{ matrix.TOOLS_INSTALLATION }}" \
                 ${{ env.CLANG_MAKEDIR }}
           popd
 
@@ -161,13 +159,16 @@ jobs:
           popd
 
       - name: Tar Build Tools
-        run: tar -czf ${{ env.BUILDTOOLS }}.tar.gz ${{ env.TOOLS_INSTALLROOT }}
+        run: |
+          pushd ${{ env.INSTALLROOT }}
+          tar -czf ${{ env.TOOLS_INSTALLATION }}.tar.gz ${{ env.TOOLS_INSTALLATION }}
+          popd
 
       - name: Upload Build Tools
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.BUILDTOOLS }}
-          path: ${{ env.BUILDTOOLS }}.tar.gz
+          name: ${{ env.TOOLS_INSTALLATION }}
+          path: ${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}.tar.gz
 
 
       ############ Build DXVK ##############
@@ -175,18 +176,21 @@ jobs:
       - name: Build DXVK
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         run: |
-          PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${{ env.DXVK_BUILDSCRIPT }} master $GITHUB_WORKSPACE/${{ env.DXVK_INSTALLROOT }} --no-package
+          PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${{ env.DXVK_BUILDSCRIPT }} master ${{ env.INSTALLROOT }}/${{ matrix.DXVK_INSTALLATION }} --no-package
 
       - name: Tar DXVK
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-        run: tar -czf ${{ env.DXVK_INSTALLATION }}.tar.gz ${{ env.DXVK_INSTALLROOT }}
+        run: |
+          pushd ${{ env.INSTALLROOT }}
+          tar -czf ${{ env.DXVK_INSTALLATION }}.tar.gz ${{ env.DXVK_INSTALLATION }}
+          popd
 
       - name: Upload DXVK
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.DXVK_INSTALLATION }}
-          path: ${{ env.DXVK_INSTALLATION }}.tar.gz
+          path: ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }}.tar.gz
 
 
       ############ Build 64bit Version ##############
@@ -241,7 +245,7 @@ jobs:
       - name: Install wine64
         run: |
           pushd ${{ env.BUILDROOT }}/wine64
-          make install-lib DESTDIR="$GITHUB_WORKSPACE/${{ env.WINE_INSTALLROOT }}"
+          make install-lib DESTDIR="${{ env.INSTALLROOT }}/${{ matrix.WINE_INSTALLATION }}"
           popd
 
 
@@ -302,17 +306,20 @@ jobs:
       - name: Install wine32on64
         run: |
           pushd ${{ env.BUILDROOT }}/wine32on64
-          make install-lib DESTDIR="$GITHUB_WORKSPACE/${{ env.WINE_INSTALLROOT }}"
+          make install-lib DESTDIR="${{ env.INSTALLROOT }}/${{ matrix.WINE_INSTALLATION }}"
           popd
 
 
       ############ Bundle and Upload Deliverable ##############
 
       - name: Tar Wine
-        run: tar -czvf ${{ env.WINE_INSTALLATION }}.tar.gz ${{ env.WINE_INSTALLROOT }}
+        run: |
+          pushd ${{ env.INSTALLROOT }}
+          tar -czvf ${{ env.WINE_INSTALLATION }}.tar.gz ${{ env.WINE_INSTALLATION }}
+          popd
 
       - name: Upload Wine
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.WINE_INSTALLATION }}
-          path: ${{ env.WINE_INSTALLATION }}.tar.gz
+          path: ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}.tar.gz

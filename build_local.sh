@@ -24,13 +24,11 @@ export DXVK_BUILDSCRIPT=$GITHUB_WORKSPACE/sources/dxvk/package-release.sh
 export BUILDROOT=$GITHUB_WORKSPACE/build
 export LLVM_BUILDDIR=$GITHUB_WORKSPACE/build/llvm
 export CLANG_BUILDDIR=$GITHUB_WORKSPACE/build/clang
-# target directories for installation (must be relative to $GITHUB_WORKSPACE)
-export TOOLS_INSTALLROOT=install/build-tools
-export WINE_INSTALLROOT=install/wine
-export DXVK_INSTALLROOT=install/dxvk
-export PACKAGE_UPLOAD=install/packages
+# target directory for installation
+export INSTALLROOT=$GITHUB_WORKSPACE/install
+export PACKAGE_UPLOAD=$GITHUB_WORKSPACE/upload
 # artifact names
-export BUILDTOOLS=build-tools-cx${CROSS_OVER_VERSION}
+export TOOLS_INSTALLATION=build-tools-cx${CROSS_OVER_VERSION}
 export WINE_INSTALLATION=wine-cx${CROSS_OVER_VERSION}
 export DXVK_INSTALLATION=dxvk-cx${CROSS_OVER_VERSION}
 
@@ -65,7 +63,7 @@ export PATH="$(brew --prefix bison)/bin":${PATH}
 export PATH="$(brew --prefix krb5)/bin":${PATH}
 
 echo Add llvm/clang to PATH for later
-export PATH="$GITHUB_WORKSPACE/${TOOLS_INSTALLROOT}/bin":${PATH}
+export PATH="${INSTALLROOT}/${TOOLS_INSTALLATION}/bin":${PATH}
 
 
 ############ Download and Prepare Source Code ##############
@@ -98,7 +96,7 @@ pushd ${LLVM_BUILDDIR}
 cmake -G Ninja \
     -DLLVM_TARGETS_TO_BUILD=X86 \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/${TOOLS_INSTALLROOT}" \
+    -DCMAKE_INSTALL_PREFIX="${INSTALLROOT}/${TOOLS_INSTALLATION}" \
     ${LLVM_MAKEDIR}
 popd
 
@@ -117,7 +115,7 @@ mkdir -p ${CLANG_BUILDDIR}
 pushd ${CLANG_BUILDDIR}
 cmake -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/${TOOLS_INSTALLROOT}" \
+    -DCMAKE_INSTALL_PREFIX="${INSTALLROOT}/${TOOLS_INSTALLATION}" \
     ${CLANG_MAKEDIR}
 popd
 
@@ -132,25 +130,29 @@ Ninja install
 popd
 
 echo Tar Build Tools
-tar -czf ${BUILDTOOLS}.tar.gz ${TOOLS_INSTALLROOT}
+pushd ${INSTALLROOT}
+tar -czf ${TOOLS_INSTALLATION}.tar.gz ${TOOLS_INSTALLATION}
+popd
 
 echo Upload Build Tools
 mkdir -p ${PACKAGE_UPLOAD}
-cp ${BUILDTOOLS}.tar.gz ${PACKAGE_UPLOAD}/
+cp ${INSTALLROOT}/${TOOLS_INSTALLATION}.tar.gz ${PACKAGE_UPLOAD}/
 
 
 ############ Build DXVK ##############
 
 if [[ ${CROSS_OVER_VERSION} == 20.* ]]; then
     echo Build DXVK
-    PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${DXVK_BUILDSCRIPT} master $GITHUB_WORKSPACE/${DXVK_INSTALLROOT} --no-package
+    PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${DXVK_BUILDSCRIPT} master ${INSTALLROOT}/${DXVK_INSTALLATION} --no-package
 
     echo Tar DXVK
-    tar -czf ${DXVK_INSTALLATION}.tar.gz ${DXVK_INSTALLROOT}
+    pushd ${INSTALLROOT}
+    tar -czf ${DXVK_INSTALLATION}.tar.gz ${DXVK_INSTALLATION}
+    popd
 
     echo Upload DXVK
     mkdir -p ${PACKAGE_UPLOAD}
-    cp ${DXVK_INSTALLATION}.tar.gz ${PACKAGE_UPLOAD}/
+    cp ${INSTALLROOT}/${DXVK_INSTALLATION}.tar.gz ${PACKAGE_UPLOAD}/
 fi
 
 ############ Build 64bit Version ##############
@@ -202,7 +204,7 @@ popd
 
 echo Install wine64
 pushd ${BUILDROOT}/wine64
-make install-lib DESTDIR="$GITHUB_WORKSPACE/${WINE_INSTALLROOT}"
+make install-lib DESTDIR="${INSTALLROOT}/${WINE_INSTALLATION}"
 popd
 
 
@@ -262,15 +264,17 @@ popd
 
 echo Install wine32on64
 pushd ${BUILDROOT}/wine32on64
-make install-lib DESTDIR="$GITHUB_WORKSPACE/${WINE_INSTALLROOT}"
+make install-lib DESTDIR="${INSTALLROOT}/${WINE_INSTALLATION}"
 popd
 
 
 ############ Bundle and Upload Deliverable ##############
 
 echo Tar Wine
-tar -czvf ${WINE_INSTALLATION}.tar.gz ${WINE_INSTALLROOT}
+pushd ${INSTALLROOT}
+tar -czvf ${WINE_INSTALLATION}.tar.gz ${WINE_INSTALLATION}
+popd
 
 echo Upload Wine
 mkdir -p ${PACKAGE_UPLOAD}
-cp ${WINE_INSTALLATION}.tar.gz ${PACKAGE_UPLOAD}/
+cp ${INSTALLROOT}/${WINE_INSTALLATION}.tar.gz ${PACKAGE_UPLOAD}/
