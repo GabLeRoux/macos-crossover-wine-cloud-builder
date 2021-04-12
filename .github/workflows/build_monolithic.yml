@@ -162,6 +162,7 @@ jobs:
         run: |
           pushd ${{ env.INSTALLROOT }}
           tar -czf ${{ env.TOOLS_INSTALLATION }}.tar.gz ${{ env.TOOLS_INSTALLATION }}
+          ls -alt
           popd
 
       - name: Upload Build Tools
