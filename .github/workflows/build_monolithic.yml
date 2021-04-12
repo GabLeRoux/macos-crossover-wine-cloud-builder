@@ -77,13 +77,13 @@ jobs:
 
       - name: Add bison & krb5 to $PATH
         run: |
-          set -eu
+          set -x
           echo "$(brew --prefix bison)/bin" >> $GITHUB_PATH
           echo "$(brew --prefix krb5)/bin" >> $GITHUB_PATH
 
       - name: Add llvm/clang to $PATH (for later)
         run: |
-          set -eu
+          set -x
           echo "${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}/bin" >> $GITHUB_PATH
 
 
@@ -115,6 +115,7 @@ jobs:
 
       - name: Configure LLVM
         run: |
+          set -x
           mkdir -p ${{ env.LLVM_BUILDDIR }}
           pushd ${{ env.LLVM_BUILDDIR }}
           cmake -G Ninja \
@@ -138,6 +139,7 @@ jobs:
 
       - name: Configure Clang
         run: |
+          set -x
           mkdir -p ${{ env.CLANG_BUILDDIR }}
           pushd ${{ env.CLANG_BUILDDIR }}
           cmake -G Ninja \
@@ -160,6 +162,7 @@ jobs:
 
       - name: Tar Build Tools
         run: |
+          set -x
           pushd ${{ env.INSTALLROOT }}
           tar -czf ${{ env.TOOLS_INSTALLATION }}.tar.gz ${{ env.TOOLS_INSTALLATION }}
           ls -alt
@@ -177,11 +180,13 @@ jobs:
       - name: Build DXVK
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         run: |
+          set -x
           PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${{ env.DXVK_BUILDSCRIPT }} master ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }} --no-package
 
       - name: Tar DXVK
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         run: |
+          set -x
           pushd ${{ env.INSTALLROOT }}
           tar -czf ${{ env.DXVK_INSTALLATION }}.tar.gz ${{ env.DXVK_INSTALLATION }}
           popd
@@ -208,6 +213,8 @@ jobs:
           CFLAGS: "-Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
           LDFLAGS: "-Wl,-headerpad_max_install_names"
         run: |
+          set -x
+
           export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include"
           export GPHOTO2_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
           export GPHOTO2_PORT_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
@@ -245,6 +252,7 @@ jobs:
 
       - name: Install wine64
         run: |
+          set -x
           pushd ${{ env.BUILDROOT }}/wine64
           make install-lib DESTDIR="${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
           popd
@@ -264,6 +272,8 @@ jobs:
           CFLAGS: "-Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
           LDFLAGS: "-Wl,-headerpad_max_install_names"
         run: |
+          set -x
+
           export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include"
 
           export PNG_CFLAGS="-I$(brew --prefix libpng)/include"
@@ -306,6 +316,7 @@ jobs:
 
       - name: Install wine32on64
         run: |
+          set -x
           pushd ${{ env.BUILDROOT }}/wine32on64
           make install-lib DESTDIR="${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
           popd
@@ -315,6 +326,7 @@ jobs:
 
       - name: Tar Wine
         run: |
+          set -x
           pushd ${{ env.INSTALLROOT }}
           tar -czvf ${{ env.WINE_INSTALLATION }}.tar.gz ${{ env.WINE_INSTALLATION }}
           popd
