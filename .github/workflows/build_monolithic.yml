@@ -84,7 +84,7 @@ jobs:
       - name: Add llvm/clang to $PATH (for later)
         run: |
           set -eu
-          echo "${{ env.INSTALLROOT }}/${{ matrix.TOOLS_INSTALLATION }}/bin" >> $GITHUB_PATH
+          echo "${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}/bin" >> $GITHUB_PATH
 
 
       ############ Download and Prepare Source Code ##############
@@ -120,7 +120,7 @@ jobs:
           cmake -G Ninja \
                 -DLLVM_TARGETS_TO_BUILD=X86 \
                 -DCMAKE_BUILD_TYPE=Release \
-                -DCMAKE_INSTALL_PREFIX="${{ env.INSTALLROOT }}/${{ matrix.TOOLS_INSTALLATION }}" \
+                -DCMAKE_INSTALL_PREFIX="${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}" \
                 ${{ env.LLVM_MAKEDIR }}
           popd
 
@@ -142,7 +142,7 @@ jobs:
           pushd ${{ env.CLANG_BUILDDIR }}
           cmake -G Ninja \
                 -DCMAKE_BUILD_TYPE=Release \
-                -DCMAKE_INSTALL_PREFIX="${{ env.INSTALLROOT }}/${{ matrix.TOOLS_INSTALLATION }}" \
+                -DCMAKE_INSTALL_PREFIX="${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}" \
                 ${{ env.CLANG_MAKEDIR }}
           popd
 
@@ -176,7 +176,7 @@ jobs:
       - name: Build DXVK
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         run: |
-          PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${{ env.DXVK_BUILDSCRIPT }} master ${{ env.INSTALLROOT }}/${{ matrix.DXVK_INSTALLATION }} --no-package
+          PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${{ env.DXVK_BUILDSCRIPT }} master ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }} --no-package
 
       - name: Tar DXVK
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')
@@ -245,7 +245,7 @@ jobs:
       - name: Install wine64
         run: |
           pushd ${{ env.BUILDROOT }}/wine64
-          make install-lib DESTDIR="${{ env.INSTALLROOT }}/${{ matrix.WINE_INSTALLATION }}"
+          make install-lib DESTDIR="${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
           popd
 
 
@@ -306,7 +306,7 @@ jobs:
       - name: Install wine32on64
         run: |
           pushd ${{ env.BUILDROOT }}/wine32on64
-          make install-lib DESTDIR="${{ env.INSTALLROOT }}/${{ matrix.WINE_INSTALLATION }}"
+          make install-lib DESTDIR="${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
           popd
 
 
