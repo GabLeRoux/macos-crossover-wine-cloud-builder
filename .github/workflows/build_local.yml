@@ -9,7 +9,7 @@ on:
 
 env:
     # this has to be synchronized with the same variable in build_local.sh
-    PACKAGE_UPLOAD: install/packages
+    PACKAGE_UPLOAD: $GITHUB_WORKSPACE/upload
 
 jobs:
   wine-crossover-local:
