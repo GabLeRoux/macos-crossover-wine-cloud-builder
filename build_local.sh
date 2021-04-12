@@ -164,7 +164,7 @@ export CROSSCFLAGS="-g -O2 -fcommon"
 # this causes wine(64) builds to fail so needs to be disabled.
 # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes
 export CFLAGS="-Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
-export LDFLAGS="-Wl,-headerpad_max_install_names -Wl,-rpath,@loader_path/../"
+export LDFLAGS="-Wl,-headerpad_max_install_names"
 
 export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include"
 export GPHOTO2_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
@@ -217,7 +217,7 @@ export CROSSCFLAGS="-g -O2 -fcommon"
 # this causes wine(64) builds to fail so needs to be disabled.
 # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes
 export CFLAGS="-Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
-export LDFLAGS="-Wl,-headerpad_max_install_names -Wl,-rpath,@loader_path/../"
+export LDFLAGS="-Wl,-headerpad_max_install_names"
 
 export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include"
 export GPHOTO2_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
