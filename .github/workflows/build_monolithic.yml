@@ -11,14 +11,14 @@ env:
     # avoid weird linker errors with Xcode 10 and later
     MACOSX_DEPLOYMENT_TARGET: 10.14
     # directories / files inside the downloaded tar file directory structure
-    WINE_CONFIGURE: $GITHUB_WORKSPACE/sources/wine/configure
-    DXVK_BUILDSCRIPT: $GITHUB_WORKSPACE/sources/dxvk/package-release.sh
+    WINE_CONFIGURE: ${{ github.workspace }}/sources/wine/configure
+    DXVK_BUILDSCRIPT: ${{ github.workspace }}/sources/dxvk/package-release.sh
     # build directories
-    BUILDROOT: $GITHUB_WORKSPACE/build
-    LLVM_BUILDDIR: $GITHUB_WORKSPACE/build/llvm
-    CLANG_BUILDDIR: $GITHUB_WORKSPACE/build/clang
+    BUILDROOT: ${{ github.workspace }}/build
+    LLVM_BUILDDIR: ${{ github.workspace }}/build/llvm
+    CLANG_BUILDDIR: ${{ github.workspace }}/build/clang
     # target directory for installation
-    INSTALLROOT: $GITHUB_WORKSPACE/install
+    INSTALLROOT: ${{ github.workspace }}/install
 
 jobs:
   wine-crossover:
