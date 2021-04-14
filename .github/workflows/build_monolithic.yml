@@ -250,13 +250,6 @@ jobs:
           make -j$(sysctl -n hw.ncpu 2>/dev/null)
           popd
 
-      - name: Install wine64
-        run: |
-          set -x
-          pushd ${{ env.BUILDROOT }}/wine64
-          make install-lib DESTDIR="${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
-          popd
-
 
       ############ Build 32bit Version (WoW64) ##############
 
@@ -314,6 +307,9 @@ jobs:
           make -j$(sysctl -n hw.ncpu 2>/dev/null)
           popd
 
+
+      ############ Install wine ##############
+
       - name: Install wine32on64
         run: |
           set -x
@@ -321,6 +317,12 @@ jobs:
           make install-lib DESTDIR="${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
           popd
 
+      - name: Install wine64
+        run: |
+          set -x
+          pushd ${{ env.BUILDROOT }}/wine64
+          make install-lib DESTDIR="${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
+          popd
 
       ############ Bundle and Upload Deliverable ##############
 

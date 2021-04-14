@@ -202,11 +202,6 @@ pushd ${BUILDROOT}/wine64
 make -j$(sysctl -n hw.ncpu 2>/dev/null)
 popd
 
-echo Install wine64
-pushd ${BUILDROOT}/wine64
-make install-lib DESTDIR="${INSTALLROOT}/${WINE_INSTALLATION}"
-popd
-
 
 ############ Build 32bit Version (WoW64) ##############
 
@@ -262,8 +257,16 @@ pushd ${BUILDROOT}/wine32on64
 make -j$(sysctl -n hw.ncpu 2>/dev/null)
 popd
 
+
+############ Install wine ##############
+
 echo Install wine32on64
 pushd ${BUILDROOT}/wine32on64
+make install-lib DESTDIR="${INSTALLROOT}/${WINE_INSTALLATION}"
+popd
+
+echo Install wine64
+pushd ${BUILDROOT}/wine64
 make install-lib DESTDIR="${INSTALLROOT}/${WINE_INSTALLATION}"
 popd
 
