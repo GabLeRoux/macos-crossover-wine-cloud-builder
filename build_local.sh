@@ -83,7 +83,11 @@ fi
 echo Add distversion.h
 cp distversion.h sources/wine/include/distversion.h
 
+
 if [[ ${CROSS_OVER_VERSION} == 20.* ]]; then
+    echo "Patch wcslen() in ntdll/wcstring.c to prevent crash if a nullptr is suppluied to the function (HACK)"
+    patch sources/wine/dlls/ntdll/wcstring.c < wcstring.patch
+
     echo Patch DXVK
     patch sources/dxvk/src/util/rc/util_rc_ptr.h < dxvk_util_rc_ptr.patch
 fi

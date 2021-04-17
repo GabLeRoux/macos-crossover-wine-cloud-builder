@@ -106,6 +106,10 @@ jobs:
       - name: Add distversion.h
         run: cp distversion.h sources/wine/include/distversion.h
 
+      - name: Patch wcslen() in ntdll/wcstring.c to prevent crash if a nullptr is suppluied to the function (HACK)
+        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
+        run: patch sources/wine/dlls/ntdll/wcstring.c < wcstring.patch
+
       - name: Patch DXVK
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         run: patch sources/dxvk/src/util/rc/util_rc_ptr.h < dxvk_util_rc_ptr.patch
