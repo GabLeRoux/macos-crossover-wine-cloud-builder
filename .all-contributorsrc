@@ -6,6 +6,15 @@
   "commit": false,
   "contributors": [
     {
+      "login": "GabLeRoux",
+      "name": "Gabriel Le Breton",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1264761?v=4",
+      "profile": "https://gableroux.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
       "login": "dasmy",
       "name": "Mathias",
       "avatar_url": "https://avatars.githubusercontent.com/u/5322274?v=4",
@@ -13,7 +22,15 @@
       "contributions": [
         "code"
       ]
-    }
+    },
+    {
+      "login": "Gcenx",
+      "name": "Gcenx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38226388?v=4",
+      "profile": "https://github.com/Gcenx",
+      "contributions": [
+        "code"
+      ]
   ],
   "contributorsPerLine": 7,
   "projectName": "macos-crossover-cloud-build",
