@@ -30,7 +30,7 @@ cd clang/llvm
 mkdir build
 cd build
 cmake ../
-make
+make -j4
 cd bin
 export PATH="$(pwd):$PATH"
 cd ../../../..
@@ -43,7 +43,7 @@ cd clang/clang
 mkdir build
 cd build
 cmake ../
-make
+make -j4
 cd bin
 export PATH="$(pwd):$PATH"
 cd ../../../..
@@ -68,4 +68,4 @@ export MACOSX_DEPLOYMENT_TARGET=10.14
     --without-vulkan \
     --disable-mscms
 
-make
+make -j4
