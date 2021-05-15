@@ -1,0 +1,24 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "GabLeRoux",
+      "name": "Gabriel Le Breton",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1264761?v=4",
+      "profile": "https://gableroux.com",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "macos-crossover-cloud-build",
+  "projectOwner": "GabLeRoux",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
