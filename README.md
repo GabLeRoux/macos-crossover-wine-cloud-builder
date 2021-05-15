@@ -1,7 +1,12 @@
 # MacOS CrossOver FOSS built from the Cloud
 
-[![.github/workflows/build_monolithic.yml](https://github.com/dasmy/macos-crossover-cloud-build/workflows/Wine-Crossover-MacOS/badge.svg)](https://github.com/dasmy/macos-crossover-cloud-build/actions)
-[![.github/workflows/build_monolithic.yml](https://github.com/dasmy/macos-crossover-cloud-build/workflows/Wine-Crossover-MacOS-local/badge.svg)](https://github.com/dasmy/macos-crossover-cloud-build/actions)
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
+
+
+[![.github/workflows/build_monolithic.yml](https://github.com/GabLeRoux/macos-crossover-cloud-build/workflows/Wine-Crossover-MacOS/badge.svg)](https://github.com/GabLeRoux/macos-crossover-cloud-build/actions)
+[![.github/workflows/build_monolithic.yml](https://github.com/GabLeRoux/macos-crossover-cloud-build/workflows/Wine-Crossover-MacOS-local/badge.svg)](https://github.com/GabLeRoux/macos-crossover-cloud-build/actions)
 
 Let's build [FOSS CrossOver][foss-crossover] for macOS in the cloud! I found [some gists][crossover-gist] and I asked myself why don't we use the cloud and the free open source builders to build this? Here it is.
 
@@ -39,10 +44,6 @@ This is an [MIT](LICENSE.md) repo. If you break something on your system doing s
 
 Definitely. Feel free to send PRs 🚀
 
-## License
-
-[MIT](LICENSE.md) © [Gabriel Le Breton](https://gableroux.com)
-
 ## References / Links / Possibly helpful resources
 See  for some technical details.
 * [Starting point for this][crossover-gist].
@@ -60,3 +61,27 @@ See  for some technical details.
 [wine-on-mac]: https://github.com/Gcenx/wine-on-mac
 [winehq-style]: https://github.com/Gcenx/macOS_Wine_builds
 [phoenics-winebuild]: https://github.com/PhoenicisOrg/phoenicis-winebuild/blob/cf86dd3c98ba0b8fdbd5f9fc02bc5a4c15587ee9/builders/scripts/builder_darwin_x86on64_wine#L42-L46
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://gableroux.com"><img src="https://avatars.githubusercontent.com/u/1264761?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Gabriel Le Breton</b></sub></a><br /><a href="https://github.com/GabLeRoux/macos-crossover-cloud-build/commits?author=GabLeRoux" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/dasmy"><img src="https://avatars.githubusercontent.com/u/5322274?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mathias</b></sub></a><br /><a href="https://github.com/GabLeRoux/macos-crossover-cloud-build/commits?author=dasmy" title="Code">💻</a></td>
+        <td align="center"><a href="https://github.com/Gcenx"><img src="https://avatars.githubusercontent.com/u/38226388?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Gcenx</b></sub></a><br /><a href="https://github.com/GabLeRoux/macos-crossover-cloud-build/commits?author=Gcenx" title="Code">💻</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+## License
+
+[MIT](LICENSE.md) © [Gabriel Le Breton](https://gableroux.com)
