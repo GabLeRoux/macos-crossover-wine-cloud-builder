@@ -1,0 +1,10 @@
+--- wcstring.c.orig	2021-04-17 16:17:37.000000000 +0200
++++ wcstring.c	2021-04-17 16:19:18.000000000 +0200
+@@ -137,6 +137,7 @@
+  */
+ INT __cdecl NTDLL_wcslen( LPCWSTR str )
+ {
++    if (!str) return 0;  // HACK(dasmy): prevent crash if this function is called with a nullptr argument
+     return strlenW( str );
+ }
+ 
