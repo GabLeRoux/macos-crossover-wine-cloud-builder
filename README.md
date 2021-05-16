@@ -4,7 +4,6 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-
 [![.github/workflows/build_monolithic.yml](https://github.com/GabLeRoux/macos-crossover-cloud-build/workflows/Wine-Crossover-MacOS/badge.svg)](https://github.com/GabLeRoux/macos-crossover-cloud-build/actions)
 [![.github/workflows/build_monolithic.yml](https://github.com/GabLeRoux/macos-crossover-cloud-build/workflows/Wine-Crossover-MacOS-local/badge.svg)](https://github.com/GabLeRoux/macos-crossover-cloud-build/actions)
 
@@ -21,7 +20,7 @@ Let's build [FOSS CrossOver][foss-crossover] for macOS in the cloud! I found [so
 In principle yes, see the following image which is `notepad.exe` running inside wine on a macOS 10.15 machine:
 ![Notepad running in wine](doc/wine64_notepad.png)
 
-However, there are still some issues, e.g. #9.
+However, there are still some issues, e.g. [#9](https://github.com/dasmy/macos-crossover-cloud-build/issues/9).
 
 ## Inspiration
 
@@ -29,7 +28,7 @@ I learned about [Free and Open Source Software Code for CrossOver][foss-crossove
 
 ## Where to download builds?
 
-See [#2](https://github.com/GabLeRoux/macos-crossover-cloud-build/issues/2)
+See [#2](https://github.com/GabLeRoux/macos-crossover-cloud-build/issues/2). They can be found in the github actions artifacts. 👍
 
 ## Can I run the build locally?
 
