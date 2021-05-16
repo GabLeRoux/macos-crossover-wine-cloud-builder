@@ -8,6 +8,9 @@ on:
       - 'doc/**'
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - 'README.md'
+      - 'doc/**'
   workflow_dispatch:
 env:
     # this has to be synchronized with the same variable in build_local.sh
