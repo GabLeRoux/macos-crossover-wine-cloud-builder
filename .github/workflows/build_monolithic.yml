@@ -3,6 +3,9 @@ name: Wine-Crossover-MacOS
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - 'README.md'
+      - 'doc/**'
   pull_request:
     branches: [ main ]
   workflow_dispatch:

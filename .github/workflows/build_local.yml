@@ -3,10 +3,12 @@ name: Wine-Crossover-MacOS-local
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - 'README.md'
+      - 'doc/**'
   pull_request:
     branches: [ main ]
   workflow_dispatch:
-
 env:
     # this has to be synchronized with the same variable in build_local.sh
     PACKAGE_UPLOAD: ${{ github.workspace }}/upload
