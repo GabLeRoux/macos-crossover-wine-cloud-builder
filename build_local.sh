@@ -255,6 +255,7 @@ ${WINE_CONFIGURE} \
         --without-sane \
         --with-png \
         --with-sdl \
+        --without-krb5 \
         ${DISABLE_VULKAN} \
         --without-x
 popd
