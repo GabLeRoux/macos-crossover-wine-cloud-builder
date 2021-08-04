@@ -227,6 +227,12 @@ export GPHOTO2_PORT_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --pre
 export PNG_CFLAGS="-I$(brew --prefix libpng)/include"
 export PNG_LIBS="-L$(brew --prefix libpng)/lib"
 
+if [[ ${CROSS_OVER_VERSION} == 19.* || ${CROSS_OVER_VERSION} == 20.* ]]; then
+    export DISABLE_VULKAN="--without-vkd3d --without-vulkan --disable-vulkan_1 --disable-winevulkan"
+else
+    export DISABLE_VULKAN=""
+fi
+
 mkdir -p ${BUILDROOT}/wine32on64
 pushd ${BUILDROOT}/wine32on64
 ${WINE_CONFIGURE} \
@@ -249,10 +255,7 @@ ${WINE_CONFIGURE} \
         --without-sane \
         --with-png \
         --with-sdl \
-        --without-vkd3d \
-        --without-vulkan \
-        --disable-vulkan_1 \
-        --disable-winevulkan \
+        ${DISABLE_VULKAN} \
         --without-x
 popd
 

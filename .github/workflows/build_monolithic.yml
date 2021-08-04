@@ -304,10 +304,7 @@ jobs:
                     --without-sane \
                     --with-png \
                     --with-sdl \
-                    --without-vkd3d \
-                    --without-vulkan \
-                    --disable-vulkan_1 \
-                    --disable-winevulkan \
+                    ${DISABLE_VULKAN} \
                     --without-x
           popd
 
