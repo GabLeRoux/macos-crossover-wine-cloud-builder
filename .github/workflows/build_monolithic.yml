@@ -219,7 +219,7 @@ jobs:
         run: |
           set -x
 
-          export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include"
+          export SDL2_CFLAGS="-I$(brew --prefix sdl2)/"$([[ ${{ matrix.CROSS_OVER_VERSION }} == 21.* ]] && echo "include/SDL2" || echo "include")
           export GPHOTO2_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
           export GPHOTO2_PORT_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
 
@@ -271,10 +271,16 @@ jobs:
         run: |
           set -x
 
-          export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include"
+          export SDL2_CFLAGS="-I$(brew --prefix sdl2)/"$([[ ${{ matrix.CROSS_OVER_VERSION }} == 21.* ]] && echo "include/SDL2" || echo "include")
 
           export PNG_CFLAGS="-I$(brew --prefix libpng)/include"
           export PNG_LIBS="-L$(brew --prefix libpng)/lib"
+
+          if [[ ${{ matrix.CROSS_OVER_VERSION }} == 19.* || ${{ matrix.CROSS_OVER_VERSION }} == 20.* ]]; then
+              export DISABLE_VULKAN="--without-vkd3d --without-vulkan --disable-vulkan_1 --disable-winevulkan"
+          else
+              export DISABLE_VULKAN=""
+          fi
 
           mkdir -p ${{ env.BUILDROOT }}/wine32on64
           pushd ${{ env.BUILDROOT }}/wine32on64

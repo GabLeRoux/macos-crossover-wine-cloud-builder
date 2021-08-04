@@ -172,7 +172,7 @@ export CROSSCFLAGS="-g -O2 -fcommon"
 export CFLAGS="-g -O2 -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
 export LDFLAGS="-Wl,-headerpad_max_install_names"
 
-export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include"
+export SDL2_CFLAGS="-I$(brew --prefix sdl2)/"$([[ ${CROSS_OVER_VERSION} == 21.* ]] && echo "include/SDL2" || echo "include")
 export GPHOTO2_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
 export GPHOTO2_PORT_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
 
@@ -220,7 +220,7 @@ export CROSSCFLAGS="-g -O2 -fcommon"
 export CFLAGS="-g -O2 -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
 export LDFLAGS="-Wl,-headerpad_max_install_names"
 
-export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include"
+export SDL2_CFLAGS="-I$(brew --prefix sdl2)/"$([[ ${CROSS_OVER_VERSION} == 21.* ]] && echo "include/SDL2" || echo "include")
 export GPHOTO2_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
 export GPHOTO2_PORT_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
 
