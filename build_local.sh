@@ -7,7 +7,7 @@ echo Wine-Crossover-MacOS
 export GITHUB_WORKSPACE=$(pwd)
 
 if [ -z "$CROSS_OVER_VERSION" ]; then
-    export CROSS_OVER_VERSION=20.0.4
+    export CROSS_OVER_VERSION=21.0.0
 fi
 
 # avoid weird linker errors with Xcode 10 and later
@@ -16,8 +16,8 @@ export MACOSX_DEPLOYMENT_TARGET=10.14
 export CROSS_OVER_SOURCE_URL=https://media.codeweavers.com/pub/crossover/source/crossover-sources-${CROSS_OVER_VERSION}.tar.gz
 export CROSS_OVER_LOCAL_FILE=crossover-${CROSS_OVER_VERSION}
 # directories / files inside the downloaded tar file directory structure
-export LLVM_MAKEDIR=$GITHUB_WORKSPACE/sources/$([[ ${CROSS_OVER_VERSION} == 20.* ]] && echo "clang/llvm" || echo "llvm")
-export CLANG_MAKEDIR=$GITHUB_WORKSPACE/sources/$([[ ${CROSS_OVER_VERSION} == 20.* ]] && echo "clang/clang" || echo "clang")
+export LLVM_MAKEDIR=$GITHUB_WORKSPACE/sources/$([[ ${CROSS_OVER_VERSION} == 2?.* ]] && echo "clang/llvm" || echo "llvm")
+export CLANG_MAKEDIR=$GITHUB_WORKSPACE/sources/$([[ ${CROSS_OVER_VERSION} == 2?.* ]] && echo "clang/clang" || echo "clang")
 export WINE_CONFIGURE=$GITHUB_WORKSPACE/sources/wine/configure
 export DXVK_BUILDSCRIPT=$GITHUB_WORKSPACE/sources/dxvk/package-release.sh
 # build directories

@@ -26,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        CROSS_OVER_VERSION: [20.0.4, 20.0.2, 20.0.1, 20.0.0, 19.0.2]
+        CROSS_OVER_VERSION: [21.0.0, 20.0.4, 20.0.2, 20.0.1, 20.0.0, 19.0.2]
 
     runs-on:  macos-10.15
 
@@ -35,8 +35,8 @@ jobs:
       CROSS_OVER_SOURCE_URL: https://media.codeweavers.com/pub/crossover/source/crossover-sources-${{ matrix.CROSS_OVER_VERSION }}.tar.gz
       CROSS_OVER_LOCAL_FILE: crossover-${{ matrix.CROSS_OVER_VERSION }}
       # directories / files inside the downloaded tar file directory structure
-      LLVM_MAKEDIR: $GITHUB_WORKSPACE/sources/${{ startsWith(matrix.CROSS_OVER_VERSION, '20') && 'clang/llvm' || 'llvm' }}
-      CLANG_MAKEDIR: $GITHUB_WORKSPACE/sources/${{ startsWith(matrix.CROSS_OVER_VERSION, '20') && 'clang/clang' || 'clang' }}
+      LLVM_MAKEDIR: $GITHUB_WORKSPACE/sources/${{ startsWith(matrix.CROSS_OVER_VERSION, '2') && 'clang/llvm' || 'llvm' }}
+      CLANG_MAKEDIR: $GITHUB_WORKSPACE/sources/${{ startsWith(matrix.CROSS_OVER_VERSION, '2') && 'clang/clang' || 'clang' }}
       # artifact names
       TOOLS_INSTALLATION: build-tools-cx${{ matrix.CROSS_OVER_VERSION }}
       WINE_INSTALLATION: wine-cx${{ matrix.CROSS_OVER_VERSION }}
