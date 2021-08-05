@@ -106,9 +106,16 @@ jobs:
       - name: Add distversion.h
         run: cp distversion.h sources/wine/include/distversion.h
 
-      - name: Patch wcslen() in ntdll/wcstring.c to prevent crash if a nullptr is suppluied to the function (HACK)
+      - name: Patch wcslen() in ntdll/wcstring.c to prevent crash if a nullptr is supplied to the function (HACK)
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         run: patch sources/wine/dlls/ntdll/wcstring.c < wcstring.patch
+
+      - name: Patch msvcrt to export the missing sincos function, see https://github.com/wine-mirror/wine/commit/f0131276474997b9d4e593bbf8c5616b879d3bd5
+        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
+        run: |
+          pushd sources/wine
+          patch -p1 < ${{ github.workspace }}/msvcrt-sincos.patch
+          popd
 
       - name: Patch DXVK
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')

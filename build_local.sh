@@ -88,6 +88,11 @@ if [[ ${CROSS_OVER_VERSION} == 20.* ]]; then
     echo "Patch wcslen() in ntdll/wcstring.c to prevent crash if a nullptr is suppluied to the function (HACK)"
     patch sources/wine/dlls/ntdll/wcstring.c < wcstring.patch
 
+    echo "Patch msvcrt to export the missing sincos function, see https://github.com/wine-mirror/wine/commit/f0131276474997b9d4e593bbf8c5616b879d3bd5"
+    pushd sources/wine
+    patch -p1 < ${GITHUB_WORKSPACE}/msvcrt-sincos.patch
+    popd
+
     echo Patch DXVK
     patch sources/dxvk/src/util/rc/util_rc_ptr.h < dxvk_util_rc_ptr.patch
 fi
