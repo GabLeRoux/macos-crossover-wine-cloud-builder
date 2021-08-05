@@ -145,19 +145,19 @@ cp ${INSTALLROOT}/${TOOLS_INSTALLATION}.tar.gz ${PACKAGE_UPLOAD}/
 
 ############ Build DXVK ##############
 
-if [[ ${CROSS_OVER_VERSION} == 20.* ]]; then
-    echo Build DXVK
-    PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${DXVK_BUILDSCRIPT} master ${INSTALLROOT}/${DXVK_INSTALLATION} --no-package
-
-    echo Tar DXVK
-    pushd ${INSTALLROOT}
-    tar -czf ${DXVK_INSTALLATION}.tar.gz ${DXVK_INSTALLATION}
-    popd
-
-    echo Upload DXVK
-    mkdir -p ${PACKAGE_UPLOAD}
-    cp ${INSTALLROOT}/${DXVK_INSTALLATION}.tar.gz ${PACKAGE_UPLOAD}/
-fi
+#if [[ ${CROSS_OVER_VERSION} == 20.* ]]; then
+#    echo Build DXVK
+#    PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${DXVK_BUILDSCRIPT} master ${INSTALLROOT}/${DXVK_INSTALLATION} --no-package
+#
+#    echo Tar DXVK
+#    pushd ${INSTALLROOT}
+#    tar -czf ${DXVK_INSTALLATION}.tar.gz ${DXVK_INSTALLATION}
+#    popd
+#
+#    echo Upload DXVK
+#    mkdir -p ${PACKAGE_UPLOAD}
+#    cp ${INSTALLROOT}/${DXVK_INSTALLATION}.tar.gz ${PACKAGE_UPLOAD}/
+#fi
 
 ############ Build 64bit Version ##############
 

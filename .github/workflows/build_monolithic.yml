@@ -181,26 +181,26 @@ jobs:
 
       ############ Build DXVK ##############
 
-      - name: Build DXVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-        run: |
-          set -x
-          PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${{ env.DXVK_BUILDSCRIPT }} master ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }} --no-package
+      #- name: Build DXVK
+      #  if: startsWith(matrix.CROSS_OVER_VERSION, '20')
+      #  run: |
+      #    set -x
+      #    PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${{ env.DXVK_BUILDSCRIPT }} master ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }} --no-package
 
-      - name: Tar DXVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-        run: |
-          set -x
-          pushd ${{ env.INSTALLROOT }}
-          tar -czf ${{ env.DXVK_INSTALLATION }}.tar.gz ${{ env.DXVK_INSTALLATION }}
-          popd
+      #- name: Tar DXVK
+      #  if: startsWith(matrix.CROSS_OVER_VERSION, '20')
+      #  run: |
+      #    set -x
+      #    pushd ${{ env.INSTALLROOT }}
+      #    tar -czf ${{ env.DXVK_INSTALLATION }}.tar.gz ${{ env.DXVK_INSTALLATION }}
+      #    popd
 
-      - name: Upload DXVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.DXVK_INSTALLATION }}
-          path: ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }}.tar.gz
+      #- name: Upload DXVK
+      #  if: startsWith(matrix.CROSS_OVER_VERSION, '20')
+      #  uses: actions/upload-artifact@v2
+      #  with:
+      #    name: ${{ env.DXVK_INSTALLATION }}
+      #    path: ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }}.tar.gz
 
 
       ############ Build 64bit Version ##############
