@@ -210,134 +210,91 @@ jobs:
       #    path: ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }}.tar.gz
 
 
+      ############ Configure 64bit Version ##############
+
+      - name: Configure wine64 (specific to 21)
+        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        uses: ./.github/actions/configure_wine@v1
+        with:
+          winearch: "wine64"
+          build-dir: "${{ env.BUILDROOT }}/wine64"
+          crossflags: "-g -O2"
+          configure-params: "--enable-win64 --with-vulkan"
+
+      - name: Configure wine64 (specific to 20)
+        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
+        uses: ./.github/actions/configure_wine@v1
+        with:
+          winearch: "wine64"
+          build-dir: "${{ env.BUILDROOT }}/wine64"
+          crossflags: "-g -O2"
+          configure-params: "--enable-win64 --with-vulkan"
+
+      - name: Configure wine64 (specific to 19)
+        if: startsWith(matrix.CROSS_OVER_VERSION, '19')
+        uses: ./.github/actions/configure_wine@v1
+        with:
+          winearch: "wine64"
+          build-dir: "${{ env.BUILDROOT }}/wine64"
+          crossflags: "-g -O2 -fcommon"
+          configure-params: "--enable-win64 --with-vulkan"
+
       ############ Build 64bit Version ##############
 
-      - name: Configure wine64
-        env:
-          CC: clang
-          CXX: clang++
-          # see https://github.com/Gcenx/macOS_Wine_builds/issues/17#issuecomment-750346843
-          CROSSCFLAGS: "${{ startsWith(matrix.CROSS_OVER_VERSION, '19') && '-g -O2 -fcommon' || '-g -O2' }}"
-          # Xcode12 by default enables '-Werror,-Wimplicit-function-declaration' (49917738)
-          # this causes wine(64) builds to fail so needs to be disabled.
-          # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes
-          CFLAGS: "-g -O2 -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
-          LDFLAGS: "-Wl,-headerpad_max_install_names"
-        run: |
-          set -x
-
-          export SDL2_CFLAGS="-I$(brew --prefix sdl2)/"$([[ ${{ matrix.CROSS_OVER_VERSION }} == 21.* ]] && echo "include/SDL2" || echo "include")
-          export GPHOTO2_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
-          export GPHOTO2_PORT_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
-
-          export PNG_CFLAGS="-I$(brew --prefix libpng)/include"
-          export PNG_LIBS="-L$(brew --prefix libpng)/lib"
-
-          export LDFLAGS="-L $(brew --prefix molten-vk)/lib"
-
-          mkdir -p ${{ env.BUILDROOT }}/wine64
-          pushd ${{ env.BUILDROOT }}/wine64
-          ${{ env.WINE_CONFIGURE }} \
-                    --enable-win64 \
-                    --disable-tests \
-                    --without-alsa \
-                    --without-capi \
-                    --without-dbus \
-                    --without-inotify \
-                    --without-oss \
-                    --without-pulse \
-                    --without-udev \
-                    --without-v4l2 \
-                    --without-gsm \
-                    --with-png \
-                    --with-sdl \
-                    --with-vulkan \
-                    --without-x
-          popd
-
       - name: Build wine64
-        run: |
-          pushd ${{ env.BUILDROOT }}/wine64
-          make -j$(sysctl -n hw.ncpu 2>/dev/null)
-          popd
+        uses: ./.github/actions/make@v1
+        with:
+          build-dir: "${{ env.BUILDROOT }}/wine64"
 
+      ############ Configure 32on64bit Version ##############
 
-      ############ Build 32bit Version (WoW64) ##############
+      - name: Configure wine32on64 (specific to 21)
+        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        uses: ./.github/actions/configure_wine@v1
+        with:
+          winearch: "wine32on64"
+          build-dir: "${{ env.BUILDROOT }}/wine32on64"
+          crossflags: "-g -O2"
+          configure-params: "--enable-win32on64 --with-wine64=${{ env.BUILDROOT }}/wine64 --without-cms --without-gstreamer --without-gphoto --without-sane --without-krb5"
 
-      - name: Configure wine32on64
-        env:
-          CC: clang
-          CXX: clang++
-          # see https://github.com/Gcenx/macOS_Wine_builds/issues/17#issuecomment-750346843
-          CROSSCFLAGS: "${{ startsWith(matrix.CROSS_OVER_VERSION, '19') && '-g -O2 -fcommon' || '-g -O2' }}"
-          # Xcode12 by default enables '-Werror,-Wimplicit-function-declaration' (49917738)
-          # this causes wine(64) builds to fail so needs to be disabled.
-          # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes
-          CFLAGS: "-g -O2 -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
-          LDFLAGS: "-Wl,-headerpad_max_install_names"
-        run: |
-          set -x
+      - name: Configure wine32on64 (specific to 20)
+        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
+        uses: ./.github/actions/configure_wine@v1
+        with:
+          winearch: "wine32on64"
+          build-dir: "${{ env.BUILDROOT }}/wine32on64"
+          crossflags: "-g -O2"
+          configure-params: "--enable-win32on64 --with-wine64=${{ env.BUILDROOT }}/wine64 --without-cms --without-gstreamer --without-gphoto --without-sane --without-krb5 --disable-winedbg --without-vkd3d --without-vulkan --disable-vulkan_1 --disable-winevulkan"
 
-          export SDL2_CFLAGS="-I$(brew --prefix sdl2)/"$([[ ${{ matrix.CROSS_OVER_VERSION }} == 21.* ]] && echo "include/SDL2" || echo "include")
+      - name: Configure wine32on64 (specific to 19)
+        if: startsWith(matrix.CROSS_OVER_VERSION, '19')
+        uses: ./.github/actions/configure_wine@v1
+        with:
+          winearch: "wine32on64"
+          build-dir: "${{ env.BUILDROOT }}/wine32on64"
+          crossflags: "-g -O2 -fcommon"
+          configure-params: "--enable-win32on64 --with-wine64=${{ env.BUILDROOT }}/wine64 --without-cms --without-gstreamer --without-gphoto --without-sane --without-krb5 --disable-winedbg --without-vkd3d --without-vulkan --disable-vulkan_1 --disable-winevulkan"
 
-          export PNG_CFLAGS="-I$(brew --prefix libpng)/include"
-          export PNG_LIBS="-L$(brew --prefix libpng)/lib"
-
-          if [[ ${{ matrix.CROSS_OVER_VERSION }} == 19.* || ${{ matrix.CROSS_OVER_VERSION }} == 20.* ]]; then
-              export DISABLE_VULKAN="--without-vkd3d --without-vulkan --disable-vulkan_1 --disable-winevulkan"
-          else
-              export DISABLE_VULKAN=""
-          fi
-
-          mkdir -p ${{ env.BUILDROOT }}/wine32on64
-          pushd ${{ env.BUILDROOT }}/wine32on64
-          ${{ env.WINE_CONFIGURE }} \
-                    --enable-win32on64 \
-                    --with-wine64=${{ env.BUILDROOT }}/wine64 \
-                    --disable-tests \
-                    --without-alsa \
-                    --without-capi \
-                    --without-dbus \
-                    --without-inotify \
-                    --without-oss \
-                    --without-pulse \
-                    --without-udev \
-                    --without-v4l2 \
-                    --disable-winedbg \
-                    --without-cms \
-                    --without-gstreamer \
-                    --without-gsm \
-                    --without-gphoto \
-                    --without-sane \
-                    --with-png \
-                    --with-sdl \
-                    --without-krb5 \
-                    ${DISABLE_VULKAN} \
-                    --without-x
-          popd
+      ############ Build 32on64bit Version ##############
 
       - name: Build wine32on64
-        run: |
-          pushd ${{ env.BUILDROOT }}/wine32on64
-          make -j$(sysctl -n hw.ncpu 2>/dev/null)
-          popd
-
+        uses: ./.github/actions/make@v1
+        with:
+          build-dir: "${{ env.BUILDROOT }}/wine32on64"
 
       ############ Install wine ##############
 
       - name: Install wine32on64
-        run: |
-          set -x
-          pushd ${{ env.BUILDROOT }}/wine32on64
-          make install-lib DESTDIR="${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
-          popd
+        uses: ./.github/actions/install@v1
+        with:
+          build-dir: "${{ env.BUILDROOT }}/wine32on64"
+          install-dir: "${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
 
       - name: Install wine64
-        run: |
-          set -x
-          pushd ${{ env.BUILDROOT }}/wine64
-          make install-lib DESTDIR="${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
-          popd
+        uses: ./.github/actions/install@v1
+        with:
+          build-dir: "${{ env.BUILDROOT }}/wine64"
+          install-dir: "${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
 
       ############ Bundle and Upload Deliverable ##############
 

@@ -1,0 +1,76 @@
+name: 'Configure Wine'
+description: 'Crossover-version independent action to configure Wine'
+inputs:
+  winearch:
+    description: 'wine64 or wine32on64'
+    required: true
+    default: "wine64"
+  crossflags:
+    descriptions: 'CROSSFLAGS to be given to ming-w64'
+    required: true
+    default: "-g -O2"
+  cflags:
+    descriptions: 'CFLAGS to be given to clang'
+    required: true
+    # Xcode12 by default enables '-Werror,-Wimplicit-function-declaration' (49917738)
+    # this causes wine(64) builds to fail so needs to be disabled.
+    # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes    
+    default: "-g -O2 -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
+  ldflags:
+    descriptions: 'LDFLAGS to be given to clang'
+    required: true
+    default: "-Wl,-headerpad_max_install_names"
+  build-dir:
+    description: 'Build directory'
+    required: true
+  wine-configure:
+    description: 'Path to wine configure script'
+    required: true
+    default: ${{ github.workspace }}/sources/wine/configure
+  configure-params:
+    description: 'additional parameters to be given to the wine configure script'
+    required: true
+    default: "--enable-win64 --with-vulkan"
+runs:
+  using: "composite"
+  steps:
+      - name: Configure ${{ inputs.winearch }}
+        env:
+          CC: clang
+          CXX: clang++
+          CROSSCFLAGS: ${{ inputs.crossflags }}
+          CFLAGS: ${{ inputs.cflags }}
+          LDFLAGS: ${{ inputs.ldflags }}
+        run: |
+          set -x
+
+          export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include -I$(brew --prefix sdl2)/include/SDL2"
+          export GPHOTO2_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
+          export GPHOTO2_PORT_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
+
+          export PNG_CFLAGS="-I$(brew --prefix libpng)/include"
+          export PNG_LIBS="-L$(brew --prefix libpng)/lib"
+
+          export LDFLAGS="-L $(brew --prefix molten-vk)/lib"
+
+          mkdir -p ${{ inputs.build-dir }}/
+          pushd ${{ inputs.build-dir }}
+          ${{ inputs.wine-configure }} \
+                    --disable-tests \
+                    --without-alsa \
+                    --without-capi \
+                    --without-dbus \
+                    --without-inotify \
+                    --without-oss \
+                    --without-pulse \
+                    --without-udev \
+                    --without-v4l2 \
+                    --without-gsm \
+                    --with-png \
+                    --with-sdl \
+                    --with-vulkan \
+                    --without-x \
+                    ${{ inputs.configure-params }}
+          popd
+
+      shell: bash
