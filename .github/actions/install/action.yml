@@ -16,4 +16,4 @@ runs:
           pushd ${{ inputs.build-dir }}
           make install-lib DESTDIR="${{ inputs.install-dir }}"
           popd
-      shell: bash
+        shell: bash

@@ -12,4 +12,4 @@ runs:
           pushd ${{ inputs.build-dir }}
           make -j$(sysctl -n hw.ncpu 2>/dev/null)
           popd
-      shell: bash
+        shell: bash
