@@ -121,10 +121,19 @@ jobs:
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         run: patch sources/dxvk/src/util/rc/util_rc_ptr.h < dxvk_util_rc_ptr.patch
 
+      ############ Restore LLVM / Clang from cache ##############
 
-      ############ Build LLVM / Clang ##############
+      - name: Restore LLVM / Clang from cache
+        uses: actions/cache@v2
+        id: cache_llvm_clang
+        with:
+          path: ${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}
+          key: llvm_clang-${{ matrix.CROSS_OVER_VERSION }}
+
+      ############ Build LLVM / Clang (if restore from cache failed) ##############
 
       - name: Configure LLVM
+        if: steps.cache_llvm_clang.outputs.cache-hit != 'true'
         run: |
           set -x
           mkdir -p ${{ env.LLVM_BUILDDIR }}
@@ -137,18 +146,21 @@ jobs:
           popd
 
       - name: Build LLVM
+        if: steps.cache_llvm_clang.outputs.cache-hit != 'true'
         run: |
           pushd ${{ env.LLVM_BUILDDIR }}
           Ninja
           popd
 
       - name: Install LLVM
+        if: steps.cache_llvm_clang.outputs.cache-hit != 'true'
         run: |
           pushd ${{ env.LLVM_BUILDDIR }}
           Ninja install
           popd
 
       - name: Configure Clang
+        if: steps.cache_llvm_clang.outputs.cache-hit != 'true'
         run: |
           set -x
           mkdir -p ${{ env.CLANG_BUILDDIR }}
@@ -160,18 +172,21 @@ jobs:
           popd
 
       - name: Build Clang
+        if: steps.cache_llvm_clang.outputs.cache-hit != 'true'
         run: |
           pushd ${{ env.CLANG_BUILDDIR }}
           Ninja
           popd
 
       - name: Install Clang
+        if: steps.cache_llvm_clang.outputs.cache-hit != 'true'
         run: |
           pushd ${{ env.CLANG_BUILDDIR }}
           Ninja install
           popd
 
       - name: Tar Build Tools
+        if: steps.cache_llvm_clang.outputs.cache-hit != 'true'
         run: |
           set -x
           pushd ${{ env.INSTALLROOT }}
