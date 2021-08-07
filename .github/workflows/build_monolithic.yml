@@ -263,17 +263,8 @@ jobs:
 
       ############ Configure 32on64bit Version ##############
 
-      - name: Configure wine32on64 (specific to 21)
-        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
-        uses: ./.github/actions/configure_wine
-        with:
-          winearch: "wine32on64"
-          build-dir: "${{ env.BUILDROOT }}/wine32on64"
-          crossflags: "-g -O2"
-          configure-params: "--enable-win32on64 --with-wine64=${{ env.BUILDROOT }}/wine64 --without-cms --without-gstreamer --without-gphoto --without-sane --without-krb5"
-
-      - name: Configure wine32on64 (specific to 20)
-        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
+      - name: Configure wine32on64 (specific to 2x)
+        if: startsWith(matrix.CROSS_OVER_VERSION, '2')
         uses: ./.github/actions/configure_wine
         with:
           winearch: "wine32on64"
