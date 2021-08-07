@@ -229,7 +229,7 @@ jobs:
 
       - name: Configure wine64 (specific to 21)
         if: startsWith(matrix.CROSS_OVER_VERSION, '21')
-        uses: ./.github/actions/configure_wine@v1
+        uses: ./.github/actions/configure_wine
         with:
           winearch: "wine64"
           build-dir: "${{ env.BUILDROOT }}/wine64"
@@ -238,7 +238,7 @@ jobs:
 
       - name: Configure wine64 (specific to 20)
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-        uses: ./.github/actions/configure_wine@v1
+        uses: ./.github/actions/configure_wine
         with:
           winearch: "wine64"
           build-dir: "${{ env.BUILDROOT }}/wine64"
@@ -247,7 +247,7 @@ jobs:
 
       - name: Configure wine64 (specific to 19)
         if: startsWith(matrix.CROSS_OVER_VERSION, '19')
-        uses: ./.github/actions/configure_wine@v1
+        uses: ./.github/actions/configure_wine
         with:
           winearch: "wine64"
           build-dir: "${{ env.BUILDROOT }}/wine64"
@@ -257,7 +257,7 @@ jobs:
       ############ Build 64bit Version ##############
 
       - name: Build wine64
-        uses: ./.github/actions/make@v1
+        uses: ./.github/actions/make
         with:
           build-dir: "${{ env.BUILDROOT }}/wine64"
 
@@ -265,7 +265,7 @@ jobs:
 
       - name: Configure wine32on64 (specific to 21)
         if: startsWith(matrix.CROSS_OVER_VERSION, '21')
-        uses: ./.github/actions/configure_wine@v1
+        uses: ./.github/actions/configure_wine
         with:
           winearch: "wine32on64"
           build-dir: "${{ env.BUILDROOT }}/wine32on64"
@@ -274,7 +274,7 @@ jobs:
 
       - name: Configure wine32on64 (specific to 20)
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-        uses: ./.github/actions/configure_wine@v1
+        uses: ./.github/actions/configure_wine
         with:
           winearch: "wine32on64"
           build-dir: "${{ env.BUILDROOT }}/wine32on64"
@@ -283,7 +283,7 @@ jobs:
 
       - name: Configure wine32on64 (specific to 19)
         if: startsWith(matrix.CROSS_OVER_VERSION, '19')
-        uses: ./.github/actions/configure_wine@v1
+        uses: ./.github/actions/configure_wine
         with:
           winearch: "wine32on64"
           build-dir: "${{ env.BUILDROOT }}/wine32on64"
@@ -293,20 +293,20 @@ jobs:
       ############ Build 32on64bit Version ##############
 
       - name: Build wine32on64
-        uses: ./.github/actions/make@v1
+        uses: ./.github/actions/make
         with:
           build-dir: "${{ env.BUILDROOT }}/wine32on64"
 
       ############ Install wine ##############
 
       - name: Install wine32on64
-        uses: ./.github/actions/install@v1
+        uses: ./.github/actions/install
         with:
           build-dir: "${{ env.BUILDROOT }}/wine32on64"
           install-dir: "${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
 
       - name: Install wine64
-        uses: ./.github/actions/install@v1
+        uses: ./.github/actions/install
         with:
           build-dir: "${{ env.BUILDROOT }}/wine64"
           install-dir: "${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
