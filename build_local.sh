@@ -267,7 +267,7 @@ popd
 
 echo Build wine32on64
 pushd ${BUILDROOT}/wine32on64
-make -j$(sysctl -n hw.ncpu 2>/dev/null)
+make -j$(sysctl -n hw.activecpu 2>/dev/null)
 popd
 
 
