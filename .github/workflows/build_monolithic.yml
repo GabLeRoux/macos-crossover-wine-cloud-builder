@@ -186,7 +186,6 @@ jobs:
           popd
 
       - name: Tar Build Tools
-        if: steps.cache_llvm_clang.outputs.cache-hit != 'true'
         run: |
           set -x
           pushd ${{ env.INSTALLROOT }}
