@@ -160,7 +160,7 @@ jobs:
 
       - name: Patch ntdll/wcstring.c to prevent crash if a nullptr is supplied to the function
         # Hack by dasmy
-        if: startsWith(matrix.CROSS_OVER_VERSION, '2')
+        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         run: |
           pushd sources/wine
           patch -p1 < ${{ github.workspace }}/wcstring.patch
