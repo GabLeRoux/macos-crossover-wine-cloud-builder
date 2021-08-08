@@ -124,14 +124,14 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: ${{ env.TOOLS_INSTALLATION }}
-          path: ${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}.tar.gz
+          path: ${{ env.INSTALLROOT }}
 
       - name: Unpack llvm/clang
         run: |
           set -x
           pushd ${{ env.INSTALLROOT }}
           ls -al
-          tar -xvf ${{ env.TOOLS_INSTALLATION }}.*
+          tar -xvf ${{ env.TOOLS_INSTALLATION }}.tar.gz
           ls -alt
           popd
 
