@@ -19,9 +19,62 @@ env:
     CLANG_BUILDDIR: ${{ github.workspace }}/build/clang
     # target directory for installation
     INSTALLROOT: ${{ github.workspace }}/install
+    TOOLS_INSTALLATION: build-tools-cx
 
 jobs:
+  llvm-clang:
+    runs-on:  macos-10.15
+    env:
+      # crossover source code to be downloaded
+      CROSS_OVER_SOURCE_URL: https://media.codeweavers.com/pub/crossover/source/crossover-sources-21.0.0.tar.gz
+      CROSS_OVER_LOCAL_FILE: crossover-21.0.0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      ############ Restore LLVM / Clang from cache ##############
+
+      - name: Restore LLVM / Clang from cache
+        uses: actions/cache@v2
+        id: cache_llvm_clang
+        with:
+          path: ${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}
+          key: llvm_clang
+
+      ############ Build LLVM / Clang (if restore from cache failed) ##############
+
+      - name: Get and Extract Source
+        if:  steps.cache_llvm_clang.outputs.cache-hit != 'true'
+        run:  |
+          curl -o ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz ${{ env.CROSS_OVER_SOURCE_URL }}
+          tar xf ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz
+
+      - name: Build / Install LLVM and Clang (if restore from cache failed)
+        if:  steps.cache_llvm_clang.outputs.cache-hit != 'true'
+        uses: ./.github/actions/build_llvm_clang
+        with:
+          install-prefix: ${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}
+          llvm-makedir: ${{ github.workspace }}/sources/clang/llvm
+          clang-makedir: ${{ github.workspace }}/sources/clang/clang
+
+      ############ Upload LLVM / Clang to be used in subsequent job steps ##############
+
+      - name: Tar Build Tools
+        run: |
+          set -x
+          pushd ${{ env.INSTALLROOT }}
+          tar -czf ${{ env.TOOLS_INSTALLATION }}.tar.gz ${{ env.TOOLS_INSTALLATION }}
+          ls -alt
+          popd
+
+      - name: Upload Build Tools
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.TOOLS_INSTALLATION }}
+          path: ${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}.tar.gz
+
   wine-crossover:
+    needs: llvm-clang
 
     strategy:
       fail-fast: false
@@ -34,9 +87,7 @@ jobs:
       # crossover source code to be downloaded
       CROSS_OVER_SOURCE_URL: https://media.codeweavers.com/pub/crossover/source/crossover-sources-${{ matrix.CROSS_OVER_VERSION }}.tar.gz
       CROSS_OVER_LOCAL_FILE: crossover-${{ matrix.CROSS_OVER_VERSION }}
-      # directories / files inside the downloaded tar file directory structure
       # artifact names
-      TOOLS_INSTALLATION: build-tools-cx${{ matrix.CROSS_OVER_VERSION }}
       WINE_INSTALLATION: wine-cx${{ matrix.CROSS_OVER_VERSION }}
       DXVK_INSTALLATION: dxvk-cx${{ matrix.CROSS_OVER_VERSION }}
 
@@ -69,6 +120,20 @@ jobs:
           echo "$(brew --prefix bison)/bin" >> $GITHUB_PATH
           echo "$(brew --prefix krb5)/bin" >> $GITHUB_PATH
 
+      - name: Download llvm/clang (from previous job)
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.TOOLS_INSTALLATION }}
+          path: ${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}.tar.gz
+
+      - name: Unpack llvm/clang
+        run: |
+          set -x
+          pushd ${{ env.INSTALLROOT }}
+          tar -xf ${{ env.TOOLS_INSTALLATION }}.tar.gz
+          ls -alt
+          popd
+
       - name: Add llvm/clang to $PATH (for later)
         run: |
           set -x
@@ -94,7 +159,7 @@ jobs:
 
       - name: Patch ntdll/wcstring.c to prevent crash if a nullptr is supplied to the function
         # Hack by dasmy
-        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
+        if: startsWith(matrix.CROSS_OVER_VERSION, '2')
         run: |
           pushd sources/wine
           patch -p1 < ${{ github.workspace }}/wcstring.patch
@@ -111,39 +176,6 @@ jobs:
       - name: Patch DXVK
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         run: patch sources/dxvk/src/util/rc/util_rc_ptr.h < dxvk_util_rc_ptr.patch
-
-      ############ Restore LLVM / Clang from cache ##############
-
-      - name: Restore LLVM / Clang from cache
-        uses: actions/cache@v2
-        id: cache_llvm_clang
-        with:
-          path: ${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}
-          key: llvm_clang-${{ matrix.CROSS_OVER_VERSION }}
-
-      ############ Build LLVM / Clang (if restore from cache failed) ##############
-
-      - name: Build / Install LLVM and Clang (if restore from cache failed)
-        if:  steps.cache_llvm_clang.outputs.cache-hit != 'true'
-        uses: ./.github/actions/build_llvm_clang
-        with:
-          install-prefix: ${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}
-          llvm-makedir: ${{ github.workspace }}/sources/${{ startsWith(matrix.CROSS_OVER_VERSION, '2') && 'clang/llvm' || 'llvm' }}
-          clang-makedir: ${{ github.workspace }}/sources/${{ startsWith(matrix.CROSS_OVER_VERSION, '2') && 'clang/clang' || 'clang' }}
-
-      - name: Tar Build Tools
-        run: |
-          set -x
-          pushd ${{ env.INSTALLROOT }}
-          tar -czf ${{ env.TOOLS_INSTALLATION }}.tar.gz ${{ env.TOOLS_INSTALLATION }}
-          ls -alt
-          popd
-
-      - name: Upload Build Tools
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.TOOLS_INSTALLATION }}
-          path: ${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}.tar.gz
 
 
       ############ Build DXVK ##############
