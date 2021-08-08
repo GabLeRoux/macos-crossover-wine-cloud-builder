@@ -1,10 +1,20 @@
---- wcstring.c.orig	2021-04-17 16:17:37.000000000 +0200
-+++ wcstring.c	2021-04-17 16:19:18.000000000 +0200
-@@ -137,6 +137,7 @@
+From fe17ff5c022cf388c4ab827d31ce493bb35554d9 Mon Sep 17 00:00:00 2001
+From: dasmy <win_wa@gmx.net>
+Date: Sat, 17 Apr 2021 16:25:06 +0200
+Subject: [PATCH] wcstring.c: HACK to prevent a nullptr-access crash
+
+---
+ dlls/ntdll/wcstring.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/dlls/ntdll/wcstring.c b/dlls/ntdll/wcstring.c
+index aaf8d29b..192697d9 100644
+--- a/dlls/ntdll/wcstring.c
++++ b/dlls/ntdll/wcstring.c
+@@ -137,6 +137,7 @@ INT __cdecl NTDLL_wcscspn( LPCWSTR str, LPCWSTR reject )
   */
  INT __cdecl NTDLL_wcslen( LPCWSTR str )
  {
 +    if (!str) return 0;  // HACK(dasmy): prevent crash if this function is called with a nullptr argument
      return strlenW( str );
  }
- 

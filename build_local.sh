@@ -36,8 +36,7 @@ export DXVK_INSTALLATION=dxvk-cx${CROSS_OVER_VERSION}
 echo Install Dependencies
 # build tools
 brew install  cmake            \
-              ninja            \
-              mingw-w64        \
+              ninja
 
 # build dependencies for wine / crossover
 brew install  freetype         \
@@ -51,12 +50,8 @@ brew install  freetype         \
               mpg123           \
               little-cms2      \
               libpng           \
+              mingw-w64        \
               molten-vk
-
-# dependencies for dxvk
-brew install  coreutils \
-            meson     \
-            glslang
 
 echo Add bison and krb5 to PATH
 export PATH="$(brew --prefix bison)/bin":${PATH}
@@ -80,15 +75,21 @@ if [[ "${CROSS_OVER_VERSION}" == "20.0.1" || "${CROSS_OVER_VERSION}" == "20.0.2"
     tar -xf crossover-20.0.0.tar.gz sources/clang
 fi
 
-echo Add distversion.h
-cp distversion.h sources/wine/include/distversion.h
+echo "Patch Add missing distversion.h"
+# Patch provided by Josh Dubois, CrossOver product manager, CodeWeavers.
+pushd sources/wine
+patch -p1 < ${GITHUB_WORKSPACE}/distversion.patch
+popd
 
 
 if [[ ${CROSS_OVER_VERSION} == 20.* ]]; then
     echo "Patch wcslen() in ntdll/wcstring.c to prevent crash if a nullptr is suppluied to the function (HACK)"
-    patch sources/wine/dlls/ntdll/wcstring.c < wcstring.patch
+    pushd sources/wine
+    patch -p1 < ${GITHUB_WORKSPACE}/wcstring.patch
+    popd
 
-    echo "Patch msvcrt to export the missing sincos function, see https://github.com/wine-mirror/wine/commit/f0131276474997b9d4e593bbf8c5616b879d3bd5"
+    echo "Patch msvcrt to export the missing sincos function"
+    # https://github.com/wine-mirror/wine/commit/f0131276474997b9d4e593bbf8c5616b879d3bd5
     pushd sources/wine
     patch -p1 < ${GITHUB_WORKSPACE}/msvcrt-sincos.patch
     popd
@@ -150,7 +151,11 @@ cp ${INSTALLROOT}/${TOOLS_INSTALLATION}.tar.gz ${PACKAGE_UPLOAD}/
 
 ############ Build DXVK ##############
 
-#if [[ ${CROSS_OVER_VERSION} == 20.* ]]; then
+#if [[ ${CROSS_OVER_VERSION} == 20.* ]]; thend
+#    Echo "Installing dependencies for dxvk"
+#    brew install  coreutils \
+#                  meson     \
+#                  glslang
 #    echo Build DXVK
 #    PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${DXVK_BUILDSCRIPT} master ${INSTALLROOT}/${DXVK_INSTALLATION} --no-package
 #

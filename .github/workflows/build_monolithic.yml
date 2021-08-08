@@ -49,14 +49,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install Dependencies
+      - name: Install Wine Dependencies
         run: |
-          # build tools
-          brew install  cmake            \
-                        ninja            \
-                        mingw-w64        \
-
-          # build dependencies for wine / crossover
           brew install  freetype         \
                         bison            \
                         krb5             \
@@ -68,12 +62,8 @@ jobs:
                         mpg123           \
                         little-cms2      \
                         libpng           \
+                        mingw-w64        \
                         molten-vk
-
-          # dependencies for dxvk
-          brew install  coreutils \
-                        meson     \
-                        glslang
 
       - name: Add bison & krb5 to $PATH
         run: |
@@ -97,20 +87,23 @@ jobs:
         run:  |
           tar xf ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz
 
-      - name: Add missing llvm/clang
-        if: ${{ matrix.CROSS_OVER_VERSION == '20.0.1' || matrix.CROSS_OVER_VERSION == '20.0.2' }}
+      - name: Patch Add missing distversion.h
+        # Patch provided by Josh Dubois, CrossOver product manager, CodeWeavers.
         run: |
-          curl -o crossover-20.0.0.tar.gz https://media.codeweavers.com/pub/crossover/source/crossover-sources-20.0.0.tar.gz
-          tar -xf crossover-20.0.0.tar.gz sources/clang
+          pushd sources/wine
+          patch -p1 < ${{ github.workspace }}/distversion.patch
+          popd
 
-      - name: Add distversion.h
-        run: cp distversion.h sources/wine/include/distversion.h
-
-      - name: Patch wcslen() in ntdll/wcstring.c to prevent crash if a nullptr is supplied to the function (HACK)
+      - name: Patch ntdll/wcstring.c to prevent crash if a nullptr is supplied to the function
+        # Hack by dasmy
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-        run: patch sources/wine/dlls/ntdll/wcstring.c < wcstring.patch
+        run: |
+          pushd sources/wine
+          patch -p1 < ${{ github.workspace }}/wcstring.patch
+          popd
 
-      - name: Patch msvcrt to export the missing sincos function, see https://github.com/wine-mirror/wine/commit/f0131276474997b9d4e593bbf8c5616b879d3bd5
+      - name: Patch msvcrt to export the missing sincos function
+        # https://github.com/wine-mirror/wine/commit/f0131276474997b9d4e593bbf8c5616b879d3bd5
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         run: |
           pushd sources/wine
@@ -131,6 +124,10 @@ jobs:
           key: llvm_clang-${{ matrix.CROSS_OVER_VERSION }}
 
       ############ Build LLVM / Clang (if restore from cache failed) ##############
+
+      - name: Install LLVM / Clang build dependencies
+        if:  steps.cache_llvm_clang.outputs.cache-hit != 'true'
+        run: brew install cmake ninja
 
       - name: Configure LLVM
         if: steps.cache_llvm_clang.outputs.cache-hit != 'true'
@@ -201,6 +198,12 @@ jobs:
 
 
       ############ Build DXVK ##############
+
+      #- name: Install Dependencies for DXVK
+      #  run: |
+      #    brew install  coreutils \
+      #                  meson     \
+      #                  glslang
 
       #- name: Build DXVK
       #  if: startsWith(matrix.CROSS_OVER_VERSION, '20')
