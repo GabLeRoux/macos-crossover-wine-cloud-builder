@@ -130,11 +130,12 @@ jobs:
         run: |
           set -x
           pushd ${{ env.INSTALLROOT }}
-          tar -xf ${{ env.TOOLS_INSTALLATION }}.tar.gz
+          ls -al
+          tar -xvf ${{ env.TOOLS_INSTALLATION }}.*
           ls -alt
           popd
 
-      - name: Add llvm/clang to $PATH (for later)
+      - name: Add llvm/clang to $PATH
         run: |
           set -x
           echo "${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}/bin" >> $GITHUB_PATH
