@@ -1,0 +1,84 @@
+name: 'Configure, Build, and Install LLVM and Clang'
+description: 'Action that sets up the toolchain needed'
+inputs:
+  install-prefix:
+    description: 'Installation target directory for LLVM and Clang'
+    required: true
+    # default: ${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}
+  llvm-builddir:
+    description: 'Directory where llvm will be built'
+    required: true
+    default: ${{ github.workspace }}/build/llvm
+  llvm-makedir:
+    description: 'Directory where the llvm CMake files reside'
+    required: true
+    # default: ${{ env.LLVM_MAKEDIR }}
+  clang-builddir:
+    description: 'Directory where clang will be built'
+    required: true
+    default: ${{ github.workspace }}/build/clang
+  clang-makedir:
+    description: 'Directory where the clang CMake files reside'
+    required: true
+    # default: ${{ env.CLANG_MAKEDIR }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install LLVM / Clang build dependencies
+      shell: bash
+      run: |
+        brew install cmake ninja
+
+    - name: Configure LLVM
+      shell: bash
+      run: |
+        set -x
+        mkdir -p ${{ inputs.llvm-builddir }}
+        pushd ${{ inputs.llvm-builddir }}
+        cmake -G Ninja \
+              -DLLVM_TARGETS_TO_BUILD=X86 \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_INSTALL_PREFIX="${{ inputs.install-prefix }}" \
+              ${{ inputs.llvm-makedir }}
+        popd
+
+    - name: Build LLVM
+      shell: bash
+      run: |
+        pushd ${{ inputs.llvm-builddir }}
+        Ninja
+        popd
+
+    - name: Install LLVM
+      shell: bash
+      run: |
+        pushd ${{ inputs.llvm-builddir }}
+        Ninja install
+        popd
+
+    - name: Configure Clang
+      shell: bash
+      run: |
+        set -x
+        mkdir -p ${{ inputs.clang-builddir }}
+        pushd ${{ inputs.clang-builddir }}
+        cmake -G Ninja \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_INSTALL_PREFIX="${{ inputs.install-prefix }}" \
+              ${{ inputs.clang-makedir }}
+        popd
+
+    - name: Build Clang
+      shell: bash
+      run: |
+        pushd ${{ inputs.clang-builddir }}
+        Ninja
+        popd
+
+    - name: Install Clang
+      shell: bash
+      run: |
+        pushd ${{ inputs.clang-builddir }}
+        Ninja install
+        popd
