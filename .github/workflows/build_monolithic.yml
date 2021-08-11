@@ -19,150 +19,45 @@ env:
     CLANG_BUILDDIR: ${{ github.workspace }}/build/clang
     # target directory for installation
     INSTALLROOT: ${{ github.workspace }}/install
+    TOOLS_INSTALLATION: build-tools-cx
 
 jobs:
-  wine-crossover:
-
-    strategy:
-      fail-fast: false
-      matrix:
-        CROSS_OVER_VERSION: [20.0.4, 20.0.2, 20.0.1, 20.0.0, 19.0.2]
-
+  llvm-clang:
     runs-on:  macos-10.15
-
     env:
       # crossover source code to be downloaded
-      CROSS_OVER_SOURCE_URL: https://media.codeweavers.com/pub/crossover/source/crossover-sources-${{ matrix.CROSS_OVER_VERSION }}.tar.gz
-      CROSS_OVER_LOCAL_FILE: crossover-${{ matrix.CROSS_OVER_VERSION }}
-      # directories / files inside the downloaded tar file directory structure
-      LLVM_MAKEDIR: $GITHUB_WORKSPACE/sources/${{ startsWith(matrix.CROSS_OVER_VERSION, '20') && 'clang/llvm' || 'llvm' }}
-      CLANG_MAKEDIR: $GITHUB_WORKSPACE/sources/${{ startsWith(matrix.CROSS_OVER_VERSION, '20') && 'clang/clang' || 'clang' }}
-      # artifact names
-      TOOLS_INSTALLATION: build-tools-cx${{ matrix.CROSS_OVER_VERSION }}
-      WINE_INSTALLATION: wine-cx${{ matrix.CROSS_OVER_VERSION }}
-      DXVK_INSTALLATION: dxvk-cx${{ matrix.CROSS_OVER_VERSION }}
-
+      CROSS_OVER_SOURCE_URL: https://media.codeweavers.com/pub/crossover/source/crossover-sources-21.0.0.tar.gz
+      CROSS_OVER_LOCAL_FILE: crossover-21.0.0
     steps:
-
-      ############ Prepare Workspace / Environment ##############
-
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install Dependencies
-        run: |
-          # build tools
-          brew install  cmake            \
-                        ninja            \
-                        mingw-w64        \
+      ############ Restore LLVM / Clang from cache ##############
 
-          # build dependencies for wine / crossover
-          brew install  freetype         \
-                        bison            \
-                        krb5             \
-                        faudio           \
-                        sdl2             \
-                        gphoto2          \
-                        sane-backends    \
-                        gst-plugins-base \
-                        mpg123           \
-                        little-cms2      \
-                        libpng           \
-                        molten-vk
+      - name: Restore LLVM / Clang from cache
+        uses: actions/cache@v2
+        id: cache_llvm_clang
+        with:
+          path: ${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}
+          key: llvm_clang
 
-          # dependencies for dxvk
-          brew install  coreutils \
-                        meson     \
-                        glslang
+      ############ Build LLVM / Clang (if restore from cache failed) ##############
 
-      - name: Add bison & krb5 to $PATH
-        run: |
-          set -x
-          echo "$(brew --prefix bison)/bin" >> $GITHUB_PATH
-          echo "$(brew --prefix krb5)/bin" >> $GITHUB_PATH
-
-      - name: Add llvm/clang to $PATH (for later)
-        run: |
-          set -x
-          echo "${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}/bin" >> $GITHUB_PATH
-
-
-      ############ Download and Prepare Source Code ##############
-
-      - name: Get Source
+      - name: Get and Extract Source
+        if:  steps.cache_llvm_clang.outputs.cache-hit != 'true'
         run:  |
           curl -o ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz ${{ env.CROSS_OVER_SOURCE_URL }}
-
-      - name: Extract Source
-        run:  |
           tar xf ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz
 
-      - name: Add missing llvm/clang
-        if: ${{ matrix.CROSS_OVER_VERSION == '20.0.1' || matrix.CROSS_OVER_VERSION == '20.0.2' }}
-        run: |
-          curl -o crossover-20.0.0.tar.gz https://media.codeweavers.com/pub/crossover/source/crossover-sources-20.0.0.tar.gz
-          tar -xf crossover-20.0.0.tar.gz sources/clang
+      - name: Build / Install LLVM and Clang (if restore from cache failed)
+        if:  steps.cache_llvm_clang.outputs.cache-hit != 'true'
+        uses: ./.github/actions/build_llvm_clang
+        with:
+          install-prefix: ${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}
+          llvm-makedir: ${{ github.workspace }}/sources/clang/llvm
+          clang-makedir: ${{ github.workspace }}/sources/clang/clang
 
-      - name: Add distversion.h
-        run: cp distversion.h sources/wine/include/distversion.h
-
-      - name: Patch wcslen() in ntdll/wcstring.c to prevent crash if a nullptr is suppluied to the function (HACK)
-        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-        run: patch sources/wine/dlls/ntdll/wcstring.c < wcstring.patch
-
-      - name: Patch DXVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-        run: patch sources/dxvk/src/util/rc/util_rc_ptr.h < dxvk_util_rc_ptr.patch
-
-
-      ############ Build LLVM / Clang ##############
-
-      - name: Configure LLVM
-        run: |
-          set -x
-          mkdir -p ${{ env.LLVM_BUILDDIR }}
-          pushd ${{ env.LLVM_BUILDDIR }}
-          cmake -G Ninja \
-                -DLLVM_TARGETS_TO_BUILD=X86 \
-                -DCMAKE_BUILD_TYPE=Release \
-                -DCMAKE_INSTALL_PREFIX="${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}" \
-                ${{ env.LLVM_MAKEDIR }}
-          popd
-
-      - name: Build LLVM
-        run: |
-          pushd ${{ env.LLVM_BUILDDIR }}
-          Ninja
-          popd
-
-      - name: Install LLVM
-        run: |
-          pushd ${{ env.LLVM_BUILDDIR }}
-          Ninja install
-          popd
-
-      - name: Configure Clang
-        run: |
-          set -x
-          mkdir -p ${{ env.CLANG_BUILDDIR }}
-          pushd ${{ env.CLANG_BUILDDIR }}
-          cmake -G Ninja \
-                -DCMAKE_BUILD_TYPE=Release \
-                -DCMAKE_INSTALL_PREFIX="${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}" \
-                ${{ env.CLANG_MAKEDIR }}
-          popd
-
-      - name: Build Clang
-        run: |
-          pushd ${{ env.CLANG_BUILDDIR }}
-          Ninja
-          popd
-
-      - name: Install Clang
-        run: |
-          pushd ${{ env.CLANG_BUILDDIR }}
-          Ninja install
-          popd
+      ############ Upload LLVM / Clang to be used in subsequent job steps ##############
 
       - name: Tar Build Tools
         run: |
@@ -178,155 +73,209 @@ jobs:
           name: ${{ env.TOOLS_INSTALLATION }}
           path: ${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}.tar.gz
 
+  wine-crossover:
+    needs: llvm-clang
 
-      ############ Build DXVK ##############
+    strategy:
+      fail-fast: false
+      matrix:
+        CROSS_OVER_VERSION: [21.0.0, 20.0.4, 19.0.2] # 20.0.2, 20.0.1, 20.0.0
 
-      - name: Build DXVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
+    runs-on:  macos-10.15
+
+    env:
+      # crossover source code to be downloaded
+      CROSS_OVER_SOURCE_URL: https://media.codeweavers.com/pub/crossover/source/crossover-sources-${{ matrix.CROSS_OVER_VERSION }}.tar.gz
+      CROSS_OVER_LOCAL_FILE: crossover-${{ matrix.CROSS_OVER_VERSION }}
+      # artifact names
+      WINE_INSTALLATION: wine-cx${{ matrix.CROSS_OVER_VERSION }}
+      DXVK_INSTALLATION: dxvk-cx${{ matrix.CROSS_OVER_VERSION }}
+
+    steps:
+
+      ############ Prepare Workspace / Environment ##############
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Wine Dependencies
+        run: |
+          brew install  freetype         \
+                        bison            \
+                        krb5             \
+                        faudio           \
+                        sdl2             \
+                        gphoto2          \
+                        sane-backends    \
+                        gst-plugins-base \
+                        mpg123           \
+                        little-cms2      \
+                        libpng           \
+                        mingw-w64        \
+                        molten-vk
+
+      - name: Add bison & krb5 to $PATH
         run: |
           set -x
-          PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${{ env.DXVK_BUILDSCRIPT }} master ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }} --no-package
+          echo "$(brew --prefix bison)/bin" >> $GITHUB_PATH
+          echo "$(brew --prefix krb5)/bin" >> $GITHUB_PATH
 
-      - name: Tar DXVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
+      - name: Download llvm/clang (from previous job)
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.TOOLS_INSTALLATION }}
+          path: ${{ env.INSTALLROOT }}
+
+      - name: Unpack llvm/clang
         run: |
           set -x
           pushd ${{ env.INSTALLROOT }}
-          tar -czf ${{ env.DXVK_INSTALLATION }}.tar.gz ${{ env.DXVK_INSTALLATION }}
+          ls -al
+          tar -xvf ${{ env.TOOLS_INSTALLATION }}.tar.gz
+          ls -alt
           popd
 
-      - name: Upload DXVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.DXVK_INSTALLATION }}
-          path: ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }}.tar.gz
+      - name: Add llvm/clang to $PATH
+        run: |
+          set -x
+          echo "${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}/bin" >> $GITHUB_PATH
 
+
+      ############ Download and Prepare Source Code ##############
+
+      - name: Get Source
+        run:  |
+          curl -o ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz ${{ env.CROSS_OVER_SOURCE_URL }}
+
+      - name: Extract Source
+        run:  |
+          tar xf ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz
+
+      - name: Patch Add missing distversion.h
+        # Patch provided by Josh Dubois, CrossOver product manager, CodeWeavers.
+        run: |
+          pushd sources/wine
+          patch -p1 < ${{ github.workspace }}/distversion.patch
+          popd
+
+      - name: Patch ntdll/wcstring.c to prevent crash if a nullptr is supplied to the function
+        # Hack by dasmy
+        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
+        run: |
+          pushd sources/wine
+          patch -p1 < ${{ github.workspace }}/wcstring.patch
+          popd
+
+      - name: Patch msvcrt to export the missing sincos function
+        # https://github.com/wine-mirror/wine/commit/f0131276474997b9d4e593bbf8c5616b879d3bd5
+        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
+        run: |
+          pushd sources/wine
+          patch -p1 < ${{ github.workspace }}/msvcrt-sincos.patch
+          popd
+
+      - name: Patch DXVK
+        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
+        run: patch sources/dxvk/src/util/rc/util_rc_ptr.h < dxvk_util_rc_ptr.patch
+
+
+      ############ Build DXVK ##############
+
+      #- name: Install Dependencies for DXVK
+      #  run: |
+      #    brew install  coreutils \
+      #                  meson     \
+      #                  glslang
+
+      #- name: Build DXVK
+      #  if: startsWith(matrix.CROSS_OVER_VERSION, '20')
+      #  run: |
+      #    set -x
+      #    PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${{ env.DXVK_BUILDSCRIPT }} master ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }} --no-package
+
+      #- name: Tar DXVK
+      #  if: startsWith(matrix.CROSS_OVER_VERSION, '20')
+      #  run: |
+      #    set -x
+      #    pushd ${{ env.INSTALLROOT }}
+      #    tar -czf ${{ env.DXVK_INSTALLATION }}.tar.gz ${{ env.DXVK_INSTALLATION }}
+      #    popd
+
+      #- name: Upload DXVK
+      #  if: startsWith(matrix.CROSS_OVER_VERSION, '20')
+      #  uses: actions/upload-artifact@v2
+      #  with:
+      #    name: ${{ env.DXVK_INSTALLATION }}
+      #    path: ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }}.tar.gz
+
+
+      ############ Configure 64bit Version ##############
+
+      - name: Configure wine64 (specific to 2x)
+        if: startsWith(matrix.CROSS_OVER_VERSION, '2')
+        uses: ./.github/actions/configure_wine
+        with:
+          winearch: "wine64"
+          build-dir: "${{ env.BUILDROOT }}/wine64"
+          crossflags: "-g -O2"
+          configure-params: "--enable-win64 --with-vulkan"
+
+      - name: Configure wine64 (specific to 19)
+        if: startsWith(matrix.CROSS_OVER_VERSION, '19')
+        uses: ./.github/actions/configure_wine
+        with:
+          winearch: "wine64"
+          build-dir: "${{ env.BUILDROOT }}/wine64"
+          crossflags: "-g -O2 -fcommon"
+          configure-params: "--enable-win64 --with-vulkan"
 
       ############ Build 64bit Version ##############
 
-      - name: Configure wine64
-        env:
-          CC: clang
-          CXX: clang++
-          # see https://github.com/Gcenx/macOS_Wine_builds/issues/17#issuecomment-750346843
-          CROSSCFLAGS: "-g -O2 -fcommon"
-          # Xcode12 by default enables '-Werror,-Wimplicit-function-declaration' (49917738)
-          # this causes wine(64) builds to fail so needs to be disabled.
-          # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes
-          CFLAGS: "-g -O2 -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
-          LDFLAGS: "-Wl,-headerpad_max_install_names"
-        run: |
-          set -x
-
-          export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include"
-          export GPHOTO2_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
-          export GPHOTO2_PORT_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
-
-          export PNG_CFLAGS="-I$(brew --prefix libpng)/include"
-          export PNG_LIBS="-L$(brew --prefix libpng)/lib"
-
-          export LDFLAGS="-L $(brew --prefix molten-vk)/lib"
-
-          mkdir -p ${{ env.BUILDROOT }}/wine64
-          pushd ${{ env.BUILDROOT }}/wine64
-          ${{ env.WINE_CONFIGURE }} \
-                    --enable-win64 \
-                    --disable-tests \
-                    --without-alsa \
-                    --without-capi \
-                    --without-dbus \
-                    --without-inotify \
-                    --without-oss \
-                    --without-pulse \
-                    --without-udev \
-                    --without-v4l2 \
-                    --without-gsm \
-                    --with-png \
-                    --with-sdl \
-                    --with-vulkan \
-                    --without-x
-          popd
-
       - name: Build wine64
-        run: |
-          pushd ${{ env.BUILDROOT }}/wine64
-          make -j$(sysctl -n hw.ncpu 2>/dev/null)
-          popd
+        uses: ./.github/actions/make
+        with:
+          build-dir: "${{ env.BUILDROOT }}/wine64"
 
+      ############ Configure 32on64bit Version ##############
 
-      ############ Build 32bit Version (WoW64) ##############
+      - name: Configure wine32on64 (specific to 2x)
+        if: startsWith(matrix.CROSS_OVER_VERSION, '2')
+        uses: ./.github/actions/configure_wine
+        with:
+          winearch: "wine32on64"
+          build-dir: "${{ env.BUILDROOT }}/wine32on64"
+          crossflags: "-g -O2"
+          configure-params: "--enable-win32on64 --with-wine64=${{ env.BUILDROOT }}/wine64 --without-cms --without-gstreamer --without-gphoto --without-sane --without-krb5 --disable-winedbg --without-vkd3d --without-vulkan --disable-vulkan_1 --disable-winevulkan"
 
-      - name: Configure wine32on64
-        env:
-          CC: clang
-          CXX: clang++
-          # see https://github.com/Gcenx/macOS_Wine_builds/issues/17#issuecomment-750346843
-          CROSSCFLAGS: "-g -O2 -fcommon"
-          # Xcode12 by default enables '-Werror,-Wimplicit-function-declaration' (49917738)
-          # this causes wine(64) builds to fail so needs to be disabled.
-          # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes
-          CFLAGS: "-g -O2 -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
-          LDFLAGS: "-Wl,-headerpad_max_install_names"
-        run: |
-          set -x
+      - name: Configure wine32on64 (specific to 19)
+        if: startsWith(matrix.CROSS_OVER_VERSION, '19')
+        uses: ./.github/actions/configure_wine
+        with:
+          winearch: "wine32on64"
+          build-dir: "${{ env.BUILDROOT }}/wine32on64"
+          crossflags: "-g -O2 -fcommon"
+          configure-params: "--enable-win32on64 --with-wine64=${{ env.BUILDROOT }}/wine64 --without-cms --without-gstreamer --without-gphoto --without-sane --without-krb5 --disable-winedbg --without-vkd3d --without-vulkan --disable-vulkan_1 --disable-winevulkan"
 
-          export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include"
-
-          export PNG_CFLAGS="-I$(brew --prefix libpng)/include"
-          export PNG_LIBS="-L$(brew --prefix libpng)/lib"
-
-          mkdir -p ${{ env.BUILDROOT }}/wine32on64
-          pushd ${{ env.BUILDROOT }}/wine32on64
-          ${{ env.WINE_CONFIGURE }} \
-                    --enable-win32on64 \
-                    --with-wine64=${{ env.BUILDROOT }}/wine64 \
-                    --disable-tests \
-                    --without-alsa \
-                    --without-capi \
-                    --without-dbus \
-                    --without-inotify \
-                    --without-oss \
-                    --without-pulse \
-                    --without-udev \
-                    --without-v4l2 \
-                    --disable-winedbg \
-                    --without-cms \
-                    --without-gstreamer \
-                    --without-gsm \
-                    --without-gphoto \
-                    --without-sane \
-                    --with-png \
-                    --with-sdl \
-                    --without-vkd3d \
-                    --without-vulkan \
-                    --disable-vulkan_1 \
-                    --disable-winevulkan \
-                    --without-x
-          popd
+      ############ Build 32on64bit Version ##############
 
       - name: Build wine32on64
-        run: |
-          pushd ${{ env.BUILDROOT }}/wine32on64
-          make -j$(sysctl -n hw.ncpu 2>/dev/null)
-          popd
-
+        uses: ./.github/actions/make
+        with:
+          build-dir: "${{ env.BUILDROOT }}/wine32on64"
 
       ############ Install wine ##############
 
       - name: Install wine32on64
-        run: |
-          set -x
-          pushd ${{ env.BUILDROOT }}/wine32on64
-          make install-lib DESTDIR="${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
-          popd
+        uses: ./.github/actions/install
+        with:
+          build-dir: "${{ env.BUILDROOT }}/wine32on64"
+          install-dir: "${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
 
       - name: Install wine64
-        run: |
-          set -x
-          pushd ${{ env.BUILDROOT }}/wine64
-          make install-lib DESTDIR="${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
-          popd
+        uses: ./.github/actions/install
+        with:
+          build-dir: "${{ env.BUILDROOT }}/wine64"
+          install-dir: "${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
 
       ############ Bundle and Upload Deliverable ##############
 

@@ -1,0 +1,15 @@
+name: 'Make'
+description: 'Make a configured project'
+inputs:
+  build-dir:
+    description: 'Build directory'
+    required: true
+runs:
+  using: "composite"
+  steps:
+      - name: Building in ${{ inputs.build-dir }}
+        run: |
+          pushd ${{ inputs.build-dir }}
+          make -j$(sysctl -n hw.activecpu 2>/dev/null)
+          popd
+        shell: bash

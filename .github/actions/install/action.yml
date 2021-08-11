@@ -1,0 +1,19 @@
+name: 'Make Install'
+description: 'Run make install with build and target directory'
+inputs:
+  build-dir:
+    description: 'Build directory'
+    required: true
+  install-dir:
+    description: 'Installation directory'
+    required: true
+runs:
+  using: "composite"
+  steps:
+      - name: Install from ${{ inputs.build-dir }} to ${{ inputs.install-dir }}
+        run: |
+          set -x
+          pushd ${{ inputs.build-dir }}
+          make install-lib DESTDIR="${{ inputs.install-dir }}"
+          popd
+        shell: bash

@@ -7,7 +7,7 @@ echo Wine-Crossover-MacOS
 export GITHUB_WORKSPACE=$(pwd)
 
 if [ -z "$CROSS_OVER_VERSION" ]; then
-    export CROSS_OVER_VERSION=20.0.4
+    export CROSS_OVER_VERSION=21.0.0
 fi
 
 # avoid weird linker errors with Xcode 10 and later
@@ -16,8 +16,8 @@ export MACOSX_DEPLOYMENT_TARGET=10.14
 export CROSS_OVER_SOURCE_URL=https://media.codeweavers.com/pub/crossover/source/crossover-sources-${CROSS_OVER_VERSION}.tar.gz
 export CROSS_OVER_LOCAL_FILE=crossover-${CROSS_OVER_VERSION}
 # directories / files inside the downloaded tar file directory structure
-export LLVM_MAKEDIR=$GITHUB_WORKSPACE/sources/$([[ ${CROSS_OVER_VERSION} == 20.* ]] && echo "clang/llvm" || echo "llvm")
-export CLANG_MAKEDIR=$GITHUB_WORKSPACE/sources/$([[ ${CROSS_OVER_VERSION} == 20.* ]] && echo "clang/clang" || echo "clang")
+export LLVM_MAKEDIR=$GITHUB_WORKSPACE/sources/$([[ ${CROSS_OVER_VERSION} == 2?.* ]] && echo "clang/llvm" || echo "llvm")
+export CLANG_MAKEDIR=$GITHUB_WORKSPACE/sources/$([[ ${CROSS_OVER_VERSION} == 2?.* ]] && echo "clang/clang" || echo "clang")
 export WINE_CONFIGURE=$GITHUB_WORKSPACE/sources/wine/configure
 export DXVK_BUILDSCRIPT=$GITHUB_WORKSPACE/sources/dxvk/package-release.sh
 # build directories
@@ -36,8 +36,7 @@ export DXVK_INSTALLATION=dxvk-cx${CROSS_OVER_VERSION}
 echo Install Dependencies
 # build tools
 brew install  cmake            \
-              ninja            \
-              mingw-w64        \
+              ninja
 
 # build dependencies for wine / crossover
 brew install  freetype         \
@@ -51,12 +50,8 @@ brew install  freetype         \
               mpg123           \
               little-cms2      \
               libpng           \
+              mingw-w64        \
               molten-vk
-
-# dependencies for dxvk
-brew install  coreutils \
-            meson     \
-            glslang
 
 echo Add bison and krb5 to PATH
 export PATH="$(brew --prefix bison)/bin":${PATH}
@@ -80,13 +75,24 @@ if [[ "${CROSS_OVER_VERSION}" == "20.0.1" || "${CROSS_OVER_VERSION}" == "20.0.2"
     tar -xf crossover-20.0.0.tar.gz sources/clang
 fi
 
-echo Add distversion.h
-cp distversion.h sources/wine/include/distversion.h
+echo "Patch Add missing distversion.h"
+# Patch provided by Josh Dubois, CrossOver product manager, CodeWeavers.
+pushd sources/wine
+patch -p1 < ${GITHUB_WORKSPACE}/distversion.patch
+popd
 
 
 if [[ ${CROSS_OVER_VERSION} == 20.* ]]; then
     echo "Patch wcslen() in ntdll/wcstring.c to prevent crash if a nullptr is suppluied to the function (HACK)"
-    patch sources/wine/dlls/ntdll/wcstring.c < wcstring.patch
+    pushd sources/wine
+    patch -p1 < ${GITHUB_WORKSPACE}/wcstring.patch
+    popd
+
+    echo "Patch msvcrt to export the missing sincos function"
+    # https://github.com/wine-mirror/wine/commit/f0131276474997b9d4e593bbf8c5616b879d3bd5
+    pushd sources/wine
+    patch -p1 < ${GITHUB_WORKSPACE}/msvcrt-sincos.patch
+    popd
 
     echo Patch DXVK
     patch sources/dxvk/src/util/rc/util_rc_ptr.h < dxvk_util_rc_ptr.patch
@@ -145,19 +151,23 @@ cp ${INSTALLROOT}/${TOOLS_INSTALLATION}.tar.gz ${PACKAGE_UPLOAD}/
 
 ############ Build DXVK ##############
 
-if [[ ${CROSS_OVER_VERSION} == 20.* ]]; then
-    echo Build DXVK
-    PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${DXVK_BUILDSCRIPT} master ${INSTALLROOT}/${DXVK_INSTALLATION} --no-package
-
-    echo Tar DXVK
-    pushd ${INSTALLROOT}
-    tar -czf ${DXVK_INSTALLATION}.tar.gz ${DXVK_INSTALLATION}
-    popd
-
-    echo Upload DXVK
-    mkdir -p ${PACKAGE_UPLOAD}
-    cp ${INSTALLROOT}/${DXVK_INSTALLATION}.tar.gz ${PACKAGE_UPLOAD}/
-fi
+#if [[ ${CROSS_OVER_VERSION} == 20.* ]]; thend
+#    Echo "Installing dependencies for dxvk"
+#    brew install  coreutils \
+#                  meson     \
+#                  glslang
+#    echo Build DXVK
+#    PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${DXVK_BUILDSCRIPT} master ${INSTALLROOT}/${DXVK_INSTALLATION} --no-package
+#
+#    echo Tar DXVK
+#    pushd ${INSTALLROOT}
+#    tar -czf ${DXVK_INSTALLATION}.tar.gz ${DXVK_INSTALLATION}
+#    popd
+#
+#    echo Upload DXVK
+#    mkdir -p ${PACKAGE_UPLOAD}
+#    cp ${INSTALLROOT}/${DXVK_INSTALLATION}.tar.gz ${PACKAGE_UPLOAD}/
+#fi
 
 ############ Build 64bit Version ##############
 
@@ -165,14 +175,14 @@ echo Configure wine64
 export CC=clang
 export CXX=clang++
 # see https://github.com/Gcenx/macOS_Wine_builds/issues/17#issuecomment-750346843
-export CROSSCFLAGS="-g -O2 -fcommon"
+export CROSSCFLAGS=$([[ ${CROSS_OVER_VERSION} == 19.* ]] && echo "-g -O2 -fcommon" || echo "-g -O2")
 # Xcode12 by default enables '-Werror,-Wimplicit-function-declaration' (49917738)
 # this causes wine(64) builds to fail so needs to be disabled.
 # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes
 export CFLAGS="-g -O2 -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
 export LDFLAGS="-Wl,-headerpad_max_install_names"
 
-export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include"
+export SDL2_CFLAGS="-I$(brew --prefix sdl2)/"$([[ ${CROSS_OVER_VERSION} == 21.* ]] && echo "include/SDL2" || echo "include")
 export GPHOTO2_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
 export GPHOTO2_PORT_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
 
@@ -213,19 +223,25 @@ echo Configure wine32on64
 export CC=clang
 export CXX=clang++
 # see https://github.com/Gcenx/macOS_Wine_builds/issues/17#issuecomment-750346843
-export CROSSCFLAGS="-g -O2 -fcommon"
+export CROSSCFLAGS=$([[ ${CROSS_OVER_VERSION} == 19.* ]] && echo "-g -O2 -fcommon" || echo "-g -O2")
 # Xcode12 by default enables '-Werror,-Wimplicit-function-declaration' (49917738)
 # this causes wine(64) builds to fail so needs to be disabled.
 # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes
 export CFLAGS="-g -O2 -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
 export LDFLAGS="-Wl,-headerpad_max_install_names"
 
-export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include"
+export SDL2_CFLAGS="-I$(brew --prefix sdl2)/"$([[ ${CROSS_OVER_VERSION} == 21.* ]] && echo "include/SDL2" || echo "include")
 export GPHOTO2_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
 export GPHOTO2_PORT_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
 
 export PNG_CFLAGS="-I$(brew --prefix libpng)/include"
 export PNG_LIBS="-L$(brew --prefix libpng)/lib"
+
+if [[ ${CROSS_OVER_VERSION} == 19.* || ${CROSS_OVER_VERSION} == 20.* ]]; then
+    export DISABLE_VULKAN="--without-vkd3d --without-vulkan --disable-vulkan_1 --disable-winevulkan"
+else
+    export DISABLE_VULKAN=""
+fi
 
 mkdir -p ${BUILDROOT}/wine32on64
 pushd ${BUILDROOT}/wine32on64
@@ -249,16 +265,14 @@ ${WINE_CONFIGURE} \
         --without-sane \
         --with-png \
         --with-sdl \
-        --without-vkd3d \
-        --without-vulkan \
-        --disable-vulkan_1 \
-        --disable-winevulkan \
+        --without-krb5 \
+        ${DISABLE_VULKAN} \
         --without-x
 popd
 
 echo Build wine32on64
 pushd ${BUILDROOT}/wine32on64
-make -j$(sysctl -n hw.ncpu 2>/dev/null)
+make -j$(sysctl -n hw.activecpu 2>/dev/null)
 popd
 
 
