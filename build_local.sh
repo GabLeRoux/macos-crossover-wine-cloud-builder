@@ -8,6 +8,7 @@ export GITHUB_WORKSPACE=$(pwd)
 
 if [ -z "$CROSS_OVER_VERSION" ]; then
     export CROSS_OVER_VERSION=21.0.0
+    echo "CROSS_OVER_VERSION not set building crossover-wine-${CROSS_OVER_VERSION}"
 fi
 
 # avoid weird linker errors with Xcode 10 and later
@@ -36,12 +37,12 @@ export DXVK_INSTALLATION=dxvk-cx${CROSS_OVER_VERSION}
 echo Install Dependencies
 # build tools
 brew install  cmake            \
+              mingw-w64        \
               ninja
 
 # build dependencies for wine / crossover
 brew install  freetype         \
               bison            \
-              krb5             \
               faudio           \
               sdl2             \
               gphoto2          \
@@ -53,9 +54,8 @@ brew install  freetype         \
               mingw-w64        \
               molten-vk
 
-echo Add bison and krb5 to PATH
+echo Add bison to PATH
 export PATH="$(brew --prefix bison)/bin":${PATH}
-export PATH="$(brew --prefix krb5)/bin":${PATH}
 
 echo Add llvm/clang to PATH for later
 export PATH="${INSTALLROOT}/${TOOLS_INSTALLATION}/bin":${PATH}
@@ -205,8 +205,10 @@ ${WINE_CONFIGURE} \
         --without-udev \
         --without-v4l2 \
         --without-gsm \
+        --with-mingw \
         --with-png \
         --with-sdl \
+        --without-krb5 \
         --with-vulkan \
         --without-x
 popd
@@ -263,6 +265,7 @@ ${WINE_CONFIGURE} \
         --without-gsm \
         --without-gphoto \
         --without-sane \
+        --with-mingw \
         --with-png \
         --with-sdl \
         --without-krb5 \
