@@ -34,25 +34,25 @@ export WINE_INSTALLATION=wine-cx${CROSS_OVER_VERSION}
 export DXVK_INSTALLATION=dxvk-cx${CROSS_OVER_VERSION}
 
 
-echo Install Dependencies
-# build tools
-brew install  cmake            \
+echo Installing Dependencies
+# build dependencies
+brew install  bison            \
+              cmake            \
               mingw-w64        \
               ninja
 
-# build dependencies for wine / crossover
-brew install  freetype         \
-              bison            \
-              faudio           \
-              sdl2             \
+# runtime dependencies for crossover-wine
+brew install  faudio           \
+              freetype         \
+              gnutls           \
               gphoto2          \
-              sane-backends    \
               gst-plugins-base \
-              mpg123           \
-              little-cms2      \
               libpng           \
-              mingw-w64        \
-              molten-vk
+              little-cms2      \
+              molten-vk        \
+              mpg123           \
+              sane-backends    \
+              sdl2
 
 echo Add bison to PATH
 export PATH="$(brew --prefix bison)/bin":${PATH}
