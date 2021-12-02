@@ -26,8 +26,8 @@ jobs:
     runs-on:  macos-10.15
     env:
       # crossover source code to be downloaded
-      CROSS_OVER_SOURCE_URL: https://media.codeweavers.com/pub/crossover/source/crossover-sources-21.0.0.tar.gz
-      CROSS_OVER_LOCAL_FILE: crossover-21.0.0
+      CROSS_OVER_SOURCE_URL: https://media.codeweavers.com/pub/crossover/source/crossover-sources-21.1.0.tar.gz
+      CROSS_OVER_LOCAL_FILE: crossover-21.1.0
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -79,7 +79,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        CROSS_OVER_VERSION: [21.0.0, 20.0.4, 19.0.2] # 20.0.2, 20.0.1, 20.0.0
+        CROSS_OVER_VERSION: [21.1.0, 21.0.0, 20.0.4, 19.0.2] # 20.0.2, 20.0.1, 20.0.0
 
     runs-on:  macos-10.15
 
