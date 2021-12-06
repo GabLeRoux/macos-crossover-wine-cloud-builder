@@ -111,7 +111,8 @@ jobs:
                         mpg123           \
                         little-cms2      \
                         libpng           \
-                        mingw-w64
+                        mingw-w64        \
+                        molten-vk
 
       - name: Add bison & krb5 to $PATH
         run: |
@@ -184,7 +185,7 @@ jobs:
 
       ############ Build DXVK ##############
       - name: Patch DXVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         run: patch sources/dxvk/src/util/rc/util_rc_ptr.h < dxvk_util_rc_ptr.patch
 
       - name: Install Dependencies for DXVK
