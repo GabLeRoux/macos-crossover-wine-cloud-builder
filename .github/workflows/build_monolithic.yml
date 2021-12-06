@@ -177,7 +177,7 @@ jobs:
       ############ Build MoltenVK ##############
       - name: Build MoltenVK
         if: startsWith(matrix.CROSS_OVER_VERSION, '21')
-        run:
+        run: |
           pushd sources/moltenvk
           ./fetchDependencies --macos
           make macos
@@ -218,7 +218,7 @@ jobs:
       ############ Build VKD3D ##############
       - name: Build VKD3D
         if: startsWith(matrix.CROSS_OVER_VERSION, '21')
-        run:
+        run: |
           brew install  automake \
                         bison \
                         flex \
