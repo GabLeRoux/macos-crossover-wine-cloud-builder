@@ -111,8 +111,7 @@ jobs:
                         mpg123           \
                         little-cms2      \
                         libpng           \
-                        mingw-w64        \
-                        molten-vk
+                        mingw-w64
 
       - name: Add bison & krb5 to $PATH
         run: |
@@ -174,40 +173,57 @@ jobs:
           patch -p1 < ${{ github.workspace }}/msvcrt-sincos.patch
           popd
 
-      - name: Patch DXVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-        run: patch sources/dxvk/src/util/rc/util_rc_ptr.h < dxvk_util_rc_ptr.patch
-
+      ############ Build MoltenVK ##############
+      - name: Build MoltenVK
+        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        run:
+          pushd sources/moltenvk
+          ./fetchDependencies --macos
+          make macos
+          popd
 
       ############ Build DXVK ##############
+      - name: Patch DXVK
+        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        run: patch sources/dxvk/src/util/rc/util_rc_ptr.h < dxvk_util_rc_ptr.patch
 
-      #- name: Install Dependencies for DXVK
-      #  run: |
-      #    brew install  coreutils \
-      #                  meson     \
-      #                  glslang
+      - name: Install Dependencies for DXVK
+        run: |
+          brew install  coreutils \
+                        meson     \
+                        glslang
 
-      #- name: Build DXVK
-      #  if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-      #  run: |
-      #    set -x
-      #    PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${{ env.DXVK_BUILDSCRIPT }} master ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }} --no-package
+      - name: Build DXVK
+        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        run: |
+          set -x
+          PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${{ env.DXVK_BUILDSCRIPT }} master ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }} --no-package
 
-      #- name: Tar DXVK
-      #  if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-      #  run: |
-      #    set -x
-      #    pushd ${{ env.INSTALLROOT }}
-      #    tar -czf ${{ env.DXVK_INSTALLATION }}.tar.gz ${{ env.DXVK_INSTALLATION }}
-      #    popd
+      - name: Tar DXVK
+        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        run: |
+          set -x
+          pushd ${{ env.INSTALLROOT }}
+          tar -czf ${{ env.DXVK_INSTALLATION }}.tar.gz ${{ env.DXVK_INSTALLATION }}
+          popd
 
-      #- name: Upload DXVK
-      #  if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-      #  uses: actions/upload-artifact@v2
-      #  with:
-      #    name: ${{ env.DXVK_INSTALLATION }}
-      #    path: ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }}.tar.gz
+      - name: Upload DXVK
+        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.DXVK_INSTALLATION }}
+          path: ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }}.tar.gz
 
+      ############ Build VKD3D ##############
+      - name: Build VKD3D
+        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        run:
+          brew install automake
+          pushd sources/vkd3d
+          ./autogen.sh
+          CPPFLAGS="-I ../moltenvk/Package/Latest/MoltenVK/include/ -I ../moltenvk/External/glslang/External/spirv-tools/external/spirv-headers/include/" ./configure
+          make -j
+          popd
 
       ############ Configure 64bit Version ##############
 
