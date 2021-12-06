@@ -184,9 +184,13 @@ jobs:
           popd
 
       ############ Build DXVK ##############
-      - name: Patch DXVK
+      - name: Patch DXVK to add missing <ostream> include
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         run: patch sources/dxvk/src/util/rc/util_rc_ptr.h < dxvk_util_rc_ptr.patch
+
+      - name: Patch DXVK to remove duplicate definition of D3D11_FORMAT_SUPPORT2
+        if: startsWith(matrix.CROSS_OVER_VERSION, '2')
+        run: patch sources/dxvk/src/d3d11/d3d11_include.h < dxvk_d3d11_include_h.patch
 
       - name: Install Dependencies for DXVK
         run: |
@@ -195,13 +199,13 @@ jobs:
                         glslang
 
       - name: Build DXVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        if: startsWith(matrix.CROSS_OVER_VERSION, '2')
         run: |
           set -x
           PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${{ env.DXVK_BUILDSCRIPT }} master ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }} --no-package
 
       - name: Tar DXVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        if: startsWith(matrix.CROSS_OVER_VERSION, '2')
         run: |
           set -x
           pushd ${{ env.INSTALLROOT }}
@@ -209,7 +213,7 @@ jobs:
           popd
 
       - name: Upload DXVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        if: startsWith(matrix.CROSS_OVER_VERSION, '2')
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.DXVK_INSTALLATION }}
