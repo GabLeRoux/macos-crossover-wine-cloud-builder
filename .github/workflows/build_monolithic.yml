@@ -218,9 +218,20 @@ jobs:
       - name: Build VKD3D
         if: startsWith(matrix.CROSS_OVER_VERSION, '21')
         run:
-          brew install automake
+          brew install  automake \
+                        bison \
+                        flex \
+                        pkgconfig
+          export PATH="$(brew --prefix bison)/bin":${PATH}
+          export PATH="$(brew --prefix flex)/bin":${PATH}
+
           pushd sources/vkd3d
+
           ./autogen.sh
+
+          ln -s $(brew --prefix mingw-w64)/toolchain-x86_64/bin/x86_64-w64-mingw32-widl ./bin/widl
+          export PATH=./bin:$PATH
+
           CPPFLAGS="-I ../moltenvk/Package/Latest/MoltenVK/include/ -I ../moltenvk/External/glslang/External/spirv-tools/external/spirv-headers/include/" ./configure
           make -j
           popd
