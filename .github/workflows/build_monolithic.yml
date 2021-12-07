@@ -239,12 +239,22 @@ jobs:
 
           CPPFLAGS="-I ../moltenvk/Package/Latest/MoltenVK/include/ -I ../moltenvk/External/glslang/External/spirv-tools/external/spirv-headers/include/" ./configure
           make -j
+          make install
           popd
 
       ############ Configure 64bit Version ##############
 
-      - name: Configure wine64 (specific to 2x)
-        if: startsWith(matrix.CROSS_OVER_VERSION, '2')
+      - name: Configure wine64 (specific to 21)
+        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        uses: ./.github/actions/configure_wine
+        with:
+          winearch: "wine64"
+          build-dir: "${{ env.BUILDROOT }}/wine64"
+          crossflags: "-g -O2"
+          configure-params: "--enable-win64 --with-vulkan --with-vkd3d"
+
+      - name: Configure wine64 (specific to 22)
+        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         uses: ./.github/actions/configure_wine
         with:
           winearch: "wine64"
