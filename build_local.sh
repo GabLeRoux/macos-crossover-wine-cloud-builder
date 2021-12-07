@@ -7,7 +7,7 @@ echo Wine-Crossover-MacOS
 export GITHUB_WORKSPACE=$(pwd)
 
 if [ -z "$CROSS_OVER_VERSION" ]; then
-    export CROSS_OVER_VERSION=21.0.0
+    export CROSS_OVER_VERSION=21.1.0
     echo "CROSS_OVER_VERSION not set building crossover-wine-${CROSS_OVER_VERSION}"
 fi
 
