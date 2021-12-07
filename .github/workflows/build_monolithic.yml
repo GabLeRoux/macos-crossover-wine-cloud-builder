@@ -45,9 +45,10 @@ jobs:
 
       - name: Get and Extract Source
         if:  steps.cache_llvm_clang.outputs.cache-hit != 'true'
-        run:  |
-          curl -o ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz ${{ env.CROSS_OVER_SOURCE_URL }}
-          tar xf ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz
+        uses: ./.github/actions/get_source
+        with:
+          crossover-local-file: "${{ env.CROSS_OVER_LOCAL_FILE }}"
+          crossover-source-url: "${{ env.CROSS_OVER_SOURCE_URL }}"
 
       - name: Build / Install LLVM and Clang (if restore from cache failed)
         if:  steps.cache_llvm_clang.outputs.cache-hit != 'true'
@@ -143,13 +144,11 @@ jobs:
 
       ############ Download and Prepare Source Code ##############
 
-      - name: Get Source
-        run:  |
-          curl -o ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz ${{ env.CROSS_OVER_SOURCE_URL }}
-
-      - name: Extract Source
-        run:  |
-          tar xf ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz
+      - name: Get and Extract Source
+        uses: ./.github/actions/get_source
+        with:
+          crossover-local-file: "${{ env.CROSS_OVER_LOCAL_FILE }}"
+          crossover-source-url: "${{ env.CROSS_OVER_SOURCE_URL }}"
 
       - name: Patch Add missing distversion.h
         # Patch provided by Josh Dubois, CrossOver product manager, CodeWeavers.
