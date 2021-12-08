@@ -35,6 +35,7 @@ runs:
   using: "composite"
   steps:
       - name: Configure ${{ inputs.winearch }}
+        id: configure
         env:
           CC: clang
           CXX: clang++
@@ -70,7 +71,7 @@ runs:
                     --with-sdl \
                     --with-vulkan \
                     --without-x \
-                    ${{ inputs.configure-params }}
+                    ${{ inputs.configure-params }} || cat config.log
           popd
 
         shell: bash
