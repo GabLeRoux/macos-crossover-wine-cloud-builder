@@ -226,6 +226,7 @@ jobs:
                         bison \
                         flex \
                         pkgconfig
+          export VKD3D_PREFIX="${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local"
           export PATH="$(brew --prefix bison)/bin":${PATH}
           export PATH="$(brew --prefix flex)/bin":${PATH}
 
@@ -236,10 +237,15 @@ jobs:
           ln -s $(brew --prefix mingw-w64)/toolchain-x86_64/bin/x86_64-w64-mingw32-widl ./bin/widl
           export PATH=./bin:$PATH
 
-          CPPFLAGS="-I ../moltenvk/Package/Latest/MoltenVK/include/ -I ../moltenvk/External/glslang/External/spirv-tools/external/spirv-headers/include/" ./configure --without-ncurses --prefix="${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local"
+          CPPFLAGS="-I ../moltenvk/Package/Latest/MoltenVK/include/ -I ../moltenvk/External/glslang/External/spirv-tools/external/spirv-headers/include/" ./configure --without-ncurses --prefix="${VKD3D_PREFIX}"
           make -j
           make install
           popd
+
+          export VKD3D_CFLAGS="-I${VKD3D_PREFIX}/include"
+          export VKD3D_LIBS="-L${VKD3D_PREFIX}/lib -lvkd3d -lvkd3d-utils"
+          export VKD3D_SHADER_CFLAGS="-I${VKD3D_PREFIX}/include"
+          export VKD3D_SHADER_LIBS="-L${VKD3D_PREFIX}/lib -lvkd3d-shader"
 
       ############ Configure 64bit Version ##############
 
