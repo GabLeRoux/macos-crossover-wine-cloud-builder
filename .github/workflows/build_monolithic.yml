@@ -236,7 +236,7 @@ jobs:
           ln -s $(brew --prefix mingw-w64)/toolchain-x86_64/bin/x86_64-w64-mingw32-widl ./bin/widl
           export PATH=./bin:$PATH
 
-          CPPFLAGS="-I ../moltenvk/Package/Latest/MoltenVK/include/ -I ../moltenvk/External/glslang/External/spirv-tools/external/spirv-headers/include/" ./configure --without-ncurses
+          CPPFLAGS="-I ../moltenvk/Package/Latest/MoltenVK/include/ -I ../moltenvk/External/glslang/External/spirv-tools/external/spirv-headers/include/" ./configure --without-ncurses --prefix="${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local"
           make -j
           make install
           popd
