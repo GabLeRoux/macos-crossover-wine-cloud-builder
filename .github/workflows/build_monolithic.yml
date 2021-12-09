@@ -99,10 +99,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install Wine Dependencies
+      - name: Install Wine Build Dependencies
+        run: |
+          brew install  bison            \
+                        flex             \
+                        mingw-w64        \
+                        pkgconfig
+
+      # TODO: Alphabetical Order
+      - name: Install Wine Runtime Dependencies
         run: |
           brew install  freetype         \
-                        bison            \
                         krb5             \
                         faudio           \
                         sdl2             \
@@ -112,14 +119,14 @@ jobs:
                         mpg123           \
                         little-cms2      \
                         libpng           \
-                        mingw-w64        \
                         molten-vk
 
-      - name: Add bison & krb5 to $PATH
+      - name: Add bison, flex & krb5 to $PATH
         run: |
           set -x
           echo "$(brew --prefix bison)/bin" >> $GITHUB_PATH
-          echo "$(brew --prefix krb5)/bin" >> $GITHUB_PATH
+          echo "$(brew --prefix flex)/bin"  >> $GITHUB_PATH
+          echo "$(brew --prefix krb5)/bin"  >> $GITHUB_PATH
 
       - name: Download llvm/clang (from previous job)
         uses: actions/download-artifact@v2
@@ -194,8 +201,8 @@ jobs:
       - name: Install Dependencies for DXVK
         run: |
           brew install  coreutils \
-                        meson     \
-                        glslang
+                        glslang   \
+                        meson
 
       - name: Build DXVK
         if: startsWith(matrix.CROSS_OVER_VERSION, '2')
@@ -223,12 +230,7 @@ jobs:
         if: startsWith(matrix.CROSS_OVER_VERSION, '21')
         run: |
           brew install  automake \
-                        bison \
-                        flex \
                         pkgconfig
-          export VKD3D_PREFIX="${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local"
-          export PATH="$(brew --prefix bison)/bin":${PATH}
-          export PATH="$(brew --prefix flex)/bin":${PATH}
 
           pushd sources/vkd3d
 
@@ -237,15 +239,10 @@ jobs:
           ln -s $(brew --prefix mingw-w64)/toolchain-x86_64/bin/x86_64-w64-mingw32-widl ./bin/widl
           export PATH=./bin:$PATH
 
-          CPPFLAGS="-I ../moltenvk/Package/Latest/MoltenVK/include/ -I ../moltenvk/External/glslang/External/spirv-tools/external/spirv-headers/include/" ./configure --without-ncurses --prefix="${VKD3D_PREFIX}"
+          CPPFLAGS="-I ../moltenvk/Package/Latest/MoltenVK/include/ -I ../moltenvk/External/glslang/External/spirv-tools/external/spirv-headers/include/" ./configure --without-ncurses
           make -j
           make install
           popd
-
-          export VKD3D_CFLAGS="-I${VKD3D_PREFIX}/include"
-          export VKD3D_LIBS="-L${VKD3D_PREFIX}/lib -lvkd3d -lvkd3d-utils"
-          export VKD3D_SHADER_CFLAGS="-I${VKD3D_PREFIX}/include"
-          export VKD3D_SHADER_LIBS="-L${VKD3D_PREFIX}/lib -lvkd3d-shader"
 
       ############ Configure 64bit Version ##############
 
@@ -258,7 +255,7 @@ jobs:
           crossflags: "-g -O2"
           configure-params: "--enable-win64 --with-vulkan --with-vkd3d"
 
-      - name: Configure wine64 (specific to 22)
+      - name: Configure wine64 (specific to 20)
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         uses: ./.github/actions/configure_wine
         with:
@@ -323,6 +320,9 @@ jobs:
         with:
           build-dir: "${{ env.BUILDROOT }}/wine64"
           install-dir: "${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
+
+      # TODO: Add install_name_tool stage here
+      # copy /usr/local/bin/vkd3d-compiler and /usr/local/lib/libvkd3d-shader.dylib,libvkd3d-utils.dylib,libvkd3d.dylib,libvkd3d-shader.1.dylib,libvkd3d-utils.1.dylib,libvkd3d.1.dylib
 
       ############ Bundle and Upload Deliverable ##############
 
