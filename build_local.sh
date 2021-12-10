@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env arch -x86_64 bash
 
 set -ex
 
@@ -33,26 +33,42 @@ export TOOLS_INSTALLATION=build-tools-cx${CROSS_OVER_VERSION}
 export WINE_INSTALLATION=wine-cx${CROSS_OVER_VERSION}
 export DXVK_INSTALLATION=dxvk-cx${CROSS_OVER_VERSION}
 
+# Need to ensure Instel brew actually exists
+if ! command -v "/usr/local/bin/brew" &> /dev/null
+then
+    echo "</usr/local/bin/brew> could not be found"
+    echo "An Intel brew installation is required"
+    exit
+fi
+
+# Make a wrapper to ensure Intel brew is used and not Apple Silicon brew
+ibrew() {
+    /usr/local/bin/brew "$@"
+}
+export -f ibrew
+
+# Make sure Intel brew Install is before a possible Apple Silicon brew
+export PATH="/usr/local/bin:/usr/local/sbin:${PATH}"
 
 echo Installing Dependencies
 # build dependencies
-brew install  bison            \
-              cmake            \
-              mingw-w64        \
-              ninja
+ibrew install  bison            \
+               cmake            \
+               mingw-w64        \
+               ninja
 
 # runtime dependencies for crossover-wine
-brew install  faudio           \
-              freetype         \
-              gnutls           \
-              gphoto2          \
-              gst-plugins-base \
-              libpng           \
-              little-cms2      \
-              molten-vk        \
-              mpg123           \
-              sane-backends    \
-              sdl2
+ibrew install  faudio           \
+               freetype         \
+               gnutls           \
+               gphoto2          \
+               gst-plugins-base \
+               libpng           \
+               little-cms2      \
+               molten-vk        \
+               mpg123           \
+               sane-backends    \
+               sdl2
 
 echo Add bison to PATH
 export PATH="$(brew --prefix bison)/bin":${PATH}
@@ -71,8 +87,8 @@ tar xf ${CROSS_OVER_LOCAL_FILE}.tar.gz
 
 if [[ "${CROSS_OVER_VERSION}" == "20.0.1" || "${CROSS_OVER_VERSION}" == "20.0.2"  ]]; then
     echo Add missing llvm/clang
-    curl -o crossover-20.0.0.tar.gz https://media.codeweavers.com/pub/crossover/source/crossover-sources-20.0.0.tar.gz
-    tar -xf crossover-20.0.0.tar.gz sources/clang
+    curl -o crossover-21.1.0.tar.gz https://media.codeweavers.com/pub/crossover/source/crossover-sources-21.1.0.tar.gz
+    tar -xf crossover-21.1.0.tar.gz sources/clang
 fi
 
 echo "Patch Add missing distversion.h"
@@ -182,18 +198,16 @@ export CROSSCFLAGS=$([[ ${CROSS_OVER_VERSION} -le 20.0.2 ]] && echo "-g -O2 -fco
 export CFLAGS="-g -O2 -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
 export LDFLAGS="-Wl,-headerpad_max_install_names"
 
-export SDL2_CFLAGS="-I$(brew --prefix sdl2)/"$([[ ${CROSS_OVER_VERSION} == 21.* ]] && echo "include/SDL2" || echo "include")
 export GPHOTO2_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
 export GPHOTO2_PORT_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
-
-export PNG_CFLAGS="-I$(brew --prefix libpng)/include"
-export PNG_LIBS="-L$(brew --prefix libpng)/lib"
-
-export LDFLAGS="-L $(brew --prefix molten-vk)/lib ${LDFLAGS}"
+export SDL2_CFLAGS="-I$(brew --prefix sdl2)/"$([[ ${CROSS_OVER_VERSION} -ge 21.* ]] && echo "include/SDL2" || echo "include")
+export ac_cv_lib_soname_vulkan=""
+export ac_cv_lib_soname_MoltenVK="$(brew --prefix molten-vk)/lib/libMoltenVK.dylib"
 
 mkdir -p ${BUILDROOT}/wine64
 pushd ${BUILDROOT}/wine64
 ${WINE_CONFIGURE} \
+        --disable-option-checking \
         --enable-win64 \
         --disable-tests \
         --without-alsa \
@@ -225,29 +239,21 @@ echo Configure wine32on64
 export CC=clang
 export CXX=clang++
 # see https://github.com/Gcenx/macOS_Wine_builds/issues/17#issuecomment-750346843
-export CROSSCFLAGS=$([[ ${CROSS_OVER_VERSION} == 19.* ]] && echo "-g -O2 -fcommon" || echo "-g -O2")
+export CROSSCFLAGS=$([[ ${CROSS_OVER_VERSION} -le 20.0.2 ]] && echo "-g -O2 -fcommon" || echo "-g -O2")
 # Xcode12 by default enables '-Werror,-Wimplicit-function-declaration' (49917738)
 # this causes wine(64) builds to fail so needs to be disabled.
 # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes
 export CFLAGS="-g -O2 -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
 export LDFLAGS="-Wl,-headerpad_max_install_names"
 
-export SDL2_CFLAGS="-I$(brew --prefix sdl2)/"$([[ ${CROSS_OVER_VERSION} == 21.* ]] && echo "include/SDL2" || echo "include")
 export GPHOTO2_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
 export GPHOTO2_PORT_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
-
-export PNG_CFLAGS="-I$(brew --prefix libpng)/include"
-export PNG_LIBS="-L$(brew --prefix libpng)/lib"
-
-if [[ ${CROSS_OVER_VERSION} == 19.* || ${CROSS_OVER_VERSION} == 20.* ]]; then
-    export DISABLE_VULKAN="--without-vkd3d --without-vulkan --disable-vulkan_1 --disable-winevulkan"
-else
-    export DISABLE_VULKAN=""
-fi
+export SDL2_CFLAGS="-I$(brew --prefix sdl2)/"$([[ ${CROSS_OVER_VERSION} -ge 21.* ]] && echo "include/SDL2" || echo "include")
 
 mkdir -p ${BUILDROOT}/wine32on64
 pushd ${BUILDROOT}/wine32on64
 ${WINE_CONFIGURE} \
+        --disable-option-checking \
         --enable-win32on64 \
         --with-wine64=${BUILDROOT}/wine64 \
         --disable-tests \
@@ -269,7 +275,10 @@ ${WINE_CONFIGURE} \
         --with-png \
         --with-sdl \
         --without-krb5 \
-        ${DISABLE_VULKAN} \
+        --without-vkd3d \
+        --without-vulkan \
+        --disable-vulkan_1 \
+        --disable-winevulkan \
         --without-x
 popd
 
