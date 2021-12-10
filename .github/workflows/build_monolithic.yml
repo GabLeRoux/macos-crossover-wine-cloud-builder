@@ -106,20 +106,19 @@ jobs:
                         mingw-w64        \
                         pkgconfig
 
-      # TODO: Alphabetical Order
       - name: Install Wine Runtime Dependencies
         run: |
-          brew install  freetype         \
-                        krb5             \
-                        faudio           \
-                        sdl2             \
+          brew install  faudio           \
+                        freetype         \
                         gphoto2          \
-                        sane-backends    \
                         gst-plugins-base \
-                        mpg123           \
+                        krb5             \
                         little-cms2      \
                         libpng           \
-                        molten-vk
+                        molten-vk        \
+                        mpg123           \
+                        sane-backends    \
+                        sdl2
 
       - name: Add bison, flex & krb5 to $PATH
         run: |
@@ -229,8 +228,7 @@ jobs:
       - name: Build VKD3D
         if: startsWith(matrix.CROSS_OVER_VERSION, '21')
         run: |
-          brew install  automake \
-                        pkgconfig
+          brew install  automake
 
           pushd sources/vkd3d
 
@@ -242,6 +240,14 @@ jobs:
           CPPFLAGS="-I ../moltenvk/Package/Latest/MoltenVK/include/ -I ../moltenvk/External/glslang/External/spirv-tools/external/spirv-headers/include/" ./configure --without-ncurses
           make -j
           make install
+          popd
+
+      ############ Install VKD3D ##############
+      - name: Install VKD3D
+        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        run: |
+          pushd sources/vkd3d
+          make install-exec-am DESTDIR="${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
           popd
 
       ############ Configure 64bit Version ##############
@@ -307,6 +313,8 @@ jobs:
         with:
           build-dir: "${{ env.BUILDROOT }}/wine32on64"
 
+      # TODO: Add install_name_tool stage here to fix dylibs
+
       ############ Install wine ##############
 
       - name: Install wine32on64
@@ -321,8 +329,7 @@ jobs:
           build-dir: "${{ env.BUILDROOT }}/wine64"
           install-dir: "${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
 
-      # TODO: Add install_name_tool stage here
-      # copy /usr/local/bin/vkd3d-compiler and /usr/local/lib/libvkd3d-shader.dylib,libvkd3d-utils.dylib,libvkd3d.dylib,libvkd3d-shader.1.dylib,libvkd3d-utils.1.dylib,libvkd3d.1.dylib
+      # TODO: Add install_name_tool stage here to fix elfs
 
       ############ Bundle and Upload Deliverable ##############
 
