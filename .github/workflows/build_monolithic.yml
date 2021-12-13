@@ -313,8 +313,6 @@ jobs:
         with:
           build-dir: "${{ env.BUILDROOT }}/wine32on64"
 
-      # TODO: Add install_name_tool stage here to fix dylibs
-
       ############ Install wine ##############
 
       - name: Install wine32on64
@@ -329,7 +327,15 @@ jobs:
           build-dir: "${{ env.BUILDROOT }}/wine64"
           install-dir: "${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
 
-      # TODO: Add install_name_tool stage here to fix elfs
+      ############ Add rpaht to vkd3d libs ##############
+
+      - name: Add rpath entry for VKD3D
+        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        run: |
+          pushd ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/bin
+          install_name_tool -add_rpath @executable_path/../lib wine64-preloader
+          install_name_tool -add_rpath @executable_path/../lib vkd3d-compiler
+          popd
 
       ############ Bundle and Upload Deliverable ##############
 
