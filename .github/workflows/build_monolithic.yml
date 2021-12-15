@@ -207,6 +207,7 @@ jobs:
         if: startsWith(matrix.CROSS_OVER_VERSION, '2')
         run: |
           set -x
+          sed -i "" "s/build_arch 32/# build_arch 32/g" ${{ env.DXVK_BUILDSCRIPT }}
           PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${{ env.DXVK_BUILDSCRIPT }} master ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }} --no-package
 
       - name: Tar DXVK
