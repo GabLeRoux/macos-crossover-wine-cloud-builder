@@ -270,6 +270,13 @@ jobs:
           make install-exec-am DESTDIR="${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
           popd
 
+      ############ Install MoltenVK ##############
+      - name: Install MoltenVK
+        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        run: |
+          mkdir -p ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/lib
+          cp ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_INSTALLATION }}/Latest/MoltenVK/dylib/macOS/*.dylib ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/lib/
+
       ############ Configure 64bit Version ##############
 
       - name: Configure wine64 (specific to 21)
@@ -354,12 +361,13 @@ jobs:
           ln -s wine32on64-preloader wine-preloader
           popd
 
-      ############ Add rpaht to vkd3d libs ##############
+      ############ Add rpath to vkd3d, moltenVK libs ##############
 
-      - name: Add rpath entry for VKD3D
+      - name: Add rpath entry for VKD3D, MoltenVK
         if: startsWith(matrix.CROSS_OVER_VERSION, '21')
         run: |
           pushd ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/bin
+          install_name_tool -add_rpath @executable_path/../lib wine64
           install_name_tool -add_rpath @executable_path/../lib wine64-preloader
           install_name_tool -add_rpath @executable_path/../lib vkd3d-compiler
           popd
