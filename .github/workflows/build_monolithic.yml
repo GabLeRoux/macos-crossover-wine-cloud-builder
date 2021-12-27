@@ -91,6 +91,7 @@ jobs:
       # artifact names
       WINE_INSTALLATION: wine-cx${{ matrix.CROSS_OVER_VERSION }}
       DXVK_INSTALLATION: dxvk-cx${{ matrix.CROSS_OVER_VERSION }}
+      MOLTENVK_INSTALLATION: moltenvk-cx${{ matrix.CROSS_OVER_VERSION }}
 
     steps:
 
@@ -187,6 +188,24 @@ jobs:
           ./fetchDependencies --macos
           make macos
           popd
+
+      - name: Tar MoltenVK
+        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        run: |
+          set -x
+          pushd sources/moltenvk
+          cp -r Package ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_INSTALLATION }}
+          popd
+          pushd ${{ env.INSTALLROOT }}
+          tar -czf ${{ env.MOLTENVK_INSTALLATION }}.tar.gz ${{ env.MOLTENVK_INSTALLATION }}
+          popd
+
+      - name: Upload MoltenVK
+        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.MOLTENVK_INSTALLATION }}
+          path: ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_INSTALLATION }}.tar.gz
 
       ############ Build DXVK ##############
       - name: Patch DXVK to add missing <ostream> include
