@@ -328,6 +328,13 @@ jobs:
           build-dir: "${{ env.BUILDROOT }}/wine64"
           install-dir: "${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
 
+      - name: Create wine, wine-preloader symlinks
+        run: |
+          pushd ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/bin
+          ln -s wine32on64 wine
+          ln -s wine32on64-preloader wine-preloader
+          popd
+
       ############ Add rpaht to vkd3d libs ##############
 
       - name: Add rpath entry for VKD3D
