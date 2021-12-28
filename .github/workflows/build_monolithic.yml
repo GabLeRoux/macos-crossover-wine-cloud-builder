@@ -372,6 +372,18 @@ jobs:
           install_name_tool -add_rpath @executable_path/../lib vkd3d-compiler
           popd
 
+      ############ Integrate DXVK dlls into installation and patch install script  ##############
+
+      - name: Integrate DXVK dlls into installation
+        if: startsWith(matrix.CROSS_OVER_VERSION, '2')
+        run: |
+          pushd ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }}/dxvk-master
+          cp -r x64 ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/lib64/wine/dxvk
+          cp setup_dxvk.sh ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/bin/
+          sed -i "" "s|x32|../lib/wine/dxvk|g" ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/bin/setup_dxvk.sh
+          sed -i "" "s|x64|../lib64/wine/dxvk|g" ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/bin/setup_dxvk.sh
+          popd
+
       ############ Bundle and Upload Deliverable ##############
 
       - name: Tar Wine
