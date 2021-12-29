@@ -136,6 +136,7 @@ jobs:
         run: |
           brew install  coreutils \
                         glslang   \
+                        mingw-w64 \
                         meson
 
       - name: Build DXVK
