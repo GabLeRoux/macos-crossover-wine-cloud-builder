@@ -55,7 +55,7 @@ runs:
         pushd ${{ inputs.crossover-source }}/dxvk
 
         # disable building the 32bit version
-        sed -i "" "s/build_arch 32/# build_arch 32/g" ./package-release.sh
+        # sed -i "" "s/build_arch 32/# build_arch 32/g" ./package-release.sh
 
         PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ./package-release.sh master ./install --no-package
         popd
@@ -67,6 +67,8 @@ runs:
         pushd ${{ inputs.crossover-source }}/dxvk/install/dxvk-master
 
         echo Installing DXVK dlls...
+        mkdir -p ${{ inputs.install-prefix }}/usr/local/lib/wine
+        cp -r x32 ${{ inputs.install-prefix }}/usr/local/lib/wine/dxvk
         mkdir -p ${{ inputs.install-prefix }}/usr/local/lib64/wine
         cp -r x64 ${{ inputs.install-prefix }}/usr/local/lib64/wine/dxvk
 
@@ -74,8 +76,19 @@ runs:
         mkdir -p ${{ inputs.install-prefix }}/usr/local/bin
         cp setup_dxvk.sh ${{ inputs.install-prefix }}/usr/local/bin/
 
+
         echo Patching DXVK setup script...
-        sed -i "" "s|x32|../lib/wine/dxvk|g" ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
-        sed -i "" "s|x64|../lib64/wine/dxvk|g" ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
+
+        sed -i "" 's|"x32"|"../lib/wine/dxvk"|g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
+        sed -i "" 's|"x64"|"../lib64/wine/dxvk"|g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
+
+        sed -i "" 's|readlink|greadlink|g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
+
+        sed -i "" 's|wine_path=|wine_path="\${basedir}" # |g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
+
+        sed -i "" 's|wine="wine"|wine="\${basedir}/wine"|g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
+        sed -i "" 's|wine64="wine64"|wine64="\${basedir}/wine64"|g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
+
+        sed -i "" 's|\$wineboot -u|\$wine \$wineboot -u|g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
 
         popd
