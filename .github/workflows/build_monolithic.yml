@@ -143,7 +143,6 @@ jobs:
       # artifact names
       WINE_INSTALLATION: wine-cx${{ matrix.CROSS_OVER_VERSION }}
       DXVK_INSTALLATION: dxvk-cx${{ matrix.CROSS_OVER_VERSION }}
-      MOLTENVK_DXVK_INSTALLATION: moltenvk-cx${{ matrix.CROSS_OVER_VERSION }}
 
     steps:
 
@@ -200,6 +199,21 @@ jobs:
           set -x
           echo "${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}/bin" >> $GITHUB_PATH
 
+      - name: Download MoltenVK / DXVK (from previous job)
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.MOLTENVK_DXVK_INSTALLATION }}
+          path: ${{ env.INSTALLROOT }}
+
+      - name: Unpack MoltenVK / DXVK
+        run: |
+          set -x
+          mkdir -p ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}
+          pushd ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}
+          ls -al
+          tar --strip-components=1 -xvf ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}.tar.gz
+          ls -alt
+          popd
 
       ############ Download and Prepare Source Code ##############
 
@@ -245,7 +259,7 @@ jobs:
           ln -s $(brew --prefix mingw-w64)/toolchain-x86_64/bin/x86_64-w64-mingw32-widl ./bin/widl
           export PATH=./bin:$PATH
 
-          CPPFLAGS="-I ../moltenvk/Package/Latest/MoltenVK/include/ -I ../moltenvk/External/glslang/External/spirv-tools/external/spirv-headers/include/" ./configure --without-ncurses
+          CPPFLAGS="-I ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/include/" ./configure --without-ncurses
           make -j
           make install
           popd
