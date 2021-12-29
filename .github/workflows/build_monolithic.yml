@@ -119,7 +119,11 @@ jobs:
           pushd sources/moltenvk/Package/Latest/MoltenVK
           mkdir -p ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}/usr/local/lib/
           cp ./dylib/macOS/*.dylib ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}/usr/local/lib/
-          cp -r ./include ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}/usr/local/lib/include
+          cp -r ./include ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}/usr/local/
+          popd
+          # also copy the spirv-headers as VKD3D seems to need them for building
+          pushd sources/moltenvk/External/glslang/External/spirv-tools/external/spirv-headers/include/
+          cp -r ./spirv ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}/usr/local/include/
           popd
 
       ############ Build and Install DXVK ##############
