@@ -12,7 +12,6 @@ env:
     MACOSX_DEPLOYMENT_TARGET: 10.14
     # directories / files inside the downloaded tar file directory structure
     WINE_CONFIGURE: ${{ github.workspace }}/sources/wine/configure
-    DXVK_BUILDSCRIPT: ${{ github.workspace }}/sources/dxvk/package-release.sh
     # build directories
     BUILDROOT: ${{ github.workspace }}/build
     LLVM_BUILDDIR: ${{ github.workspace }}/build/llvm
@@ -20,6 +19,7 @@ env:
     # target directory for installation
     INSTALLROOT: ${{ github.workspace }}/install
     TOOLS_INSTALLATION: build-tools-cx
+    MOLTENVK_DXVK_INSTALLATION: moltenvk-dxvk
 
 jobs:
   llvm-clang:
@@ -58,7 +58,7 @@ jobs:
           llvm-makedir: ${{ github.workspace }}/sources/clang/llvm
           clang-makedir: ${{ github.workspace }}/sources/clang/clang
 
-      ############ Upload LLVM / Clang to be used in subsequent job steps ##############
+      ############ Upload LLVM / Clang to be used in subsequent jobs ##############
 
       - name: Tar Build Tools
         run: |
@@ -74,8 +74,110 @@ jobs:
           name: ${{ env.TOOLS_INSTALLATION }}
           path: ${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}.tar.gz
 
+
+  moltenVK_DXVK:
+    runs-on:  macos-10.15
+    env:
+      # crossover source code to be downloaded
+      CROSS_OVER_SOURCE_URL: https://media.codeweavers.com/pub/crossover/source/crossover-sources-21.1.0.tar.gz
+      CROSS_OVER_LOCAL_FILE: crossover-21.1.0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      ############ Restore MoltenVK / DXVK from cache ##############
+
+      - name: Restore MoltenVK / DXVK from cache
+        uses: actions/cache@v2
+        id: cache_moltenVK_DXVK
+        with:
+          path: ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}
+          key: cache_moltenVK_DXVK
+
+      ############ Build MoltenVK / DXVK (if restore from cache failed) ##############
+
+      - name: Get and Extract Source
+        if:  steps.cache_moltenVK_DXVK.outputs.cache-hit != 'true'
+        uses: ./.github/actions/get_source
+        with:
+          crossover-local-file: "${{ env.CROSS_OVER_LOCAL_FILE }}"
+          crossover-source-url: "${{ env.CROSS_OVER_SOURCE_URL }}"
+
+      ############ Build and Install MoltenVK ##############
+      - name: Build MoltenVK
+        if:  steps.cache_moltenVK_DXVK.outputs.cache-hit != 'true'
+        run: |
+          pushd sources/moltenvk
+          ./fetchDependencies --macos
+          make macos
+          popd
+
+      - name: Install MoltenVK
+        if:  steps.cache_moltenVK_DXVK.outputs.cache-hit != 'true'
+        run: |
+          set -x
+          pushd sources/moltenvk/Package/Latest/MoltenVK
+          mkdir -p ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}/usr/local/lib/
+          cp ./dylib/macOS/*.dylib ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}/usr/local/lib/
+          cp -r ./include ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}/usr/local/lib/include
+          popd
+
+      ############ Build and Install DXVK ##############
+      - name: Patch DXVK to remove duplicate definition of D3D11_FORMAT_SUPPORT2
+        if:  steps.cache_moltenVK_DXVK.outputs.cache-hit != 'true'
+        run: patch sources/dxvk/src/d3d11/d3d11_include.h < dxvk_d3d11_include_h.patch
+
+      - name: Install Dependencies for DXVK
+        if:  steps.cache_moltenVK_DXVK.outputs.cache-hit != 'true'
+        run: |
+          brew install  coreutils \
+                        glslang   \
+                        meson
+
+      - name: Build DXVK
+        if:  steps.cache_moltenVK_DXVK.outputs.cache-hit != 'true'
+        run: |
+          set -x
+          pushd sources/dxvk
+          # disable building the 32bit version
+          sed -i "" "s/build_arch 32/# build_arch 32/g" ./package-release.sh
+          PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ./package-release.sh master ./install --no-package
+          popd
+
+      - name: Install DXVK
+        if:  steps.cache_moltenVK_DXVK.outputs.cache-hit != 'true'
+        run: |
+          set -x
+          pushd sources/dxvk/install/dxvk-master
+          # install dlls
+          mkdir -p ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}/usr/local/lib64/wine
+          cp -r x64 ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}/usr/local/lib64/wine/dxvk
+          mkdir -p ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}/usr/local/bin
+          # install and patch installation script
+          cp setup_dxvk.sh ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}/usr/local/bin/
+          sed -i "" "s|x32|../lib/wine/dxvk|g" ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/bin/setup_dxvk.sh
+          sed -i "" "s|x64|../lib64/wine/dxvk|g" ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/bin/setup_dxvk.sh
+          popd
+
+      ############ Upload MoltenVK / DXVK to be used in subsequent jobs ##############
+
+      - name: Tar MoltenVK / DXVK
+        run: |
+          set -x
+          pushd ${{ env.INSTALLROOT }}
+          tar -czf ${{ env.MOLTENVK_DXVK_INSTALLATION }}.tar.gz ${{ env.MOLTENVK_DXVK_INSTALLATION }}
+          ls -alt
+          popd
+
+      - name: Upload MoltenVK / DXVK
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.MOLTENVK_DXVK_INSTALLATION }}
+          path: ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}.tar.gz
+
+
   wine-crossover:
-    needs: llvm-clang
+    needs: [llvm-clang, moltenVK_DXVK]
 
     strategy:
       fail-fast: false
@@ -91,7 +193,7 @@ jobs:
       # artifact names
       WINE_INSTALLATION: wine-cx${{ matrix.CROSS_OVER_VERSION }}
       DXVK_INSTALLATION: dxvk-cx${{ matrix.CROSS_OVER_VERSION }}
-      MOLTENVK_INSTALLATION: moltenvk-cx${{ matrix.CROSS_OVER_VERSION }}
+      MOLTENVK_DXVK_INSTALLATION: moltenvk-cx${{ matrix.CROSS_OVER_VERSION }}
 
     steps:
 
@@ -180,70 +282,6 @@ jobs:
           patch -p1 < ${{ github.workspace }}/msvcrt-sincos.patch
           popd
 
-      ############ Build MoltenVK ##############
-      - name: Build MoltenVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
-        run: |
-          pushd sources/moltenvk
-          ./fetchDependencies --macos
-          make macos
-          popd
-
-      - name: Tar MoltenVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
-        run: |
-          set -x
-          pushd sources/moltenvk
-          cp -r Package ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_INSTALLATION }}
-          popd
-          pushd ${{ env.INSTALLROOT }}
-          tar -czf ${{ env.MOLTENVK_INSTALLATION }}.tar.gz ${{ env.MOLTENVK_INSTALLATION }}
-          popd
-
-      - name: Upload MoltenVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.MOLTENVK_INSTALLATION }}
-          path: ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_INSTALLATION }}.tar.gz
-
-      ############ Build DXVK ##############
-      - name: Patch DXVK to add missing <ostream> include
-        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-        run: patch sources/dxvk/src/util/rc/util_rc_ptr.h < dxvk_util_rc_ptr.patch
-
-      - name: Patch DXVK to remove duplicate definition of D3D11_FORMAT_SUPPORT2
-        if: startsWith(matrix.CROSS_OVER_VERSION, '2')
-        run: patch sources/dxvk/src/d3d11/d3d11_include.h < dxvk_d3d11_include_h.patch
-
-      - name: Install Dependencies for DXVK
-        run: |
-          brew install  coreutils \
-                        glslang   \
-                        meson
-
-      - name: Build DXVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '2')
-        run: |
-          set -x
-          sed -i "" "s/build_arch 32/# build_arch 32/g" ${{ env.DXVK_BUILDSCRIPT }}
-          PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${{ env.DXVK_BUILDSCRIPT }} master ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }} --no-package
-
-      - name: Tar DXVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '2')
-        run: |
-          set -x
-          pushd ${{ env.INSTALLROOT }}
-          tar -czf ${{ env.DXVK_INSTALLATION }}.tar.gz ${{ env.DXVK_INSTALLATION }}
-          popd
-
-      - name: Upload DXVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '2')
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.DXVK_INSTALLATION }}
-          path: ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }}.tar.gz
-
       ############ Build VKD3D ##############
       - name: Build VKD3D
         if: startsWith(matrix.CROSS_OVER_VERSION, '21')
@@ -269,13 +307,6 @@ jobs:
           pushd sources/vkd3d
           make install-exec-am DESTDIR="${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
           popd
-
-      ############ Install MoltenVK ##############
-      - name: Install MoltenVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
-        run: |
-          mkdir -p ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/lib
-          cp ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_INSTALLATION }}/Latest/MoltenVK/dylib/macOS/*.dylib ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/lib/
 
       ############ Configure 64bit Version ##############
 
@@ -370,18 +401,6 @@ jobs:
           install_name_tool -add_rpath @executable_path/../lib wine64
           install_name_tool -add_rpath @executable_path/../lib wine64-preloader
           install_name_tool -add_rpath @executable_path/../lib vkd3d-compiler
-          popd
-
-      ############ Integrate DXVK dlls into installation and patch install script  ##############
-
-      - name: Integrate DXVK dlls into installation
-        if: startsWith(matrix.CROSS_OVER_VERSION, '2')
-        run: |
-          pushd ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }}/dxvk-master
-          cp -r x64 ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/lib64/wine/dxvk
-          cp setup_dxvk.sh ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/bin/
-          sed -i "" "s|x32|../lib/wine/dxvk|g" ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/bin/setup_dxvk.sh
-          sed -i "" "s|x64|../lib64/wine/dxvk|g" ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/bin/setup_dxvk.sh
           popd
 
       ############ Bundle and Upload Deliverable ##############
