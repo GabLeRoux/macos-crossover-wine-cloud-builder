@@ -16,6 +16,7 @@ runs:
 
     ############ Build and Install MoltenVK ##############
     - name: Build MoltenVK
+      shell: bash
       run: |
         pushd ${{ inputs.crossover-source }}/moltenvk
         ./fetchDependencies --macos
@@ -23,6 +24,7 @@ runs:
         popd
 
     - name: Install MoltenVK
+      shell: bash
       run: |
         set -x
 
@@ -40,9 +42,11 @@ runs:
 
     ############ Build and Install DXVK ##############
     - name: Patch DXVK to remove duplicate definition of D3D11_FORMAT_SUPPORT2
+      shell: bash
       run: patch ${{ inputs.crossover-source }}/dxvk/src/d3d11/d3d11_include.h < dxvk_d3d11_include_h.patch
 
     - name: Install Dependencies for DXVK
+      shell: bash
       run: |
         brew install  coreutils \
                       glslang   \
@@ -50,6 +54,7 @@ runs:
                       meson
 
     - name: Build DXVK
+      shell: bash
       run: |
         set -x
         pushd ${{ inputs.crossover-source }}/dxvk
@@ -61,7 +66,7 @@ runs:
         popd
 
     - name: Install DXVK
-      if:  steps.cache_moltenVK_DXVK.outputs.cache-hit != 'true'
+      shell: bash
       run: |
         set -x
         pushd ${{ inputs.crossover-source }}/dxvk/install/dxvk-master
