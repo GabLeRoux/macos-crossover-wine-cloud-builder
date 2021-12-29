@@ -154,14 +154,15 @@ jobs:
         run: |
           set -x
           pushd sources/dxvk/install/dxvk-master
-          # install dlls
+          echo Installing DXVK dlls...
           mkdir -p ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}/usr/local/lib64/wine
           cp -r x64 ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}/usr/local/lib64/wine/dxvk
+          echo Installing DXVK setup script...
           mkdir -p ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}/usr/local/bin
-          # install and patch installation script
           cp setup_dxvk.sh ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}/usr/local/bin/
-          sed -i "" "s|x32|../lib/wine/dxvk|g" ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/bin/setup_dxvk.sh
-          sed -i "" "s|x64|../lib64/wine/dxvk|g" ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/bin/setup_dxvk.sh
+          echo Patching DXVK setup script...
+          sed -i "" "s|x32|../lib/wine/dxvk|g" ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}/usr/local/bin/setup_dxvk.sh
+          sed -i "" "s|x64|../lib64/wine/dxvk|g" ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}/usr/local/bin/setup_dxvk.sh
           popd
 
       ############ Upload MoltenVK / DXVK to be used in subsequent jobs ##############
