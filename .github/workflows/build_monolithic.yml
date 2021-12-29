@@ -108,7 +108,7 @@ jobs:
         if:  steps.cache_moltenVK_DXVK.outputs.cache-hit != 'true'
         run: |
           pushd sources/moltenvk
-          ./fetchDependencies --macos --parallel-build
+          ./fetchDependencies --macos
           make macos
           popd
 
