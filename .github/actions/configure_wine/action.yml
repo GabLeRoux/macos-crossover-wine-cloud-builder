@@ -35,6 +35,7 @@ runs:
   using: "composite"
   steps:
       - name: Configure ${{ inputs.winearch }}
+        id: configure
         env:
           CC: clang
           CXX: clang++
@@ -44,18 +45,17 @@ runs:
         run: |
           set -x
 
-          export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include -I$(brew --prefix sdl2)/include/SDL2"
           export GPHOTO2_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
           export GPHOTO2_PORT_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
+          export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include -I$(brew --prefix sdl2)/include/SDL2"
 
-          export PNG_CFLAGS="-I$(brew --prefix libpng)/include"
-          export PNG_LIBS="-L$(brew --prefix libpng)/lib"
-
-          export LDFLAGS="-L $(brew --prefix molten-vk)/lib"
+          export ac_cv_lib_soname_vulkan=""
+          export ac_cv_lib_soname_MoltenVK="$(brew --prefix molten-vk)/lib/libMoltenVK.dylib"
 
           mkdir -p ${{ inputs.build-dir }}/
           pushd ${{ inputs.build-dir }}
           ${{ inputs.wine-configure }} \
+                    --disable-option-checking \
                     --disable-tests \
                     --without-alsa \
                     --without-capi \
@@ -66,11 +66,9 @@ runs:
                     --without-udev \
                     --without-v4l2 \
                     --without-gsm \
-                    --with-png \
-                    --with-sdl \
-                    --with-vulkan \
+                    --without-quicktime \
                     --without-x \
-                    ${{ inputs.configure-params }}
+                    ${{ inputs.configure-params }} || cat config.log
           popd
 
         shell: bash

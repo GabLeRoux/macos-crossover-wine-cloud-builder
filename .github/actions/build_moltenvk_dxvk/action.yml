@@ -1,0 +1,99 @@
+name: 'Build and Install MoltenVK and DXVK'
+description: 'Action that builds MoltenVK and DXVK and bundles them in a common installation'
+inputs:
+  crossover-source:
+    description: 'Path to the crossover source (i.e. the directory that contains the "moltenvk" and "dxvk" directories'
+    required: true
+    default: ${{ github.workspace }}/sources
+  install-prefix:
+    description: 'Installation target directory for MoltenVK and DXVK'
+    required: true
+    # default: ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}
+
+runs:
+  using: "composite"
+  steps:
+
+    ############ Build and Install MoltenVK ##############
+    - name: Build MoltenVK
+      shell: bash
+      run: |
+        pushd ${{ inputs.crossover-source }}/moltenvk
+        ./fetchDependencies --macos
+        make macos
+        popd
+
+    - name: Install MoltenVK
+      shell: bash
+      run: |
+        set -x
+
+        pushd ${{ inputs.crossover-source }}/moltenvk/Package/Latest/MoltenVK
+        mkdir -p ${{ inputs.install-prefix }}/usr/local/lib/
+        cp ./dylib/macOS/*.dylib ${{ inputs.install-prefix }}/usr/local/lib/
+        cp -r ./include ${{ inputs.install-prefix }}/usr/local/
+        popd
+
+        # also copy the spirv-headers as VKD3D seems to need them for building
+        pushd ${{ inputs.crossover-source }}/moltenvk/External/glslang/External/spirv-tools/external/spirv-headers/include/
+        cp -r ./spirv ${{ inputs.install-prefix }}/usr/local/include/
+
+        popd
+
+    ############ Build and Install DXVK ##############
+    - name: Patch DXVK to remove duplicate definition of D3D11_FORMAT_SUPPORT2
+      shell: bash
+      run: patch ${{ inputs.crossover-source }}/dxvk/src/d3d11/d3d11_include.h < dxvk_d3d11_include_h.patch
+
+    - name: Install Dependencies for DXVK
+      shell: bash
+      run: |
+        brew install  coreutils \
+                      glslang   \
+                      mingw-w64 \
+                      meson
+
+    - name: Build DXVK
+      shell: bash
+      run: |
+        set -x
+        pushd ${{ inputs.crossover-source }}/dxvk
+
+        # disable building the 32bit version
+        # sed -i "" "s/build_arch 32/# build_arch 32/g" ./package-release.sh
+
+        PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ./package-release.sh master ./install --no-package
+        popd
+
+    - name: Install DXVK
+      shell: bash
+      run: |
+        set -x
+        pushd ${{ inputs.crossover-source }}/dxvk/install/dxvk-master
+
+        echo Installing DXVK dlls...
+        mkdir -p ${{ inputs.install-prefix }}/usr/local/lib/wine
+        cp -r x32 ${{ inputs.install-prefix }}/usr/local/lib/wine/dxvk
+        mkdir -p ${{ inputs.install-prefix }}/usr/local/lib64/wine
+        cp -r x64 ${{ inputs.install-prefix }}/usr/local/lib64/wine/dxvk
+
+        echo Installing DXVK setup script...
+        mkdir -p ${{ inputs.install-prefix }}/usr/local/bin
+        cp setup_dxvk.sh ${{ inputs.install-prefix }}/usr/local/bin/
+
+
+        echo Patching DXVK setup script...
+
+        sed -i "" 's|"x32"|"../lib/wine/dxvk"|g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
+        sed -i "" 's|"x64"|"../lib64/wine/dxvk"|g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
+
+        sed -i "" 's|readlink|greadlink|g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
+
+        sed -i "" 's|wine_path=|wine_path="\${basedir}" # |g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
+
+        sed -i "" 's|wine="wine"|wine="\${basedir}/wine"|g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
+        sed -i "" 's|wine64="wine64"|wine64="\${basedir}/wine64"|g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
+
+        sed -i "" 's|\$wineboot -u|\$wine \$wineboot -u|g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
+
+        popd

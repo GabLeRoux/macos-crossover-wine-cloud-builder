@@ -1,0 +1,29 @@
+name: 'Get Crossover Source'
+description: 'Download and Extract Crossover Source, either from Cache or from the Codeweaver Server'
+inputs:
+  crossover-local-file:
+    description: 'Basename of the Downloaded Tarball'
+    required: true
+  crossover-source-url:
+    description: 'URL of the Tarball'
+    required: true
+runs:
+  using: "composite"
+  steps:
+      - name: Restore Source Code Tarball from Cache
+        uses: actions/cache@v2
+        id: cache_sourcecode
+        with:
+          path: ${{ inputs.crossover-local-file }}.tar.gz
+          key: ${{ inputs.crossover-local-file }}
+
+      - name: Download Source
+        if:  steps.cache_sourcecode.outputs.cache-hit != 'true'
+        run:  |
+          curl -o ${{ inputs.crossover-local-file }}.tar.gz ${{ inputs.crossover-source-url }}
+        shell: bash
+
+      - name: Extract Source
+        run: |
+          tar xf ${{ inputs.crossover-local-file }}.tar.gz
+        shell: bash

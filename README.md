@@ -21,15 +21,18 @@ Let's build [FOSS CrossOver][foss-crossover] for macOS in the cloud! I found [so
 In principle yes, see the following image which is `notepad.exe` running inside wine on a macOS 10.15 machine:
 ![Notepad running in wine](doc/wine64_notepad.png)
 
-However, there are still some issues, e.g. #9.
-
 ## Inspiration
 
 I learned about [Free and Open Source Software Code for CrossOver][foss-crossover] and found [this gist][crossover-gist].
 
-## Where to download builds?
+## Where to download builds? How can I run them?
 
-See [#2](https://github.com/GabLeRoux/macos-crossover-cloud-build/issues/2)
+Builds are currently available as artifacts from github actions.
+Simply go to [the Actions tab](https://github.com/GabLeRoux/macos-crossover-wine-cloud-builder/actions), click the newest green run from the main branch, scroll down to the artifacts and select the version of your choice.
+See however also [#25](https://github.com/GabLeRoux/macos-crossover-cloud-build/issues/25).
+
+After downloading and unpacking the tarball, e. g. to the `./wine-cx` folder, you need to remove the quarantine attribute using `sudo xattr -r -d com.apple.quarantine wine-cx`.
+Afterwards inside `./wine-cx/usr/local/bin` you will find the `wine32on64` and `wine64` binaries.
 
 ## Can I run the build locally?
 
@@ -38,7 +41,10 @@ Clone the project, read the scripts first, then feel free to run [`build_local.s
 The script is a copy of the steps done in the github action in [`.github/workflows/build_monolithic.yml`](./.github/workflows/build_monolithic.yml).
 It contains some variables to allow for customizations.
 
-This is an [MIT](LICENSE.md) repo. If you break something on your system doing so, it's your fault 😉
+We try to keep [`build_local.sh`](./build_local.sh) synchronized with the action, but sometimes might miss a step.
+In case of issues with the local build compare the script to the steps in [`.github/workflows/build_monolithic.yml`](./.github/workflows/build_monolithic.yml) and possibly open an issue.
+
+Note, that this is an [MIT](LICENSE.md) repo. If you break something on your system doing so, it's your fault 😉
 
 ## Can I contribute?
 

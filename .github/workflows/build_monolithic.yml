@@ -12,7 +12,6 @@ env:
     MACOSX_DEPLOYMENT_TARGET: 10.14
     # directories / files inside the downloaded tar file directory structure
     WINE_CONFIGURE: ${{ github.workspace }}/sources/wine/configure
-    DXVK_BUILDSCRIPT: ${{ github.workspace }}/sources/dxvk/package-release.sh
     # build directories
     BUILDROOT: ${{ github.workspace }}/build
     LLVM_BUILDDIR: ${{ github.workspace }}/build/llvm
@@ -20,6 +19,7 @@ env:
     # target directory for installation
     INSTALLROOT: ${{ github.workspace }}/install
     TOOLS_INSTALLATION: build-tools-cx
+    MOLTENVK_DXVK_INSTALLATION: moltenvk-dxvk
 
 jobs:
   llvm-clang:
@@ -45,9 +45,10 @@ jobs:
 
       - name: Get and Extract Source
         if:  steps.cache_llvm_clang.outputs.cache-hit != 'true'
-        run:  |
-          curl -o ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz ${{ env.CROSS_OVER_SOURCE_URL }}
-          tar xf ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz
+        uses: ./.github/actions/get_source
+        with:
+          crossover-local-file: "${{ env.CROSS_OVER_LOCAL_FILE }}"
+          crossover-source-url: "${{ env.CROSS_OVER_SOURCE_URL }}"
 
       - name: Build / Install LLVM and Clang (if restore from cache failed)
         if:  steps.cache_llvm_clang.outputs.cache-hit != 'true'
@@ -57,7 +58,7 @@ jobs:
           llvm-makedir: ${{ github.workspace }}/sources/clang/llvm
           clang-makedir: ${{ github.workspace }}/sources/clang/clang
 
-      ############ Upload LLVM / Clang to be used in subsequent job steps ##############
+      ############ Upload LLVM / Clang to be used in subsequent jobs ##############
 
       - name: Tar Build Tools
         run: |
@@ -73,8 +74,60 @@ jobs:
           name: ${{ env.TOOLS_INSTALLATION }}
           path: ${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}.tar.gz
 
+
+  moltenVK_DXVK:
+    runs-on:  macos-10.15
+    env:
+      # crossover source code to be downloaded
+      CROSS_OVER_SOURCE_URL: https://media.codeweavers.com/pub/crossover/source/crossover-sources-21.1.0.tar.gz
+      CROSS_OVER_LOCAL_FILE: crossover-21.1.0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      ############ Restore MoltenVK / DXVK from cache ##############
+
+      - name: Restore MoltenVK / DXVK from cache
+        uses: actions/cache@v2
+        id: cache_moltenVK_DXVK
+        with:
+          path: ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}
+          key: cache_moltenVK_DXVK_v2
+
+      ############ Build MoltenVK / DXVK (if restore from cache failed) ##############
+
+      - name: Get and Extract Source
+        if:  steps.cache_moltenVK_DXVK.outputs.cache-hit != 'true'
+        uses: ./.github/actions/get_source
+        with:
+          crossover-local-file: "${{ env.CROSS_OVER_LOCAL_FILE }}"
+          crossover-source-url: "${{ env.CROSS_OVER_SOURCE_URL }}"
+
+      - name: Build / Install MoltenVK and DXVK (if restore from cache failed)
+        if:  steps.cache_moltenVK_DXVK.outputs.cache-hit != 'true'
+        uses: ./.github/actions/build_moltenvk_dxvk
+        with:
+          install-prefix: "${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}"
+
+      ############ Upload MoltenVK / DXVK to be used in subsequent jobs ##############
+
+      - name: Tar MoltenVK / DXVK
+        run: |
+          set -x
+          pushd ${{ env.INSTALLROOT }}
+          tar -czf ${{ env.MOLTENVK_DXVK_INSTALLATION }}.tar.gz ${{ env.MOLTENVK_DXVK_INSTALLATION }}
+          ls -alt
+          popd
+
+      - name: Upload MoltenVK / DXVK
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.MOLTENVK_DXVK_INSTALLATION }}
+          path: ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}.tar.gz
+
+
   wine-crossover:
-    needs: llvm-clang
+    needs: [llvm-clang, moltenVK_DXVK]
 
     strategy:
       fail-fast: false
@@ -98,27 +151,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install Wine Dependencies
+      - name: Install Wine Build Dependencies
         run: |
-          brew install  freetype         \
-                        bison            \
-                        krb5             \
-                        faudio           \
-                        sdl2             \
+          brew install  bison            \
+                        flex             \
+                        mingw-w64        \
+                        pkgconfig
+
+      - name: Install Wine Runtime Dependencies
+        run: |
+          brew install  faudio           \
+                        freetype         \
                         gphoto2          \
-                        sane-backends    \
                         gst-plugins-base \
-                        mpg123           \
+                        krb5             \
                         little-cms2      \
                         libpng           \
-                        mingw-w64        \
-                        molten-vk
+                        molten-vk        \
+                        mpg123           \
+                        sane-backends    \
+                        sdl2
 
-      - name: Add bison & krb5 to $PATH
+      - name: Add bison, flex & krb5 to $PATH
         run: |
           set -x
           echo "$(brew --prefix bison)/bin" >> $GITHUB_PATH
-          echo "$(brew --prefix krb5)/bin" >> $GITHUB_PATH
+          echo "$(brew --prefix flex)/bin"  >> $GITHUB_PATH
+          echo "$(brew --prefix krb5)/bin"  >> $GITHUB_PATH
 
       - name: Download llvm/clang (from previous job)
         uses: actions/download-artifact@v2
@@ -140,16 +199,29 @@ jobs:
           set -x
           echo "${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}/bin" >> $GITHUB_PATH
 
+      - name: Download MoltenVK / DXVK (from previous job)
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.MOLTENVK_DXVK_INSTALLATION }}
+          path: ${{ env.INSTALLROOT }}
+
+      - name: Unpack MoltenVK / DXVK
+        run: |
+          set -x
+          mkdir -p ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}
+          pushd ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}
+          ls -al
+          tar --strip-components=1 -xvf ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}.tar.gz
+          ls -alt
+          popd
 
       ############ Download and Prepare Source Code ##############
 
-      - name: Get Source
-        run:  |
-          curl -o ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz ${{ env.CROSS_OVER_SOURCE_URL }}
-
-      - name: Extract Source
-        run:  |
-          tar xf ${{ env.CROSS_OVER_LOCAL_FILE }}.tar.gz
+      - name: Get and Extract Source
+        uses: ./.github/actions/get_source
+        with:
+          crossover-local-file: "${{ env.CROSS_OVER_LOCAL_FILE }}"
+          crossover-source-url: "${{ env.CROSS_OVER_SOURCE_URL }}"
 
       - name: Patch Add missing distversion.h
         # Patch provided by Josh Dubois, CrossOver product manager, CodeWeavers.
@@ -174,45 +246,45 @@ jobs:
           patch -p1 < ${{ github.workspace }}/msvcrt-sincos.patch
           popd
 
-      - name: Patch DXVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-        run: patch sources/dxvk/src/util/rc/util_rc_ptr.h < dxvk_util_rc_ptr.patch
+      ############ Build VKD3D ##############
+      - name: Build VKD3D
+        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        run: |
+          brew install  automake
 
+          pushd sources/vkd3d
 
-      ############ Build DXVK ##############
+          ./autogen.sh
 
-      #- name: Install Dependencies for DXVK
-      #  run: |
-      #    brew install  coreutils \
-      #                  meson     \
-      #                  glslang
+          ln -s $(brew --prefix mingw-w64)/toolchain-x86_64/bin/x86_64-w64-mingw32-widl ./bin/widl
+          export PATH=./bin:$PATH
 
-      #- name: Build DXVK
-      #  if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-      #  run: |
-      #    set -x
-      #    PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ${{ env.DXVK_BUILDSCRIPT }} master ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }} --no-package
+          CPPFLAGS="-I ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/include/" ./configure --without-ncurses
+          make -j
+          make install
+          popd
 
-      #- name: Tar DXVK
-      #  if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-      #  run: |
-      #    set -x
-      #    pushd ${{ env.INSTALLROOT }}
-      #    tar -czf ${{ env.DXVK_INSTALLATION }}.tar.gz ${{ env.DXVK_INSTALLATION }}
-      #    popd
-
-      #- name: Upload DXVK
-      #  if: startsWith(matrix.CROSS_OVER_VERSION, '20')
-      #  uses: actions/upload-artifact@v2
-      #  with:
-      #    name: ${{ env.DXVK_INSTALLATION }}
-      #    path: ${{ env.INSTALLROOT }}/${{ env.DXVK_INSTALLATION }}.tar.gz
-
+      ############ Install VKD3D ##############
+      - name: Install VKD3D
+        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        run: |
+          pushd sources/vkd3d
+          make install-exec-am DESTDIR="${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
+          popd
 
       ############ Configure 64bit Version ##############
 
-      - name: Configure wine64 (specific to 2x)
-        if: startsWith(matrix.CROSS_OVER_VERSION, '2')
+      - name: Configure wine64 (specific to 21)
+        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        uses: ./.github/actions/configure_wine
+        with:
+          winearch: "wine64"
+          build-dir: "${{ env.BUILDROOT }}/wine64"
+          crossflags: "-g -O2"
+          configure-params: "--enable-win64 --with-vulkan --with-vkd3d"
+
+      - name: Configure wine64 (specific to 20)
+        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         uses: ./.github/actions/configure_wine
         with:
           winearch: "wine64"
@@ -276,6 +348,24 @@ jobs:
         with:
           build-dir: "${{ env.BUILDROOT }}/wine64"
           install-dir: "${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
+
+      - name: Create wine, wine-preloader symlinks
+        run: |
+          pushd ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/bin
+          ln -s wine32on64 wine
+          ln -s wine32on64-preloader wine-preloader
+          popd
+
+      ############ Add rpath to VKD3D, MoltenVK libs ##############
+
+      - name: Add rpath entry for VKD3D, MoltenVK
+        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
+        run: |
+          pushd ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/bin
+          install_name_tool -add_rpath @executable_path/../lib wine64
+          install_name_tool -add_rpath @executable_path/../lib wine64-preloader
+          install_name_tool -add_rpath @executable_path/../lib vkd3d-compiler
+          popd
 
       ############ Bundle and Upload Deliverable ##############
 
