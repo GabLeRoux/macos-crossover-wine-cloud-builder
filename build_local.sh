@@ -7,7 +7,7 @@ echo Wine-Crossover-MacOS
 export GITHUB_WORKSPACE=$(pwd)
 
 if [ -z "$CROSS_OVER_VERSION" ]; then
-    export CROSS_OVER_VERSION=21.1.0
+    export CROSS_OVER_VERSION=21.2.0
     echo "CROSS_OVER_VERSION not set building crossover-wine-${CROSS_OVER_VERSION}"
 fi
 
@@ -16,6 +16,7 @@ export MACOSX_DEPLOYMENT_TARGET=10.14
 # crossover source code to be downloaded
 export CROSS_OVER_SOURCE_URL=https://media.codeweavers.com/pub/crossover/source/crossover-sources-${CROSS_OVER_VERSION}.tar.gz
 export CROSS_OVER_LOCAL_FILE=crossover-${CROSS_OVER_VERSION}
+export CROSS_OVER_LLVM=21.2.0
 # directories / files inside the downloaded tar file directory structure
 export LLVM_MAKEDIR=$GITHUB_WORKSPACE/sources/$([[ ${CROSS_OVER_VERSION} == 2?.* ]] && echo "clang/llvm" || echo "llvm")
 export CLANG_MAKEDIR=$GITHUB_WORKSPACE/sources/$([[ ${CROSS_OVER_VERSION} == 2?.* ]] && echo "clang/clang" || echo "clang")
@@ -87,8 +88,8 @@ tar xf ${CROSS_OVER_LOCAL_FILE}.tar.gz
 
 if [[ "${CROSS_OVER_VERSION}" == "20.0.1" || "${CROSS_OVER_VERSION}" == "20.0.2"  ]]; then
     echo Add missing llvm/clang
-    curl -o crossover-21.1.0.tar.gz https://media.codeweavers.com/pub/crossover/source/crossover-sources-21.1.0.tar.gz
-    tar -xf crossover-21.1.0.tar.gz sources/clang
+    curl -o crossover-${CROSS_OVER_LLVM}.tar.gz https://media.codeweavers.com/pub/crossover/source/crossover-sources-${CROSS_OVER_LLVM}.tar.gz
+    tar -xf crossover-${CROSS_OVER_LLVM} sources/clang
 fi
 
 echo "Patch Add missing distversion.h"
