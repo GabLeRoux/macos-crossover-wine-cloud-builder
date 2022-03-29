@@ -153,6 +153,7 @@ jobs:
 
       - name: Install Wine Build Dependencies
         run: |
+          brew update
           brew install  bison            \
                         flex             \
                         mingw-w64        \
