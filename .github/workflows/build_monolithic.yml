@@ -151,6 +151,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Get latest HomeBrew formulas/bottles
+        run: |
+          brew update
+
       - name: Install Wine Build Dependencies
         run: |
           brew install  bison            \

@@ -25,6 +25,11 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Get latest HomeBrew formulas/bottles
+      shell: bash
+      run: |
+        brew update
+
     - name: Install LLVM / Clang build dependencies
       shell: bash
       run: |

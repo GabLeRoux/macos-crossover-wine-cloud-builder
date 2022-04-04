@@ -45,6 +45,11 @@ runs:
       shell: bash
       run: patch ${{ inputs.crossover-source }}/dxvk/src/d3d11/d3d11_include.h < dxvk_d3d11_include_h.patch
 
+    - name: Get latest HomeBrew formulas/bottles
+      shell: bash
+      run: |
+        brew update
+
     - name: Install Dependencies for DXVK
       shell: bash
       run: |
