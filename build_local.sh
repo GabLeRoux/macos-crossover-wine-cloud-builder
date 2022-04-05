@@ -51,6 +51,9 @@ export -f ibrew
 # Make sure Intel brew Install is before a possible Apple Silicon brew
 export PATH="/usr/local/bin:/usr/local/sbin:${PATH}"
 
+echo Getting latest HomeBrew formulas/bottles
+ibrew update
+
 echo Installing Dependencies
 # build dependencies
 ibrew install  bison            \
