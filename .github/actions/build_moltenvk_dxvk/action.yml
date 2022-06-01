@@ -14,6 +14,13 @@ runs:
   using: "composite"
   steps:
 
+    - name: Patch DXVK for GCC12 support
+      shell: bash
+      run: |
+        pushd ${{ inputs.crossover-source }}/dxvk
+        patch -p1 < ${{ github.workspace }}/0002-fixes-for-mingw-gcc-12.patch
+        popd
+
     ############ Build and Install MoltenVK ##############
     - name: Build MoltenVK
       shell: bash
