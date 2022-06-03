@@ -1,0 +1,32 @@
+From 1ba34b47e134a845ebd21b99b95e62753e2cc797 Mon Sep 17 00:00:00 2001
+From: oltolm <oleg.tolmatcev@gmail.com>
+Date: Mon, 4 Jan 2021 00:52:43 +0100
+Subject: [PATCH 2/3] fix d3d11 header for MinGW 9 (#1883)
+
+---
+ src/d3d11/d3d11_include.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/d3d11/d3d11_include.h b/src/d3d11/d3d11_include.h
+index 7daaf4e2..10aaf9c8 100644
+--- a/src/d3d11/d3d11_include.h
++++ b/src/d3d11/d3d11_include.h
+@@ -25,6 +25,7 @@
+ // directly, although others from the same header work.
+ // Some structures are missing from the mingw headers.
+ #ifndef _MSC_VER
++#if !defined(__MINGW64_VERSION_MAJOR) || __MINGW64_VERSION_MAJOR < 9
+ typedef enum D3D11_FORMAT_SUPPORT2 { 
+   D3D11_FORMAT_SUPPORT2_UAV_ATOMIC_ADD                                = 0x1,
+   D3D11_FORMAT_SUPPORT2_UAV_ATOMIC_BITWISE_OPS                        = 0x2,
+@@ -41,6 +42,7 @@ typedef enum D3D11_FORMAT_SUPPORT2 {
+ } D3D11_FORMAT_SUPPORT2;
+ #define D3D11_RESOURCE_MISC_TILE_POOL (0x20000)
+ #define D3D11_RESOURCE_MISC_TILED     (0x40000)
++#endif // !defined(__MINGW64_VERSION_MAJOR) || __MINGW64_VERSION_MAJOR < 9
+ #ifndef __WINE__
+ 
+ //MinGW-Headers supports these typedefs since 6.0.0
+-- 
+2.32.0 (Apple Git-132)
+
