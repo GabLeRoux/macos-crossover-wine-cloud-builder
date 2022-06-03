@@ -75,7 +75,7 @@ runs:
         set -x
         pushd ${{ inputs.crossover-source }}/dxvk
 
-        PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ./package-release.sh master ./install --no-package
+        ./package-release.sh master ${{ inputs.crossover-source }}/dxvk/install --no-package
         popd
 
     - name: Install DXVK
