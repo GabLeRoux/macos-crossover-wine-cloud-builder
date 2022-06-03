@@ -92,7 +92,7 @@ jobs:
         id: cache_moltenVK_DXVK
         with:
           path: ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}
-          key: cache_moltenVK_DXVK_v4
+          key: cache_moltenVK_DXVK_v5
 
       ############ Build MoltenVK / DXVK (if restore from cache failed) ##############
 
