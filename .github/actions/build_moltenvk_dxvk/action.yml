@@ -82,7 +82,7 @@ runs:
       shell: bash
       run: |
         set -x
-        pushd ${{ inputs.crossover-source }}/dxvk/install/dxvk-master
+        pushd ${{ inputs.crossover-source }}/dxvk/install/dxvk-macOS-master
 
         echo Installing DXVK dlls...
         mkdir -p ${{ inputs.install-prefix }}/usr/local/lib64/wine
