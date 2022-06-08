@@ -1,7 +1,7 @@
-From 862dfb9bcdd43fa746ce4e0a15521b083af3b057 Mon Sep 17 00:00:00 2001
+From 277ea7306703288c2453ddd767178f35a40b73b0 Mon Sep 17 00:00:00 2001
 From: Gcenx <38226388+Gcenx@users.noreply.github.com>
 Date: Tue, 17 May 2022 20:07:12 -0400
-Subject: [PATCH 2/2] fixes for mingw-gcc-12
+Subject: [PATCH 3/3] fixes for mingw-gcc-12
 
 ---
  meson.build                     | 2 +-
@@ -14,7 +14,7 @@ Subject: [PATCH 2/2] fixes for mingw-gcc-12
  7 files changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 7ced6ffb..dcfbcf82 100644
+index a33bebe9..2f5e6d1b 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -1,4 +1,4 @@
@@ -94,5 +94,5 @@ index 97108ea6..dd416d55 100644
  
  namespace dxvk::vk {
 -- 
-2.21.1 (Apple Git-122.3)
+2.32.0 (Apple Git-132)
 

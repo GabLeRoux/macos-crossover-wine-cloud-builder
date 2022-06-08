@@ -37,7 +37,7 @@ Afterwards inside `./wine-cx/usr/local/bin` you will find the `wine32on64` and `
 ## Can I run the build locally?
 
 It will only work if you're on macOS, but yes.
-Clone the project, read the scripts first, then feel free to run [`build_local.sh`](./build_local.sh) 👍.
+Clone the project, read the scripts first, then feel free to run [`build_local.command`](./build_local.command) 👍.
 The script is a copy of the steps done in the github action in [`.github/workflows/build_monolithic.yml`](./.github/workflows/build_monolithic.yml).
 It contains some variables to allow for customizations.
 

@@ -1,10 +1,6 @@
 name: Wine-Crossover-MacOS-local
 
 on:
-  #push:
-  #  branches: [ main ]
-  #pull_request:
-  #  branches: [ main ]
   workflow_dispatch:
 
 env:
@@ -17,9 +13,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        CROSS_OVER_VERSION: [21.2.0, 20.0.4, 19.0.2] # 21.1.0, 21.0.0, 20.0.2, 20.0.1, 20.0.0
+        CROSS_OVER_VERSION: [21.2.0] # 20.0.4, 19.0.2, 21.1.0, 21.0.0, 20.0.2, 20.0.1, 20.0.0
 
-    runs-on:  macos-10.15
+    runs-on:  macos-latest
 
     env:
       CROSS_OVER_VERSION: ${{ matrix.CROSS_OVER_VERSION }}
@@ -31,3 +27,9 @@ jobs:
 
       - name: Run build_local.sh
         run: ./build_local.sh
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts-build_local-wine-cx${{ matrix.CROSS_OVER_VERSION }}
+          path: ${{ env.PACKAGE_UPLOAD }}

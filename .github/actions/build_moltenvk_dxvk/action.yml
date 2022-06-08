@@ -14,11 +14,13 @@ runs:
   using: "composite"
   steps:
 
-    - name: Patch DXVK for GCC12 support
+    - name: Applying patches to DXVK
       shell: bash
       run: |
         pushd ${{ inputs.crossover-source }}/dxvk
-        patch -p1 < ${{ github.workspace }}/0002-fixes-for-mingw-gcc-12.patch
+        patch -p1 < ${{ github.workspace }}/0001-build-macOS-Fix-up-for-macOS.patch
+        patch -p1 < ${{ github.workspace }}/0002-fix-d3d11-header-for-MinGW-9-1883.patch
+        patch -p1 < ${{ github.workspace }}/0003-fixes-for-mingw-gcc-12.patch
         popd
 
     - name: Patch MoltenVK for Monterey support (no python 2.7 any more)
@@ -55,10 +57,6 @@ runs:
         popd
 
     ############ Build and Install DXVK ##############
-    - name: Patch DXVK to remove duplicate definition of D3D11_FORMAT_SUPPORT2
-      shell: bash
-      run: patch ${{ inputs.crossover-source }}/dxvk/src/d3d11/d3d11_include.h < dxvk_d3d11_include_h.patch
-
     - name: Get latest HomeBrew formulas/bottles
       shell: bash
       run: |
@@ -67,8 +65,7 @@ runs:
     - name: Install Dependencies for DXVK
       shell: bash
       run: |
-        brew install  coreutils \
-                      glslang   \
+        brew install  glslang   \
                       mingw-w64 \
                       meson
 
@@ -78,41 +75,21 @@ runs:
         set -x
         pushd ${{ inputs.crossover-source }}/dxvk
 
-        # disable building the 32bit version
-        # sed -i "" "s/build_arch 32/# build_arch 32/g" ./package-release.sh
-
-        PATH="$(brew --prefix coreutils)/libexec/gnubin:${PATH}" ./package-release.sh master ./install --no-package
+        ./package-release.sh master ${{ inputs.crossover-source }}/dxvk/install --no-package
         popd
 
     - name: Install DXVK
       shell: bash
       run: |
         set -x
-        pushd ${{ inputs.crossover-source }}/dxvk/install/dxvk-master
+        pushd ${{ inputs.crossover-source }}/dxvk/install/dxvk-macOS-master
 
         echo Installing DXVK dlls...
-        mkdir -p ${{ inputs.install-prefix }}/usr/local/lib/wine
-        cp -r x32 ${{ inputs.install-prefix }}/usr/local/lib/wine/dxvk
         mkdir -p ${{ inputs.install-prefix }}/usr/local/lib64/wine
         cp -r x64 ${{ inputs.install-prefix }}/usr/local/lib64/wine/dxvk
 
         echo Installing DXVK setup script...
         mkdir -p ${{ inputs.install-prefix }}/usr/local/bin
         cp setup_dxvk.sh ${{ inputs.install-prefix }}/usr/local/bin/
-
-
-        echo Patching DXVK setup script...
-
-        sed -i "" 's|"x32"|"../lib/wine/dxvk"|g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
-        sed -i "" 's|"x64"|"../lib64/wine/dxvk"|g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
-
-        sed -i "" 's|readlink|greadlink|g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
-
-        sed -i "" 's|wine_path=|wine_path="\${basedir}" # |g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
-
-        sed -i "" 's|wine="wine"|wine="\${basedir}/wine"|g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
-        sed -i "" 's|wine64="wine64"|wine64="\${basedir}/wine64"|g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
-
-        sed -i "" 's|\$wineboot -u|\$wine \$wineboot -u|g' ${{ inputs.install-prefix }}/usr/local/bin/setup_dxvk.sh
 
         popd

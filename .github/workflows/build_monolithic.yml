@@ -92,7 +92,7 @@ jobs:
         id: cache_moltenVK_DXVK
         with:
           path: ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}
-          key: cache_moltenVK_DXVK_v4
+          key: cache_moltenVK_DXVK_v5
 
       ############ Build MoltenVK / DXVK (if restore from cache failed) ##############
 
@@ -385,3 +385,32 @@ jobs:
         with:
           name: ${{ env.WINE_INSTALLATION }}
           path: ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}.tar.gz
+
+  wine-crossover-local:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        CROSS_OVER_VERSION: [21.2.0] # 20.0.4, 19.0.2, 21.1.0, 21.0.0, 20.0.2, 20.0.1, 20.0.0
+
+    runs-on:  macos-latest
+    needs: wine-crossover
+
+    env:
+      CROSS_OVER_VERSION: ${{ matrix.CROSS_OVER_VERSION }}
+      # this has to be synchronized with the same variable in build_local.sh
+      PACKAGE_UPLOAD: ${{ github.workspace }}/upload
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Run build_local.sh
+        run: ./build_local.sh
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts-build_local-wine-cx${{ matrix.CROSS_OVER_VERSION }}
+          path: ${{ env.PACKAGE_UPLOAD }}
