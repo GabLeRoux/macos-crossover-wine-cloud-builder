@@ -1,0 +1,24 @@
+name: CI Releases
+
+on:
+  push:
+    tags:
+      - '*'
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download artifact
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        workflow: build_local.yml
+        workflow_conclusion: success
+        path: ./artifacts/
+        event: push
+    - name: Release
+      uses: fnkr/github-action-ghr@v1
+      env:
+        GHR_COMPRESS: zip
+        GHR_PATH: ./upload/
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
