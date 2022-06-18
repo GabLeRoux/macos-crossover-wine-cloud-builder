@@ -14,67 +14,12 @@ env:
     WINE_CONFIGURE: ${{ github.workspace }}/sources/wine/configure
     # build directories
     BUILDROOT: ${{ github.workspace }}/build
-    LLVM_BUILDDIR: ${{ github.workspace }}/build/llvm
-    CLANG_BUILDDIR: ${{ github.workspace }}/build/clang
     # target directory for installation
     INSTALLROOT: ${{ github.workspace }}/install
     TOOLS_INSTALLATION: build-tools-cx
     MOLTENVK_DXVK_INSTALLATION: moltenvk-dxvk
 
 jobs:
-  llvm-clang:
-    runs-on:  macos-latest
-    env:
-      # crossover source code to be downloaded
-      CROSS_OVER_SOURCE_URL: https://media.codeweavers.com/pub/crossover/source/crossover-sources-21.2.0.tar.gz
-      CROSS_OVER_LOCAL_FILE: crossover-21.2.0
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      ############ Restore LLVM / Clang from cache ##############
-
-      - name: Restore LLVM / Clang from cache
-        uses: actions/cache@v2
-        id: cache_llvm_clang
-        with:
-          path: ${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}
-          key: llvm_clang_v1
-
-      ############ Build LLVM / Clang (if restore from cache failed) ##############
-
-      - name: Get and Extract Source
-        if:  steps.cache_llvm_clang.outputs.cache-hit != 'true'
-        uses: ./.github/actions/get_source
-        with:
-          crossover-local-file: "${{ env.CROSS_OVER_LOCAL_FILE }}"
-          crossover-source-url: "${{ env.CROSS_OVER_SOURCE_URL }}"
-
-      - name: Build / Install LLVM and Clang (if restore from cache failed)
-        if:  steps.cache_llvm_clang.outputs.cache-hit != 'true'
-        uses: ./.github/actions/build_llvm_clang
-        with:
-          install-prefix: ${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}
-          llvm-makedir: ${{ github.workspace }}/sources/clang/llvm
-          clang-makedir: ${{ github.workspace }}/sources/clang/clang
-
-      ############ Upload LLVM / Clang to be used in subsequent jobs ##############
-
-      - name: Tar Build Tools
-        run: |
-          set -x
-          pushd ${{ env.INSTALLROOT }}
-          tar -czf ${{ env.TOOLS_INSTALLATION }}.tar.gz ${{ env.TOOLS_INSTALLATION }}
-          ls -alt
-          popd
-
-      - name: Upload Build Tools
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.TOOLS_INSTALLATION }}
-          path: ${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}.tar.gz
-
-
   moltenVK_DXVK:
     runs-on:  macos-latest
     env:
@@ -127,7 +72,7 @@ jobs:
 
 
   wine-crossover:
-    needs: [llvm-clang, moltenVK_DXVK]
+    needs: [moltenVK_DXVK]
 
     strategy:
       fail-fast: false
@@ -157,51 +102,33 @@ jobs:
 
       - name: Install Wine Build Dependencies
         run: |
-          brew install  bison            \
-                        flex             \
-                        mingw-w64        \
+          brew install  bison              \
+                        gcenx/wine/cx-llvm \
+                        flex               \
+                        mingw-w64          \
                         pkgconfig
 
       - name: Install Wine Runtime Dependencies
         run: |
-          brew install  faudio           \
-                        freetype         \
-                        gphoto2          \
-                        gst-plugins-base \
-                        krb5             \
-                        little-cms2      \
-                        libpng           \
-                        molten-vk        \
-                        mpg123           \
-                        sane-backends    \
+          brew install  faudio             \
+                        freetype           \
+                        gphoto2            \
+                        gst-plugins-base   \
+                        krb5               \
+                        little-cms2        \
+                        libpng             \
+                        molten-vk          \
+                        mpg123             \
+                        sane-backends      \
                         sdl2
 
-      - name: Add bison, flex & krb5 to $PATH
+      - name: Add bison, cx-llvm, flex & krb5 to $PATH
         run: |
           set -x
-          echo "$(brew --prefix bison)/bin" >> $GITHUB_PATH
-          echo "$(brew --prefix flex)/bin"  >> $GITHUB_PATH
-          echo "$(brew --prefix krb5)/bin"  >> $GITHUB_PATH
-
-      - name: Download llvm/clang (from previous job)
-        uses: actions/download-artifact@v2
-        with:
-          name: ${{ env.TOOLS_INSTALLATION }}
-          path: ${{ env.INSTALLROOT }}
-
-      - name: Unpack llvm/clang
-        run: |
-          set -x
-          pushd ${{ env.INSTALLROOT }}
-          ls -al
-          tar -xvf ${{ env.TOOLS_INSTALLATION }}.tar.gz
-          ls -alt
-          popd
-
-      - name: Add llvm/clang to $PATH
-        run: |
-          set -x
-          echo "${{ env.INSTALLROOT }}/${{ env.TOOLS_INSTALLATION }}/bin" >> $GITHUB_PATH
+          echo "$(brew --prefix bison)/bin"   >> $GITHUB_PATH
+          echo "$(brew --prefix cx-llvm)/bin" >> $GITHUB_PATH
+          echo "$(brew --prefix flex)/bin"    >> $GITHUB_PATH
+          echo "$(brew --prefix krb5)/bin"    >> $GITHUB_PATH
 
       - name: Download MoltenVK / DXVK (from previous job)
         uses: actions/download-artifact@v2
