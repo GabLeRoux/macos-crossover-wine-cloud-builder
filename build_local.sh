@@ -232,7 +232,7 @@ popd
 
 echo "Build wine32on64-${CROSS_OVER_VERSION}"
 pushd ${BUILDROOT}/wine32on64-${CROSS_OVER_VERSION}
-make -j$(sysctl -n hw.activecpu 2>/dev/null)
+make -k -j$(sysctl -n hw.activecpu 2>/dev/null)
 popd
 
 
