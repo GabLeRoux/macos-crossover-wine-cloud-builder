@@ -25,51 +25,10 @@ jobs:
     env:
       # crossover source code to be downloaded
       CROSS_OVER_SOURCE_URL: https://media.codeweavers.com/pub/crossover/source/crossover-sources-21.2.0.tar.gz
-      CROSS_OVER_LOCAL_FILE: crossover-21.2.0
+      CROSS_OVER_LOCAL_FILE: crossover-22.0.0
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      ############ Restore MoltenVK / DXVK from cache ##############
-
-      - name: Restore MoltenVK / DXVK from cache
-        uses: actions/cache@v2
-        id: cache_moltenVK_DXVK
-        with:
-          path: ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}
-          key: cache_moltenVK_DXVK_v5
-
-      ############ Build MoltenVK / DXVK (if restore from cache failed) ##############
-
-      - name: Get and Extract Source
-        if:  steps.cache_moltenVK_DXVK.outputs.cache-hit != 'true'
-        uses: ./.github/actions/get_source
-        with:
-          crossover-local-file: "${{ env.CROSS_OVER_LOCAL_FILE }}"
-          crossover-source-url: "${{ env.CROSS_OVER_SOURCE_URL }}"
-
-      - name: Build / Install MoltenVK and DXVK (if restore from cache failed)
-        if:  steps.cache_moltenVK_DXVK.outputs.cache-hit != 'true'
-        uses: ./.github/actions/build_moltenvk_dxvk
-        with:
-          install-prefix: "${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}"
-
-      ############ Upload MoltenVK / DXVK to be used in subsequent jobs ##############
-
-      - name: Tar MoltenVK / DXVK
-        run: |
-          set -x
-          pushd ${{ env.INSTALLROOT }}
-          tar -czf ${{ env.MOLTENVK_DXVK_INSTALLATION }}.tar.gz ${{ env.MOLTENVK_DXVK_INSTALLATION }}
-          ls -alt
-          popd
-
-      - name: Upload MoltenVK / DXVK
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.MOLTENVK_DXVK_INSTALLATION }}
-          path: ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}.tar.gz
-
 
   wine-crossover:
     needs: [moltenVK_DXVK]
@@ -77,7 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        CROSS_OVER_VERSION: [21.2.0, 20.0.4, 19.0.2] # 21.1.0, 21.0.0, 20.0.2, 20.0.1, 20.0.0
+        CROSS_OVER_VERSION: [22.0.0] # 21.2.0, 21.1.0, 21.0.0, 20.0.4, 20.0.2, 20.0.1, 20.0.0, 19.0.2
 
     runs-on:  macos-latest
 
@@ -110,15 +69,11 @@ jobs:
 
       - name: Install Wine Runtime Dependencies
         run: |
-          brew install  faudio             \
-                        freetype           \
+          brew install  freetype           \
                         gphoto2            \
                         gst-plugins-base   \
                         krb5               \
-                        little-cms2        \
-                        libpng             \
                         molten-vk          \
-                        mpg123             \
                         sane-backends      \
                         sdl2
 
