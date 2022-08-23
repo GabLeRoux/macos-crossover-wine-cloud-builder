@@ -30,9 +30,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-  wine-crossover:
-    needs: [moltenVK_DXVK]
-
     strategy:
       fail-fast: false
       matrix:
