@@ -7,7 +7,7 @@ echo Wine-Crossover-MacOS
 export GITHUB_WORKSPACE=$(pwd)
 
 if [ -z "$CROSS_OVER_VERSION" ]; then
-    export CROSS_OVER_VERSION=21.2.0
+    export CROSS_OVER_VERSION=22.0.0
     echo "CROSS_OVER_VERSION not set building crossover-wine-${CROSS_OVER_VERSION}"
 fi
 
@@ -51,15 +51,11 @@ brew install   bison                \
                ninja
 
 # runtime dependencies for crossover-wine
-brew install   faudio               \
-               freetype             \
+brew install   freetype             \
                gnutls               \
                gphoto2              \
                gst-plugins-base     \
-               libpng               \
-               little-cms2          \
                molten-vk            \
-               mpg123               \
                sane-backends        \
                sdl2
 
