@@ -28,7 +28,7 @@ export PACKAGE_UPLOAD=$GITHUB_WORKSPACE/upload
 export WINE_INSTALLATION=wine-cx${CROSS_OVER_VERSION}
 export DXVK_INSTALLATION=dxvk-cx${CROSS_OVER_VERSION}
 
-export VKD3D_PE_CFLAGS= $GITHUB_WORKSPACE/sources/vkd3d/include
+export VKD3D_PE_CFLAGS=$GITHUB_WORKSPACE/sources/vkd3d/include
 
 # Need to ensure Instel brew actually exists
 if ! command -v "/usr/local/bin/brew" &> /dev/null
