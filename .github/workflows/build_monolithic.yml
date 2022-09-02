@@ -77,7 +77,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        CROSS_OVER_VERSION: [21.2.0, 20.0.4, 19.0.2] # 21.1.0, 21.0.0, 20.0.2, 20.0.1, 20.0.0
+        CROSS_OVER_VERSION: [22.0.0, 21.2.0, 20.0.4, 19.0.2] # 21.1.0, 21.0.0, 20.0.2, 20.0.1, 20.0.0
 
     runs-on:  macos-latest
 
@@ -110,17 +110,21 @@ jobs:
 
       - name: Install Wine Runtime Dependencies
         run: |
-          brew install  faudio             \
-                        freetype           \
+          brew install  freetype           \
                         gphoto2            \
                         gst-plugins-base   \
                         krb5               \
-                        little-cms2        \
-                        libpng             \
                         molten-vk          \
-                        mpg123             \
                         sane-backends      \
                         sdl2
+
+      - name: Install Wine Runtime Dependencies (pre 22)
+        if: ${{ matrix.CROSS_OVER_VERSION < '22' }}
+        run: |
+          brew install  faudio             \
+                        little-cms2        \
+                        libpng             \
+                        mpg123
 
       - name: Add bison, cx-llvm, flex & krb5 to $PATH
         run: |
@@ -161,6 +165,14 @@ jobs:
           patch -p1 < ${{ github.workspace }}/distversion.patch
           popd
 
+      - name: Avoid requiring vkd3d-1.4 (specific to 22.0.0)
+        # Modificarion recommended by Brendan Shanks, CodeWeavers.
+        if: ${{ matrix.CROSS_OVER_VERSION == '22.0.0' }}
+        run: |
+          pushd sources/wine/dlls/wined3d
+          sed -i '' -e '/vkd3d_set_log_callback/d' wined3d_main.c
+          popd
+
       - name: Patch ntdll/wcstring.c to prevent crash if a nullptr is supplied to the function
         # Hack by dasmy
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')
@@ -169,53 +181,18 @@ jobs:
           patch -p1 < ${{ github.workspace }}/wcstring.patch
           popd
 
-      - name: Patch msvcrt to export the missing sincos function
-        # https://github.com/wine-mirror/wine/commit/f0131276474997b9d4e593bbf8c5616b879d3bd5
+      - name: Patch msvcrt to export the missing sincos function (specific to 20)
+        # https://gitlab.winehq.org/wine/wine/-/commit/f0131276474997b9d4e593bbf8c5616b879d3bd5
         if: startsWith(matrix.CROSS_OVER_VERSION, '20')
         run: |
           pushd sources/wine
           patch -p1 < ${{ github.workspace }}/msvcrt-sincos.patch
           popd
 
-      ############ Build VKD3D ##############
-      - name: Build VKD3D
-        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
-        run: |
-          brew install  automake
-
-          pushd sources/vkd3d
-
-          ./autogen.sh
-
-          ln -s $(brew --prefix mingw-w64)/toolchain-x86_64/bin/x86_64-w64-mingw32-widl ./bin/widl
-          export PATH=./bin:$PATH
-
-          CPPFLAGS="-I ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/include/" ./configure --without-ncurses
-          make -j
-          make install
-          popd
-
-      ############ Install VKD3D ##############
-      - name: Install VKD3D
-        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
-        run: |
-          pushd sources/vkd3d
-          make install-exec-am DESTDIR="${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}"
-          popd
-
       ############ Configure 64bit Version ##############
 
-      - name: Configure wine64 (specific to 21)
-        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
-        uses: ./.github/actions/configure_wine
-        with:
-          winearch: "wine64"
-          build-dir: "${{ env.BUILDROOT }}/wine64"
-          crossflags: "-g -O2"
-          configure-params: "--enable-win64 --with-vulkan --with-vkd3d"
-
-      - name: Configure wine64 (specific to 20)
-        if: startsWith(matrix.CROSS_OVER_VERSION, '20')
+      - name: Configure wine64 (specific to 22)
+        if: startsWith(matrix.CROSS_OVER_VERSION, '22')
         uses: ./.github/actions/configure_wine
         with:
           winearch: "wine64"
@@ -223,8 +200,8 @@ jobs:
           crossflags: "-g -O2"
           configure-params: "--enable-win64 --with-vulkan"
 
-      - name: Configure wine64 (specific to 19)
-        if: startsWith(matrix.CROSS_OVER_VERSION, '19')
+      - name: Configure wine64 (pre 22)
+        if: ${{ matrix.CROSS_OVER_VERSION < '22' }}
         uses: ./.github/actions/configure_wine
         with:
           winearch: "wine64"
@@ -241,23 +218,23 @@ jobs:
 
       ############ Configure 32on64bit Version ##############
 
-      - name: Configure wine32on64 (specific to 2x)
-        if: startsWith(matrix.CROSS_OVER_VERSION, '2')
+      - name: Configure wine32on64 (specific to 22)
+        if: startsWith(matrix.CROSS_OVER_VERSION, '22')
         uses: ./.github/actions/configure_wine
         with:
           winearch: "wine32on64"
           build-dir: "${{ env.BUILDROOT }}/wine32on64"
           crossflags: "-g -O2"
-          configure-params: "--enable-win32on64 --with-wine64=${{ env.BUILDROOT }}/wine64 --without-cms --without-gstreamer --without-gphoto --without-sane --without-krb5 --disable-winedbg --without-vkd3d --without-vulkan --disable-vulkan_1 --disable-winevulkan"
+          configure-params: "--enable-win32on64 --with-wine64=${{ env.BUILDROOT }}/wine64 --without-openal --without-gstreamer --without-gphoto --without-krb5 --without-sane --without-vulkan --disable-vulkan_1 --disable-winevulkan"
 
-      - name: Configure wine32on64 (specific to 19)
-        if: startsWith(matrix.CROSS_OVER_VERSION, '19')
+      - name: Configure wine32on64 (pre 22)
+        if: ${{ matrix.CROSS_OVER_VERSION < '22' }}
         uses: ./.github/actions/configure_wine
         with:
           winearch: "wine32on64"
           build-dir: "${{ env.BUILDROOT }}/wine32on64"
           crossflags: "-g -O2 -fcommon"
-          configure-params: "--enable-win32on64 --with-wine64=${{ env.BUILDROOT }}/wine64 --without-cms --without-gstreamer --without-gphoto --without-sane --without-krb5 --disable-winedbg --without-vkd3d --without-vulkan --disable-vulkan_1 --disable-winevulkan"
+          configure-params: "--enable-win32on64 --with-wine64=${{ env.BUILDROOT }}/wine64 --without-cms --without-gstreamer --without-gphoto --without-krb5 --without-sane --disable-winedbg --without-vkd3d --without-vulkan --disable-vulkan_1 --disable-winevulkan"
 
       ############ Build 32on64bit Version ##############
 
@@ -287,17 +264,6 @@ jobs:
           ln -s wine32on64-preloader wine-preloader
           popd
 
-      ############ Add rpath to VKD3D, MoltenVK libs ##############
-
-      - name: Add rpath entry for VKD3D, MoltenVK
-        if: startsWith(matrix.CROSS_OVER_VERSION, '21')
-        run: |
-          pushd ${{ env.INSTALLROOT }}/${{ env.WINE_INSTALLATION }}/usr/local/bin
-          install_name_tool -add_rpath @executable_path/../lib wine64
-          install_name_tool -add_rpath @executable_path/../lib wine64-preloader
-          install_name_tool -add_rpath @executable_path/../lib vkd3d-compiler
-          popd
-
       ############ Bundle and Upload Deliverable ##############
 
       - name: Tar Wine
@@ -318,7 +284,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        CROSS_OVER_VERSION: [21.2.0] # 20.0.4, 19.0.2, 21.1.0, 21.0.0, 20.0.2, 20.0.1, 20.0.0
+        CROSS_OVER_VERSION: [22.0.0] # 21.2.0, 20.0.4, 19.0.2, 21.1.0, 21.0.0, 20.0.2, 20.0.1, 20.0.0
 
     runs-on:  macos-latest
     needs: wine-crossover

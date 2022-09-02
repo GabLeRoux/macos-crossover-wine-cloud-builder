@@ -45,10 +45,8 @@ brew update
 echo Installing Dependencies
 # build dependencies
 brew install   bison                \
-               cmake                \
                gcenx/wine/cx-llvm   \
-               mingw-w64            \
-               ninja
+               mingw-w64
 
 # runtime dependencies for crossover-wine
 brew install   faudio               \
@@ -62,6 +60,13 @@ brew install   faudio               \
                mpg123               \
                sane-backends        \
                sdl2
+
+if [[ ${CROSS_OVER_VERSION} < 22.0.0 ]]; then
+    brew install   faudio               \
+                   libpng               \
+                   little-cms2          \
+                   mpg123
+fi
 
 echo "Add bison to PATH"
 export PATH="$(brew --prefix bison)/bin":${PATH}
@@ -89,6 +94,12 @@ pushd sources/wine
 patch -p1 < ${GITHUB_WORKSPACE}/distversion.patch
 popd
 
+# Avoid patching in vkd3d-1.4
+if [[ ${CROSS_OVER_VERSION} == 22.0.0 ]]; then
+    pushd sources/wine/dlls/wined3d
+    sed -i '' -e '/vkd3d_set_log_callback/d' wined3d_main.c
+    popd
+fi
 
 if [[ ${CROSS_OVER_VERSION} == 20.* ]]; then
     echo "Patch wcslen() in ntdll/wcstring.c to prevent crash if a nullptr is suppluied to the function (HACK)"
@@ -97,7 +108,7 @@ if [[ ${CROSS_OVER_VERSION} == 20.* ]]; then
     popd
 
     echo "Patch msvcrt to export the missing sincos function"
-    # https://github.com/wine-mirror/wine/commit/f0131276474997b9d4e593bbf8c5616b879d3bd5
+    # https://gitlab.winehq.org/wine/wine/-/commit/f0131276474997b9d4e593bbf8c5616b879d3bd5
     pushd sources/wine
     patch -p1 < ${GITHUB_WORKSPACE}/msvcrt-sincos.patch
     popd
@@ -157,20 +168,28 @@ pushd ${BUILDROOT}/wine64-${CROSS_OVER_VERSION}
 ${WINE_CONFIGURE} \
         --disable-option-checking \
         --enable-win64 \
+        $([[ ${CROSS_OVER_VERSION} -ge 22.0.0 ]] && echo "--enable-winedbg" || echo "--disable-winedbg") \
         --disable-tests \
         --without-alsa \
         --without-capi \
+        --without-cms \
         --without-dbus \
+        --without-gstreamer \
+        --without-gsm \
+        --without-gphoto \
         --without-inotify \
+        --without-krb5 \
+        --with-mingw \
+        --with-openal \
         --without-oss \
+        --with-png \
         --without-pulse \
+        --without-sane \
+        --with-sdl \
         --without-udev \
         --without-v4l2 \
-        --without-gsm \
-        --with-mingw \
-        --with-png \
-        --with-sdl \
-        --without-krb5 \
+        --without-usb \
+        --without-vkd3d \
         --with-vulkan \
         --without-x
 popd
@@ -203,26 +222,28 @@ pushd ${BUILDROOT}/wine32on64-${CROSS_OVER_VERSION}
 ${WINE_CONFIGURE} \
         --disable-option-checking \
         --enable-win32on64 \
+        $([[ ${CROSS_OVER_VERSION} -ge 22.0.0 ]] && echo "--enable-winedbg" || echo "--disable-winedbg") \
         --with-wine64=${BUILDROOT}/wine64-${CROSS_OVER_VERSION} \
         --disable-tests \
         --without-alsa \
         --without-capi \
-        --without-dbus \
-        --without-inotify \
-        --without-oss \
-        --without-pulse \
-        --without-udev \
-        --without-v4l2 \
-        --disable-winedbg \
         --without-cms \
+        --without-dbus \
         --without-gstreamer \
         --without-gsm \
         --without-gphoto \
-        --without-sane \
-        --with-mingw \
-        --with-png \
-        --with-sdl \
+        --without-inotify \
         --without-krb5 \
+        --with-mingw \
+        $([[ ${CROSS_OVER_VERSION} == 22.0.0 ]] && echo "--without-openal" || echo "--with-openal") \
+        --without-oss \
+        --with-png \
+        --without-pulse \
+        --without-sane \
+        --with-sdl \
+        --without-udev \
+        --without-v4l2 \
+        --without-usb \
         --without-vkd3d \
         --without-vulkan \
         --disable-vulkan_1 \
