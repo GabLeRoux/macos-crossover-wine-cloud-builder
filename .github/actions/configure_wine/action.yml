@@ -64,6 +64,7 @@ runs:
                     --without-oss \
                     --without-pulse \
                     --without-udev \
+                    --without-usb \
                     --without-v4l2 \
                     --without-gsm \
                     --without-quicktime \
