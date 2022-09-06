@@ -94,10 +94,10 @@ pushd sources/wine
 patch -p1 < ${GITHUB_WORKSPACE}/distversion.patch
 popd
 
-# Avoid patching in vkd3d-1.4
+# Patch in vkd3d-1.4
 if [[ ${CROSS_OVER_VERSION} == 22.0.0 ]]; then
-    pushd sources/wine/dlls/wined3d
-    sed -i '' -e '/vkd3d_set_log_callback/d' wined3d_main.c
+    pushd sources/wine
+    patch -p1 < ${GITHUB_WORKSPACE}/CX22.0.0-vkd3d-1.4.patch
     popd
 fi
 

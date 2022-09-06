@@ -165,12 +165,11 @@ jobs:
           patch -p1 < ${{ github.workspace }}/distversion.patch
           popd
 
-      - name: Avoid requiring vkd3d-1.4 (specific to 22.0.0)
-        # Modificarion recommended by Brendan Shanks, CodeWeavers.
+      - name: Patch in vkd3d-1.4 (specific to 22.0.0)
         if: ${{ matrix.CROSS_OVER_VERSION == '22.0.0' }}
         run: |
-          pushd sources/wine/dlls/wined3d
-          sed -i '' -e '/vkd3d_set_log_callback/d' wined3d_main.c
+          pushd sources/wine
+          patch -p1 < ${GITHUB_WORKSPACE}/CX22.0.0-vkd3d-1.4.patch
           popd
 
       - name: Patch ntdll/wcstring.c to prevent crash if a nullptr is supplied to the function
