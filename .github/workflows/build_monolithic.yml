@@ -25,7 +25,7 @@ jobs:
     env:
       # crossover source code to be downloaded
       CROSS_OVER_SOURCE_URL: https://media.codeweavers.com/pub/crossover/source/crossover-sources-21.2.0.tar.gz
-      CROSS_OVER_LOCAL_FILE: crossover-21.2.0
+      CROSS_OVER_LOCAL_FILE: crossover-22.0.0
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -37,7 +37,7 @@ jobs:
         id: cache_moltenVK_DXVK
         with:
           path: ${{ env.INSTALLROOT }}/${{ env.MOLTENVK_DXVK_INSTALLATION }}
-          key: cache_moltenVK_DXVK_v5
+          key: cache_moltenVK_DXVK_v6
 
       ############ Build MoltenVK / DXVK (if restore from cache failed) ##############
 

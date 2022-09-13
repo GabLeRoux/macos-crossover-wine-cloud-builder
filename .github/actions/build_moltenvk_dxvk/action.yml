@@ -23,13 +23,6 @@ runs:
         patch -p1 < ${{ github.workspace }}/0003-fixes-for-mingw-gcc-12.patch
         popd
 
-    - name: Patch MoltenVK for Monterey support (no python 2.7 any more)
-      shell: bash
-      run: |
-        pushd ${{ inputs.crossover-source }}/moltenvk
-        patch < ${{ github.workspace }}/moltenvk_python3.patch
-        popd
-
     ############ Build and Install MoltenVK ##############
     - name: Build MoltenVK
       shell: bash
