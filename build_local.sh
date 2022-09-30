@@ -1,15 +1,28 @@
 #!/usr/bin/env arch -x86_64 bash
 
-set -ex
+set -e
 
-echo Wine-Crossover-MacOS
+printtag() {
+    # GitHub Actions tag format
+    echo "::$1::${2-}"
+}
+
+begingroup() {
+    printtag "group" "$1"
+}
+
+endgroup() {
+    printtag "endgroup"
+}
 
 export GITHUB_WORKSPACE=$(pwd)
 
 if [ -z "$CROSS_OVER_VERSION" ]; then
-    export CROSS_OVER_VERSION=21.2.0
+    export CROSS_OVER_VERSION=22.0.1
     echo "CROSS_OVER_VERSION not set building crossover-wine-${CROSS_OVER_VERSION}"
 fi
+
+export CX_MAJOR="${CROSS_OVER_VERSION:0:2}"
 
 # crossover source code to be downloaded
 export CROSS_OVER_SOURCE_URL=https://media.codeweavers.com/pub/crossover/source/crossover-sources-${CROSS_OVER_VERSION}.tar.gz
@@ -37,38 +50,35 @@ fi
 # Manually configure $PATH
 export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin"
 
-echo Getting latest HomeBrew formulas/bottles
-brew update
 
-echo Installing Dependencies
+begingroup "Installing Dependencies"
 # build dependencies
 brew install   bison                \
                gcenx/wine/cx-llvm   \
                mingw-w64
 
 # runtime dependencies for crossover-wine
-brew install   faudio               \
-               freetype             \
+brew install   freetype             \
                gnutls               \
                gphoto2              \
                gst-plugins-base     \
-               libpng               \
-               little-cms2          \
                molten-vk            \
-               mpg123               \
                sane-backends        \
                sdl2
 
-if [[ ${CROSS_OVER_VERSION} < 22.0.0 ]]; then
-    brew install   faudio           \
-                   libpng           \
-                   little-cms2      \
-                   mpg123
+if [[ ${CX_MAJOR} < 22 ]]; then
+    brew install \
+               faudio               \
+               libpng               \
+               little-cms2          \
+               mpg123
 fi
+endgroup
 
-export BISON="$(brew --prefix bison)/bin/bison"
+
 export CC="$(brew --prefix cx-llvm)/bin/clang"
 export CXX="${CC}++"
+export BISON="$(brew --prefix bison)/bin/bison"
 # Xcode12 by default enables '-Werror,-Wimplicit-function-declaration' (49917738)
 # this causes wine(64) builds to fail so needs to be disabled.
 # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes
@@ -78,7 +88,7 @@ export LDFLAGS="-Wl,-headerpad_max_install_names"
 export MACOSX_DEPLOYMENT_TARGET=10.14
 
 # see https://github.com/Gcenx/macOS_Wine_builds/issues/17#issuecomment-750346843
-export CROSSCFLAGS=$([[ ${CROSS_OVER_VERSION} -le 20.0.2 ]] && echo "-g -O2 -fcommon" || echo "-g -O2")
+export CROSSCFLAGS=$([[ ${CX_MAJOR} < 21 ]] && echo "-g -O2 -fcommon" || echo "-g -O2")
 
 export GPHOTO2_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
 export GPHOTO2_PORT_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
@@ -87,89 +97,93 @@ export ac_cv_lib_soname_MoltenVK="libMoltenVK.dylib"
 export ac_cv_lib_soname_vulkan=""
 
 
-############ Download and Prepare Source Code ##############
-
-echo Get Source
+begingroup "Download & extracting source"
 if [[ ! -f ${CROSS_OVER_LOCAL_FILE}.tar.gz ]]; then
     curl -o ${CROSS_OVER_LOCAL_FILE}.tar.gz ${CROSS_OVER_SOURCE_URL}
 fi
 
-echo Extract Source
+
 if [[ -d "${GITHUB_WORKSPACE}/sources" ]]; then
     rm -rf ${GITHUB_WORKSPACE}/sources
 fi
 tar xf ${CROSS_OVER_LOCAL_FILE}.tar.gz
+endgroup
 
-echo "Patch Add missing distversion.h"
+
+begingroup "Patch Add missing distversion.h"
 # Patch provided by Josh Dubois, CrossOver product manager, CodeWeavers.
 pushd sources/wine
 patch -p1 < ${GITHUB_WORKSPACE}/distversion.patch
 popd
+endgroup
 
-# Patch in vkd3d-1.4
+
 if [[ ${CROSS_OVER_VERSION} == 22.0.0 ]]; then
     pushd sources/wine
     patch -p1 < ${GITHUB_WORKSPACE}/CX22.0.0-vkd3d-1.4.patch
     popd
 fi
 
-if [[ ${CROSS_OVER_VERSION} == 20.* ]]; then
-    echo "Patch wcslen() in ntdll/wcstring.c to prevent crash if a nullptr is supplied to the function (HACK)"
+if [[ ${CX_MAJOR} == 20 ]]; then
+    begingroup "Patch wcslen() in ntdll/wcstring.c to prevent crash if a nullptr is supplied to the function (HACK)"
     pushd sources/wine
     patch -p1 < ${GITHUB_WORKSPACE}/wcstring.patch
     popd
+    endgroup
 
-    echo "Patch msvcrt to export the missing sincos function"
+    begingroup "Patch msvcrt to export the missing sincos function"
     # https://gitlab.winehq.org/wine/wine/-/commit/f0131276474997b9d4e593bbf8c5616b879d3bd5
     pushd sources/wine
     patch -p1 < ${GITHUB_WORKSPACE}/msvcrt-sincos.patch
     popd
+    endgroup
 fi
 
 
-############ Build DXVK ##############
-
-if [[ ${CROSS_OVER_VERSION} == 21.* ]]; then
+if [[ ${CX_MAJOR} -ge 21 ]]; then
     if [[ ! -f "${PACKAGE_UPLOAD}/${DXVK_INSTALLATION}.tar.gz" ]]; then
-        echo "Applying patches to DXVK"
+        begingroup "Applying patches to DXVK"
         pushd sources/dxvk
         patch -p1 < ${GITHUB_WORKSPACE}/0001-build-macOS-Fix-up-for-macOS.patch
         patch -p1 < ${GITHUB_WORKSPACE}/0002-fix-d3d11-header-for-MinGW-9-1883.patch
         patch -p1 < ${GITHUB_WORKSPACE}/0003-fixes-for-mingw-gcc-12.patch
         popd
+        endgroup
 
-        echo "Installing dependencies for DXVK"
+        begingroup "Installing dependencies for DXVK"
         brew install  meson     \
                       glslang
+        endgroup
 
-        echo "Build DXVK"
+        begingroup "Build DXVK"
         ${DXVK_BUILDSCRIPT} master ${INSTALLROOT}/${DXVK_INSTALLATION} --no-package
+        endgroup
 
-        echo "Tar DXVK"
+        begingroup "Tar DXVK"
         pushd ${INSTALLROOT}
         tar -czf ${DXVK_INSTALLATION}.tar.gz ${DXVK_INSTALLATION}
         popd
+        endgroup
 
-        echo "Upload DXVK"
+        begingroup "Upload DXVK"
         mkdir -p ${PACKAGE_UPLOAD}
         cp ${INSTALLROOT}/${DXVK_INSTALLATION}.tar.gz ${PACKAGE_UPLOAD}/
+        endgroup
     fi
 fi
 
-############ Build 64bit Version ##############
 
-echo "Configure wine64-${CROSS_OVER_VERSION}"
-
+begingroup "Configure wine64-${CROSS_OVER_VERSION}"
 mkdir -p ${BUILDROOT}/wine64-${CROSS_OVER_VERSION}
 pushd ${BUILDROOT}/wine64-${CROSS_OVER_VERSION}
 ${WINE_CONFIGURE} \
         --disable-option-checking \
         --enable-win64 \
-        $([[ ${CROSS_OVER_VERSION} -ge 22.0.0 ]] && echo "--enable-winedbg" || echo "--disable-winedbg") \
+        $([[ ${CX_MAJOR} -ge 22 ]] && echo "--enable-winedbg" || echo "--disable-winedbg") \
         --disable-tests \
         --without-alsa \
         --without-capi \
-        --without-cms \
+        --with-cms \
         --without-dbus \
         --without-gstreamer \
         --without-gsm \
@@ -190,23 +204,23 @@ ${WINE_CONFIGURE} \
         --with-vulkan \
         --without-x
 popd
+endgroup
 
-echo "Build wine64-${CROSS_OVER_VERSION}"
+
+begingroup "Build wine64-${CROSS_OVER_VERSION}"
 pushd ${BUILDROOT}/wine64-${CROSS_OVER_VERSION}
 make -j$(sysctl -n hw.ncpu 2>/dev/null)
 popd
+endgroup
 
 
-############ Build 32bit Version (WoW64) ##############
-
-echo "Configure wine32on64-${CROSS_OVER_VERSION}"
-
+begingroup "Configure wine32on64-${CROSS_OVER_VERSION}"
 mkdir -p ${BUILDROOT}/wine32on64-${CROSS_OVER_VERSION}
 pushd ${BUILDROOT}/wine32on64-${CROSS_OVER_VERSION}
 ${WINE_CONFIGURE} \
         --disable-option-checking \
         --enable-win32on64 \
-        $([[ ${CROSS_OVER_VERSION} -ge 22.0.0 ]] && echo "--enable-winedbg" || echo "--disable-winedbg") \
+        $([[ ${CX_MAJOR} -ge 22 ]] && echo "--enable-winedbg" || echo "--disable-winedbg") \
         --with-wine64=${BUILDROOT}/wine64-${CROSS_OVER_VERSION} \
         --disable-tests \
         --without-alsa \
@@ -219,7 +233,7 @@ ${WINE_CONFIGURE} \
         --without-inotify \
         --without-krb5 \
         --with-mingw \
-        $([[ ${CROSS_OVER_VERSION} == 22.0.0 ]] && echo "--without-openal" || echo "--with-openal") \
+        $([[ ${CX_MAJOR} -ge 22 ]] && echo "--without-openal" || echo "--with-openal") \
         --without-oss \
         --with-png \
         --without-pulse \
@@ -234,33 +248,38 @@ ${WINE_CONFIGURE} \
         --disable-winevulkan \
         --without-x
 popd
+endgroup
 
-echo "Build wine32on64-${CROSS_OVER_VERSION}"
+
+begingroup "Build wine32on64-${CROSS_OVER_VERSION}"
 pushd ${BUILDROOT}/wine32on64-${CROSS_OVER_VERSION}
 make -k -j$(sysctl -n hw.activecpu 2>/dev/null)
 popd
+endgroup
 
 
-############ Install wine ##############
-
-echo "Install wine32on64-${CROSS_OVER_VERSION}"
+begingroup "Install wine32on64-${CROSS_OVER_VERSION}"
 pushd ${BUILDROOT}/wine32on64-${CROSS_OVER_VERSION}
 make install-lib DESTDIR="${INSTALLROOT}/${WINE_INSTALLATION}"
 popd
+endgroup
 
-echo "Install wine64-${CROSS_OVER_VERSION}"
+
+begingroup "Install wine64-${CROSS_OVER_VERSION}"
 pushd ${BUILDROOT}/wine64-${CROSS_OVER_VERSION}
 make install-lib DESTDIR="${INSTALLROOT}/${WINE_INSTALLATION}"
 popd
+endgroup
 
 
-############ Bundle and Upload Deliverable ##############
-
-echo "Tar Wine"
+begingroup "Tar Wine"
 pushd ${INSTALLROOT}
 tar -czvf ${WINE_INSTALLATION}.tar.gz ${WINE_INSTALLATION}
 popd
+endgroup
 
-echo "Upload Wine"
+
+begingroup "Upload Wine"
 mkdir -p ${PACKAGE_UPLOAD}
 cp ${INSTALLROOT}/${WINE_INSTALLATION}.tar.gz ${PACKAGE_UPLOAD}/
+endgroup
