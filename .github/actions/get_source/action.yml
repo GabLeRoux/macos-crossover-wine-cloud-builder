@@ -11,11 +11,11 @@ runs:
   using: "composite"
   steps:
       - name: Restore Source Code Tarball from Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: cache_sourcecode
         with:
           path: ${{ inputs.crossover-local-file }}.tar.gz
-          key: ${{ inputs.crossover-local-file }}
+          key: ${{ inputs.crossover-local-file }}_c2
 
       - name: Download Source
         if:  steps.cache_sourcecode.outputs.cache-hit != 'true'
