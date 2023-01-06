@@ -53,25 +53,23 @@ export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin
 
 begingroup "Installing Dependencies"
 # build dependencies
-brew install   bison                \
-               gcenx/wine/cx-llvm   \
-               mingw-w64
+brew install \
+    bison \
+    gcenx/wine/cx-llvm \
+    mingw-w64
 
 # runtime dependencies for crossover-wine
-brew install   freetype             \
-               gnutls               \
-               gphoto2              \
-               gst-plugins-base     \
-               molten-vk            \
-               sane-backends        \
-               sdl2
+brew install \
+    freetype \
+    gnutls \
+    molten-vk \
+    sdl2
 
 if [[ ${CX_MAJOR} < 22 ]]; then
     brew install \
-               faudio               \
-               libpng               \
-               little-cms2          \
-               mpg123
+        faudio \
+        libpng \
+        mpg123
 fi
 endgroup
 
@@ -79,19 +77,19 @@ endgroup
 export CC="$(brew --prefix cx-llvm)/bin/clang"
 export CXX="${CC}++"
 export BISON="$(brew --prefix bison)/bin/bison"
+
 # Xcode12 by default enables '-Werror,-Wimplicit-function-declaration' (49917738)
 # this causes wine(64) builds to fail so needs to be disabled.
 # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes
 export CFLAGS="-g -O2 -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
 export LDFLAGS="-Wl,-headerpad_max_install_names"
+
 # avoid weird linker errors with Xcode 10 and later
 export MACOSX_DEPLOYMENT_TARGET=10.14
 
 # see https://github.com/Gcenx/macOS_Wine_builds/issues/17#issuecomment-750346843
 export CROSSCFLAGS=$([[ ${CX_MAJOR} < 21 ]] && echo "-g -O2 -fcommon" || echo "-g -O2")
 
-export GPHOTO2_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
-export GPHOTO2_PORT_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
 export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include -I$(brew --prefix sdl2)/include/SDL2"
 export ac_cv_lib_soname_MoltenVK="libMoltenVK.dylib"
 export ac_cv_lib_soname_vulkan=""
@@ -177,32 +175,40 @@ begingroup "Configure wine64-${CROSS_OVER_VERSION}"
 mkdir -p ${BUILDROOT}/wine64-${CROSS_OVER_VERSION}
 pushd ${BUILDROOT}/wine64-${CROSS_OVER_VERSION}
 ${WINE_CONFIGURE} \
-        --disable-option-checking \
-        --enable-win64 \
-        $([[ ${CX_MAJOR} -ge 22 ]] && echo "--enable-winedbg" || echo "--disable-winedbg") \
-        --disable-tests \
-        --without-alsa \
-        --without-capi \
-        --with-cms \
-        --without-dbus \
-        --without-gstreamer \
-        --without-gsm \
-        --without-gphoto \
-        --without-inotify \
-        --without-krb5 \
-        --with-mingw \
-        --with-openal \
-        --without-oss \
-        --with-png \
-        --without-pulse \
-        --without-sane \
-        --with-sdl \
-        --without-udev \
-        --without-v4l2 \
-        --without-usb \
-        --without-vkd3d \
-        --with-vulkan \
-        --without-x
+    --disable-option-checking \
+    --enable-win64 \
+    --disable-winedbg \
+    --disable-tests \
+    --without-alsa \
+    --without-capi \
+    --with-coreaudio \
+    --with-cups \
+    --without-dbus \
+    --without-fontconfig \
+    --with-freetype \
+    --with-gettext \
+    --without-gettextpo \
+    --without-gphoto \
+    --with-gnutls \
+    --without-gssapi \
+    --without-gstreamer \
+    --without-inotify \
+    --without-krb5 \
+    --with-mingw \
+    --without-netapi \
+    --with-opencl \
+    --with-opengl \
+    --without-oss \
+    --with-pcap \
+    --with-pthread \
+    --without-pulse \
+    --without-sane \
+    --with-sdl \
+    --without-udev \
+    --with-unwind \
+    --without-usb \
+    --without-v4l2 \
+    --without-x
 popd
 endgroup
 
@@ -218,35 +224,44 @@ begingroup "Configure wine32on64-${CROSS_OVER_VERSION}"
 mkdir -p ${BUILDROOT}/wine32on64-${CROSS_OVER_VERSION}
 pushd ${BUILDROOT}/wine32on64-${CROSS_OVER_VERSION}
 ${WINE_CONFIGURE} \
-        --disable-option-checking \
-        --enable-win32on64 \
-        $([[ ${CX_MAJOR} -ge 22 ]] && echo "--enable-winedbg" || echo "--disable-winedbg") \
-        --with-wine64=${BUILDROOT}/wine64-${CROSS_OVER_VERSION} \
-        --disable-tests \
-        --without-alsa \
-        --without-capi \
-        --without-cms \
-        --without-dbus \
-        --without-gstreamer \
-        --without-gsm \
-        --without-gphoto \
-        --without-inotify \
-        --without-krb5 \
-        --with-mingw \
-        $([[ ${CX_MAJOR} -ge 22 ]] && echo "--without-openal" || echo "--with-openal") \
-        --without-oss \
-        --with-png \
-        --without-pulse \
-        --without-sane \
-        --with-sdl \
-        --without-udev \
-        --without-v4l2 \
-        --without-usb \
-        --without-vkd3d \
-        --without-vulkan \
-        --disable-vulkan_1 \
-        --disable-winevulkan \
-        --without-x
+    --disable-option-checking \
+    --enable-win32on64 \
+    --disable-winedbg \
+    --with-wine64=${BUILDROOT}/wine64-${CROSS_OVER_VERSION} \
+    --disable-tests \
+    --without-alsa \
+    --without-capi \
+    --with-coreaudio \
+    --with-cups \
+    --without-dbus \
+    --without-fontconfig \
+    --with-freetype \
+    --with-gettext \
+    --without-gettextpo \
+    --without-gphoto \
+    --with-gnutls \
+    --without-gssapi \
+    --without-gstreamer \
+    --without-inotify \
+    --without-krb5 \
+    --with-mingw \
+    --without-netapi \
+    --with-opencl \
+    --with-opengl \
+    --without-oss \
+    --with-pcap \
+    --with-pthread \
+    --without-pulse \
+    --without-sane \
+    --with-sdl \
+    --without-udev \
+    --with-unwind \
+    --without-usb \
+    --without-v4l2 \
+    --without-x \
+    --without-vulkan \
+    --disable-vulkan_1 \
+    --disable-winevulkan
 popd
 endgroup
 
