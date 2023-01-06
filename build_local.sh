@@ -149,8 +149,9 @@ if [[ ${CX_MAJOR} -ge 21 ]]; then
         endgroup
 
         begingroup "Installing dependencies for DXVK"
-        brew install  meson     \
-                      glslang
+        brew install \
+            meson \
+            glslang
         endgroup
 
         begingroup "Build DXVK"
