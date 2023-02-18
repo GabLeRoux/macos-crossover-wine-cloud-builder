@@ -56,7 +56,8 @@ begingroup "Installing Dependencies"
 brew install \
     bison \
     gcenx/wine/cx-llvm \
-    mingw-w64
+    mingw-w64 \
+    pkgconfig
 
 # runtime dependencies for crossover-wine
 brew install \
