@@ -45,12 +45,10 @@ runs:
         run: |
           set -x
 
-          export GPHOTO2_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
-          export GPHOTO2_PORT_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
-          export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include -I$(brew --prefix sdl2)/include/SDL2"
-
+          export ac_cv_lib_soname_MoltenVK="libMoltenVK.dylib"
           export ac_cv_lib_soname_vulkan=""
-          export ac_cv_lib_soname_MoltenVK="$(brew --prefix molten-vk)/lib/libMoltenVK.dylib"
+
+          export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include -I$(brew --prefix sdl2)/include/SDL2"
 
           mkdir -p ${{ inputs.build-dir }}/
           pushd ${{ inputs.build-dir }}
@@ -60,14 +58,18 @@ runs:
                     --without-alsa \
                     --without-capi \
                     --without-dbus \
+                    --without-gsm \
                     --without-inotify \
+                    --without-krb5 \
+                    --without-netapi \
+                    --without-openal \
                     --without-oss \
                     --without-pulse \
+                    --without-quicktime \
+                    --without-sane \
                     --without-udev \
                     --without-usb \
                     --without-v4l2 \
-                    --without-gsm \
-                    --without-quicktime \
                     --without-x \
                     ${{ inputs.configure-params }} || cat config.log
           popd
