@@ -77,7 +77,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        CROSS_OVER_VERSION: [22.1.0, 21.2.0, 20.0.4, 19.0.2] #22.0.1 22.0.0, 21.1.0, 21.0.0, 20.0.2, 20.0.1, 20.0.0, 19.0.1, 19.0.0
+        # Only build versions supported by winetricks
+        CROSS_OVER_VERSION: [22.1.0, 21.2.0] #22.0.1 22.0.0, 21.1.0, 21.0.0, 20.0.4, 20.0.2, 20.0.1, 20.0.0, 19.0.2, 19.0.1, 19.0.0
     runs-on:  macos-latest
 
     env:
@@ -110,11 +111,7 @@ jobs:
       - name: Install Wine Runtime Dependencies
         run: |
           brew install  freetype           \
-                        gphoto2            \
-                        gst-plugins-base   \
-                        krb5               \
                         molten-vk          \
-                        sane-backends      \
                         sdl2
 
       - name: Install Wine Runtime Dependencies (pre 22)
@@ -125,13 +122,12 @@ jobs:
                         libpng             \
                         mpg123
 
-      - name: Add bison, cx-llvm, flex & krb5 to $PATH
+      - name: Add bison, cx-llvm & flex to $PATH
         run: |
           set -x
           echo "$(brew --prefix bison)/bin"   >> $GITHUB_PATH
           echo "$(brew --prefix cx-llvm)/bin" >> $GITHUB_PATH
           echo "$(brew --prefix flex)/bin"    >> $GITHUB_PATH
-          echo "$(brew --prefix krb5)/bin"    >> $GITHUB_PATH
 
       - name: Download MoltenVK / DXVK (from previous job)
         uses: actions/download-artifact@v3
