@@ -19,7 +19,7 @@ inputs:
   ldflags:
     descriptions: 'LDFLAGS to be given to clang'
     required: true
-    default: "-Wl,-headerpad_max_install_names"
+    default: "-Wl,-headerpad_max_install_names -Wl,-no_compact_unwind"
   build-dir:
     description: 'Build directory'
     required: true
