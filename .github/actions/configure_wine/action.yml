@@ -6,7 +6,7 @@ inputs:
     required: true
     default: "wine64"
   crossflags:
-    descriptions: 'CROSSFLAGS to be given to ming-w64'
+    descriptions: 'CROSSCFLAGS to be given to ming-w64'
     required: true
     default: "-g -O2"
   cflags:
@@ -15,7 +15,7 @@ inputs:
     # Xcode12 by default enables '-Werror,-Wimplicit-function-declaration' (49917738)
     # this causes wine(64) builds to fail so needs to be disabled.
     # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes    
-    default: "-g -O2 -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
+    default: "-g -O2 -Wno-error=implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
   ldflags:
     descriptions: 'LDFLAGS to be given to clang'
     required: true
