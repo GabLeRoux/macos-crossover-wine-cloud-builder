@@ -51,6 +51,7 @@ jobs:
           brew install  bison              \
                         gcenx/wine/cx-llvm \
                         flex               \
+                        gettext            \
                         mingw-w64          \
                         pkgconfig
 
