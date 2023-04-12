@@ -58,6 +58,8 @@ runs:
                     --without-alsa \
                     --without-capi \
                     --without-dbus \
+                    --without-gettext \
+                    --without-gettextpo \
                     --without-gsm \
                     --without-inotify \
                     --without-krb5 \
