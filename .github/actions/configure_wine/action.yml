@@ -6,7 +6,7 @@ inputs:
     required: true
     default: "wine64"
   crossflags:
-    descriptions: 'CROSSCFLAGS to be given to ming-w64'
+    descriptions: 'CFLAGS to be given to ming-w64-gcc'
     required: true
     default: "-g -O2"
   cflags:
