@@ -6,20 +6,20 @@ inputs:
     required: true
     default: "wine64"
   crossflags:
-    descriptions: 'CROSSFLAGS to be given to ming-w64'
+    descriptions: 'CFLAGS to be given to ming-w64-gcc'
     required: true
     default: "-g -O2"
   cflags:
     descriptions: 'CFLAGS to be given to clang'
     required: true
     # Xcode12 by default enables '-Werror,-Wimplicit-function-declaration' (49917738)
-    # this causes wine(64) builds to fail so needs to be disabled.
-    # https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes    
-    default: "-g -O2 -Wno-implicit-function-declaration -Wno-deprecated-declarations -Wno-format"
+    #  this causes wine(64|32on64) builds to fail so needs to be dowbgraded back to a warning.
+    #  see: https://developer.apple.com/documentation/xcode-release-notes/xcode-12-release-notes    
+    default: "-g -O2 -Wno-error=implicit-function-declaration -Wno-deprecated-declarations"
   ldflags:
     descriptions: 'LDFLAGS to be given to clang'
     required: true
-    default: "-Wl,-headerpad_max_install_names"
+    default: "-Wl,-headerpad_max_install_names -Wl,-no_compact_unwind"
   build-dir:
     description: 'Build directory'
     required: true
@@ -28,7 +28,7 @@ inputs:
     required: true
     default: ${{ github.workspace }}/sources/wine/configure
   configure-params:
-    description: 'additional parameters to be given to the wine configure script'
+    description: 'Additional parameters to be given to configure'
     required: true
     default: "--enable-win64 --with-vulkan"
 runs:
@@ -45,12 +45,10 @@ runs:
         run: |
           set -x
 
-          export GPHOTO2_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
-          export GPHOTO2_PORT_CFLAGS="-I$(brew --prefix libgphoto2)/include -I$(brew --prefix libgphoto2)/include/gphoto2"
-          export SDL2_CFLAGS="-I$(brew --prefix sdl2)/include -I$(brew --prefix sdl2)/include/SDL2"
-
+          export ac_cv_lib_soname_MoltenVK="libMoltenVK.dylib"
           export ac_cv_lib_soname_vulkan=""
-          export ac_cv_lib_soname_MoltenVK="$(brew --prefix molten-vk)/lib/libMoltenVK.dylib"
+
+          export CPATH="$(brew --prefix)/include"
 
           mkdir -p ${{ inputs.build-dir }}/
           pushd ${{ inputs.build-dir }}
@@ -60,14 +58,20 @@ runs:
                     --without-alsa \
                     --without-capi \
                     --without-dbus \
+                    --without-gettext \
+                    --without-gettextpo \
+                    --without-gsm \
                     --without-inotify \
+                    --without-krb5 \
+                    --without-netapi \
+                    --without-openal \
                     --without-oss \
                     --without-pulse \
+                    --without-quicktime \
+                    --without-sane \
                     --without-udev \
                     --without-usb \
                     --without-v4l2 \
-                    --without-gsm \
-                    --without-quicktime \
                     --without-x \
                     ${{ inputs.configure-params }} || cat config.log
           popd
